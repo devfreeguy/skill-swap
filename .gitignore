@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# heroui-agents-md
+.heroui-docs/
+
+# agents
+AGENTS.md
+CLAUDE.md

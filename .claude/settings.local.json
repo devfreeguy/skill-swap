@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(New-Item -ItemType Directory -Path \"C:\\\\devfreeguy\\\\projects\\\\clients\\\\others\\\\next-js\\\\skill-swap\\\\lib\" -Force)",
+      "Bash(Out-Null)",
+      "Bash(Write-Output \"done\")",
+      "PowerShell(New-Item *)"
+    ]
+  }
+}
