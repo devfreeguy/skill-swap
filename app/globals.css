@@ -12,3 +12,9 @@ body {
   color: var(--foreground);
   overflow-x: hidden;
 }
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  @apply min-h-11;
+}

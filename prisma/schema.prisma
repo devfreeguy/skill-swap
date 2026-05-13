@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String?
+  avatarUrl     String?
+  teachSkill    String?
+  learnSkill    String?
+  walletAddress String?   @unique
+  walletNonce   String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  swapsInitiated  Swap[]         @relation("Initiator")
+  swapsReceived   Swap[]         @relation("Receiver")
+  proofs          Proof[]
+  notifications   Notification[]
+}
+
+model Swap {
+  id             String     @id @default(cuid())
+  initiatorId    String
+  receiverId     String
+  status         SwapStatus @default(PENDING)
+  adaTxHash      String?
+  initiatorDone  Boolean    @default(false)
+  receiverDone   Boolean    @default(false)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  initiator  User   @relation("Initiator", fields: [initiatorId], references: [id])
+  receiver   User   @relation("Receiver", fields: [receiverId], references: [id])
+  proof      Proof?
+}
+
+enum SwapStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  DECLINED
+}
+
+model Proof {
+  id            String   @id @default(cuid())
+  swapId        String   @unique
+  userId        String
+  teachSkill    String
+  learnSkill    String
+  adaTxHash     String
+  metadataHash  String?
+  createdAt     DateTime @default(now())
+
+  swap  Swap @relation(fields: [swapId], references: [id])
+  user  User @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  message   String
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+enum NotificationType {
+  SWAP_REQUEST
+  SWAP_ACCEPTED
+  SWAP_DECLINED
+  SWAP_COMPLETED
+  PERFECT_MATCH
+}

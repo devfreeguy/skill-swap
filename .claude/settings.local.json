@@ -4,7 +4,15 @@
       "Bash(New-Item -ItemType Directory -Path \"C:\\\\devfreeguy\\\\projects\\\\clients\\\\others\\\\next-js\\\\skill-swap\\\\lib\" -Force)",
       "Bash(Out-Null)",
       "Bash(Write-Output \"done\")",
-      "PowerShell(New-Item *)"
+      "PowerShell(New-Item *)",
+      "Bash(pnpm add *)",
+      "Bash(pnpm install *)",
+      "Bash(pnpm config *)",
+      "Bash(npm install *)",
+      "Bash(pnpm approve-builds *)",
+      "Bash(npx prisma *)",
+      "Bash(PRISMA_SCHEMA_ENGINE_TYPE=wasm PRISMA_CLI_QUERY_ENGINE_TYPE=wasm npx prisma generate)",
+      "Bash(pnpm build *)"
     ]
   }
 }
