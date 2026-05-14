@@ -12,7 +12,14 @@
       "Bash(pnpm approve-builds *)",
       "Bash(npx prisma *)",
       "Bash(PRISMA_SCHEMA_ENGINE_TYPE=wasm PRISMA_CLI_QUERY_ENGINE_TYPE=wasm npx prisma generate)",
-      "Bash(pnpm build *)"
+      "Bash(pnpm build *)",
+      "Bash(pnpm list *)",
+      "Bash(node_modules/.bin/next build *)",
+      "PowerShell(Remove-Item *)",
+      "Bash(pnpm remove *)",
+      "Bash(npx tsc *)",
+      "Bash(pnpm prisma *)",
+      "Bash(pnpm tsc *)"
     ]
   }
 }

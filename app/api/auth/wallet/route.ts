@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid nonce" }, { status: 401 });
   }
 
-  const token = await signToken({ id: user.id, email: user.email, name: user.name });
+  const token = await signToken({ id: user.id, email: user.email ?? "", name: user.name, onboarded: !!(user.teachSkill && user.learnSkill) });
   const response = NextResponse.json({
     id: user.id,
     name: user.name,

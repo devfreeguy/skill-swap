@@ -4,15 +4,16 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import {
-  Button,
-  Input,
-  Label,
-  TextField,
-  FieldError,
-  Card,
-} from "@heroui/react";
+import { Alert, Button, Card, Input, Label, TextField } from "@heroui/react";
+import dynamic from "next/dynamic";
 import Logo from "@/components/elements/Logo";
+import LemniscateLoader from "@/components/layouts/Loader";
+import PasswordField from "@/components/elements/PasswordField";
+
+const WalletConnectButton = dynamic(
+  () => import("@/components/elements/WalletConnectButton"),
+  { ssr: false },
+);
 import { fadeUp, stagger } from "@/lib/animations";
 
 export default function LoginPage() {
@@ -41,7 +42,11 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/dashboard");
+      if (data.teachSkill && data.learnSkill) {
+        router.push("/dashboard");
+      } else {
+        router.push("/onboarding");
+      }
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -50,7 +55,9 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-dvh flex items-center justify-center bg-background px-4 py-16">
+    <main className="min-h-dvh flex items-center justify-center bg-background px-2 py-16">
+      <LemniscateLoader loading={isPending} text="Signing in…" overlayOpacity={1} />
+
       <motion.div
         className="w-full max-w-sm"
         variants={stagger}
@@ -62,7 +69,7 @@ export default function LoginPage() {
         </motion.div>
 
         <motion.div variants={fadeUp}>
-          <Card className="bg-[--surface] border border-[--border] rounded-2xl p-8 flex flex-col gap-6">
+          <Card className="bg-[--surface] border border-[--border] rounded-2xl p-4 md:p-8 flex flex-col gap-6 overflow-visible">
             <div className="flex flex-col gap-1 text-center">
               <h1 className="text-2xl font-bold text-foreground">
                 Welcome back
@@ -70,6 +77,14 @@ export default function LoginPage() {
               <p className="text-sm text-muted">
                 Sign in to your SkillSwap account
               </p>
+            </div>
+
+            <WalletConnectButton />
+
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-[--border]" />
+              <span className="text-xs text-muted">or continue with email</span>
+              <div className="h-px flex-1 bg-[--border]" />
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -82,26 +97,22 @@ export default function LoginPage() {
                 className="w-full"
               >
                 <Label>Email</Label>
-                <Input
-                  placeholder="you@example.com"
-                  className="bg-background"
-                />
+                <Input placeholder="you@example.com" className="bg-background" />
               </TextField>
 
-              <TextField
-                name="password"
-                type="password"
+              <PasswordField
                 value={password}
                 onChange={setPassword}
                 isRequired
-                className="w-full"
-              >
-                <Label>Password</Label>
-                <Input placeholder="••••••••" className="bg-background" />
-              </TextField>
+              />
 
               {error && (
-                <p className="text-sm text-[--danger] text-center">{error}</p>
+                <Alert status="danger">
+                  <Alert.Indicator />
+                  <Alert.Content>
+                    <Alert.Description>{error}</Alert.Description>
+                  </Alert.Content>
+                </Alert>
               )}
 
               <Button

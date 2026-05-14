@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { uploadAvatar } from "@/lib/cloudinary";
+import { signToken } from "@/lib/jwt";
+import { setAuthCookie } from "@/lib/cookies";
 
 export async function PATCH(request: NextRequest) {
   const currentUser = await getCurrentUser(request);
@@ -10,24 +12,30 @@ export async function PATCH(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { name, teachSkill, learnSkill, avatarFile } = body;
+  const { name, teachSkill, learnSkill, teachSkills, learnSkills, avatarFile } = body;
 
   let avatarUrl = currentUser.avatarUrl;
   if (avatarFile) {
     avatarUrl = await uploadAvatar(avatarFile, currentUser.id);
   }
 
+  // Arrays (from onboarding) take precedence over single-string values
+  const finalTeachSkill =
+    teachSkills !== undefined ? JSON.stringify(teachSkills) : teachSkill;
+  const finalLearnSkill =
+    learnSkills !== undefined ? JSON.stringify(learnSkills) : learnSkill;
+
   const updated = await prisma.user.update({
     where: { id: currentUser.id },
     data: {
       ...(name !== undefined && { name }),
-      ...(teachSkill !== undefined && { teachSkill }),
-      ...(learnSkill !== undefined && { learnSkill }),
+      ...(finalTeachSkill !== undefined && { teachSkill: finalTeachSkill }),
+      ...(finalLearnSkill !== undefined && { learnSkill: finalLearnSkill }),
       ...(avatarUrl !== undefined && { avatarUrl }),
     },
   });
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     id: updated.id,
     name: updated.name,
     email: updated.email,
@@ -36,4 +44,14 @@ export async function PATCH(request: NextRequest) {
     learnSkill: updated.learnSkill,
     walletAddress: updated.walletAddress,
   });
+
+  const token = await signToken({
+    id: updated.id,
+    email: updated.email ?? "",
+    name: updated.name,
+    onboarded: !!(updated.teachSkill && updated.learnSkill),
+  });
+  setAuthCookie(response, token);
+
+  return response;
 }

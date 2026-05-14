@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const token = await signToken({ id: user.id, email: user.email, name: user.name });
+  const token = await signToken({ id: user.id, email: user.email, name: user.name, onboarded: !!(user.teachSkill && user.learnSkill) });
   const response = NextResponse.json({
     id: user.id,
     name: user.name,

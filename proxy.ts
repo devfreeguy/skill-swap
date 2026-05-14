@@ -9,7 +9,7 @@ const protectedPaths = [
   "/notifications",
 ];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
 
@@ -25,6 +25,10 @@ export async function middleware(request: NextRequest) {
 
   if (!payload) {
     return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  if (!payload.onboarded) {
+    return NextResponse.redirect(new URL("/onboarding", request.url));
   }
 
   return NextResponse.next();

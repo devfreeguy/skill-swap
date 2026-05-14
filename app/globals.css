@@ -18,3 +18,7 @@ input[type="email"],
 input[type="password"] {
   @apply min-h-11;
 }
+
+button{
+  @apply min-h-11;
+}

@@ -4,8 +4,16 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Button, Card, Input, Label, TextField } from "@heroui/react";
+import { Alert, Button, Card, Input, Label, TextField } from "@heroui/react";
+import dynamic from "next/dynamic";
 import Logo from "@/components/elements/Logo";
+import LemniscateLoader from "@/components/layouts/Loader";
+import PasswordField from "@/components/elements/PasswordField";
+
+const WalletConnectButton = dynamic(
+  () => import("@/components/elements/WalletConnectButton"),
+  { ssr: false }
+);
 import { fadeUp, stagger } from "@/lib/animations";
 
 export default function RegisterPage() {
@@ -35,7 +43,7 @@ export default function RegisterPage() {
         return;
       }
 
-      router.push("/dashboard");
+      router.push("/onboarding");
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -44,7 +52,9 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="min-h-dvh flex items-center justify-center bg-background px-4 py-16">
+    <main className="min-h-dvh flex items-center justify-center bg-background px-2 py-16">
+      <LemniscateLoader loading={isPending} text="Creating account…" overlayOpacity={1} />
+
       <motion.div
         className="w-full max-w-sm"
         variants={stagger}
@@ -56,12 +66,20 @@ export default function RegisterPage() {
         </motion.div>
 
         <motion.div variants={fadeUp}>
-          <Card className="border border-border p-8 gap-6">
+          <Card className="border border-border p-4 md:p-8 gap-6 overflow-visible">
             <div className="flex flex-col gap-1 text-center">
               <h1 className="text-2xl font-bold text-foreground">
                 Create an account
               </h1>
               <p className="text-sm text-muted">Start trading skills today</p>
+            </div>
+
+            <WalletConnectButton mode="register" />
+
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-[--border]" />
+              <span className="text-xs text-muted">or continue with email</span>
+              <div className="h-px flex-1 bg-[--border]" />
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -89,21 +107,20 @@ export default function RegisterPage() {
                 <Input placeholder="you@example.com" className="bg-background" />
               </TextField>
 
-              <TextField
-                name="password"
-                type="password"
+              <PasswordField
                 value={password}
                 onChange={setPassword}
                 isRequired
                 minLength={8}
-                className="w-full"
-              >
-                <Label>Password</Label>
-                <Input placeholder="••••••••" className="bg-background" />
-              </TextField>
+              />
 
               {error && (
-                <p className="text-sm text-[--danger] text-center">{error}</p>
+                <Alert status="danger">
+                  <Alert.Indicator />
+                  <Alert.Content>
+                    <Alert.Description>{error}</Alert.Description>
+                  </Alert.Content>
+                </Alert>
               )}
 
               <Button
