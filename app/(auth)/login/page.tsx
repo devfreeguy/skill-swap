@@ -69,7 +69,7 @@ export default function LoginPage() {
         </motion.div>
 
         <motion.div variants={fadeUp}>
-          <Card className="bg-[--surface] border border-[--border] rounded-2xl p-4 md:p-8 flex flex-col gap-6 overflow-visible">
+          <Card className="bg-[--surface] border border-[--border] rounded-2xl p-6 md:p-8 flex flex-col gap-6 overflow-visible">
             <div className="flex flex-col gap-1 text-center">
               <h1 className="text-2xl font-bold text-foreground">
                 Welcome back

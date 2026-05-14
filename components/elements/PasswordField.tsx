@@ -37,11 +37,10 @@ export default function PasswordField({
       className={className}
     >
       <Label>{label}</Label>
-      <InputGroup className="overflow-hidden">
+      <InputGroup className="overflow-hidden bg-background">
         <InputGroup.Input
           type={show ? "text" : "password"}
           placeholder={placeholder}
-          className="bg-background"
         />
         <InputGroup.Suffix className="pr-0">
           <Button
