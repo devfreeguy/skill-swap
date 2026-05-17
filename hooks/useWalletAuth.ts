@@ -23,7 +23,11 @@ export function useWalletAuth() {
       await connect(walletName);
 
       setLoadingText("Awaiting signature…");
-      const nonceRes = await fetch("/api/users/nonce");
+      const nonceRes = await fetch("/api/auth/wallet/nonce");
+      if (!nonceRes.ok) {
+        setError("Failed to get nonce. Please try again.");
+        return;
+      }
       const { nonce } = await nonceRes.json();
 
       await signMessage(
@@ -53,8 +57,16 @@ export function useWalletAuth() {
           console.error(err);
         }
       );
-    } catch (err) {
-      setError("Failed to connect wallet.");
+    } catch (err: any) {
+      if (
+        err?.name === "WrongNetworkTypeError" ||
+        err?.message?.includes("WrongNetworkTypeError") ||
+        err?.message?.includes("Testnet")
+      ) {
+        setError("Please switch your wallet to Mainnet and try again.");
+      } else {
+        setError("Failed to connect wallet.");
+      }
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -111,8 +123,16 @@ export function useWalletAuth() {
           console.error(err);
         }
       );
-    } catch (err) {
-      setError("Failed to connect wallet.");
+    } catch (err: any) {
+      if (
+        err?.name === "WrongNetworkTypeError" ||
+        err?.message?.includes("WrongNetworkTypeError") ||
+        err?.message?.includes("Testnet")
+      ) {
+        setError("Please switch your wallet to Mainnet and try again.");
+      } else {
+        setError("Failed to connect wallet.");
+      }
       console.error(err);
     } finally {
       setIsLoading(false);
