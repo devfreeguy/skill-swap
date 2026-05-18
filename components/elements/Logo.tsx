@@ -1,9 +1,10 @@
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 
-const Logo = () => {
+const Logo = ({ className }: { className?: string }) => {
   return (
-    <Link href="/" className="flex items-center">
+    <Link href="/" className={cn("flex items-center", className)}>
       <div className="relative size-7 m-2">
         <Image src="/images/logo.webp" alt="SkillSwap" fill />
       </div>

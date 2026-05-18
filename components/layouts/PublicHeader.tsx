@@ -32,7 +32,7 @@ export default function PublicHeader() {
     <header className="fixed top-2 md:top-4 left-0 w-full py-4 z-50">
       <nav className="max-w-5xl mx-auto px-4">
         <motion.div
-          className="flex items-center justify-between rounded-full border px-4 py-2 shadow-sm backdrop-blur-md"
+          className="flex items-center justify-between rounded-full border px-4 py-2 backdrop-blur-md"
           style={{
             borderColor: "var(--border)",
             backgroundColor:
@@ -69,9 +69,9 @@ export default function PublicHeader() {
             <ThemeToggle />
             <NextLink href="/login" className="hidden md:flex">
               <Button
-                variant="outline"
+                variant="secondary"
                 size="sm"
-                className="rounded-full border-[--accent] text-[--accent]"
+                className="min-h-0! text-foreground dark:text-accent"
               >
                 Login
               </Button>
@@ -115,26 +115,26 @@ export default function PublicHeader() {
               exit={{ opacity: 0, y: -8, scaleY: 0.95 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
               style={{ transformOrigin: "top" }}
-              className="md:hidden mt-1 rounded-2xl border border-[--border] bg-[--surface] backdrop-blur-md shadow-lg flex flex-col px-4 py-4 gap-1"
+              className="md:hidden mt-1 rounded-2xl border border-border bg-surface backdrop-blur-md shadow-lg flex flex-col px-4 py-4 gap-1"
             >
               {links.map((link) => (
                 <NextLink
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
-                  className="text-sm text-muted hover:text-foreground transition-colors py-2 px-2 rounded-lg hover:bg-[--surface-secondary]"
+                  className="text-sm text-muted hover:text-foreground transition-colors py-2 px-2 rounded-lg hover:bg-surface-secondary"
                 >
                   {link.label}
                 </NextLink>
               ))}
 
-              <div className="h-px bg-[--border] my-1" />
+              <div className="h-px bg-border my-1" />
 
               <NextLink href="/login" onClick={() => setIsOpen(false)}>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="rounded-full border-[--accent] text-[--accent] w-full"
+                  className="rounded-full border-accent w-full"
                 >
                   Login
                 </Button>

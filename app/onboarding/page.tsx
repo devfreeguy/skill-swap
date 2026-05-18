@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { motion } from "framer-motion";
+import skillsData from "@/assets/data/skills.json";
+import Logo from "@/components/elements/Logo";
+import LemniscateLoader from "@/components/layouts/Loader";
+import { fadeUp, stagger } from "@/lib/animations";
 import type { Key } from "@heroui/react";
 import {
   Alert,
@@ -18,11 +18,10 @@ import {
   TagGroup,
   useFilter,
 } from "@heroui/react";
-import Logo from "@/components/elements/Logo";
-import LemniscateLoader from "@/components/layouts/Loader";
-import { fadeUp, stagger } from "@/lib/animations";
-import skillsData from "@/assets/data/skills.json";
-import { IconX } from "@tabler/icons-react";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const ALL_SKILLS: string[] = skillsData.skills;
 
@@ -177,7 +176,7 @@ export default function OnboardingPage() {
         animate="visible"
       >
         <motion.div variants={fadeUp}>
-          <Card className="bg-[--surface] border border-[--border] rounded-2xl p-8 flex flex-col gap-6 overflow-visible">
+          <Card className="bg-surface border border-border rounded-2xl p-8 flex flex-col gap-6 overflow-visible">
             <div className="flex justify-center">
               <Logo />
             </div>

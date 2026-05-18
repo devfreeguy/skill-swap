@@ -37,12 +37,12 @@ export default function PasswordField({
       className={className}
     >
       <Label>{label}</Label>
-      <InputGroup className="overflow-hidden bg-background">
+      <InputGroup className="overflow-hidden bg-surface">
         <InputGroup.Input
           type={show ? "text" : "password"}
           placeholder={placeholder}
         />
-        <InputGroup.Suffix className="pr-0">
+        <InputGroup.Suffix className="px-1">
           <Button
             isIconOnly
             aria-label={show ? "Hide password" : "Show password"}

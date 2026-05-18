@@ -56,7 +56,7 @@ export default function HeroSection() {
           <Link href="/register">
             <Button
               size="lg"
-              className="rounded-full w-48 bg-accent text-accent-foreground font-semibold"
+              className="rounded-full w-48 bg-accent text-accent-foreground font-semibold shadow"
             >
               Get Started
             </Button>
@@ -65,7 +65,7 @@ export default function HeroSection() {
             <Button
               variant="secondary"
               size="lg"
-              className="rounded-full w-48 border-border text-foreground"
+              className="rounded-full w-48 border-border text-foreground shadow"
             >
               See How It Works
             </Button>
@@ -80,15 +80,6 @@ export default function HeroSection() {
         animate={{ opacity: 1 }}
         transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
       >
-        {/* Gradient overlay — blends image into background */}
-        <div
-          className="absolute top-0 left-0 right-0 h-2/3 z-10"
-          style={{
-            background:
-              "linear-gradient(to bottom, var(--background) 0%, transparent 100%)",
-          }}
-        />
-
         {/* Single combined hero illustration */}
         <div
           className={`relative w-full ${isMobile ? "aspect-3/4" : "aspect-video"}`}

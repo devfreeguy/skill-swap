@@ -7,7 +7,11 @@ export const illustrations = {
   HeroFemale: "/illustrations/hero-female.webp",
   HeroMaleDark: "/illustrations/hero-male-dark.webp",
   HeroFemaleDark: "/illustrations/hero-female-dark.webp",
+
   FeaturesPortrait: "/illustrations/features-portrait.webp",
   FeaturesPortraitDark: "/illustrations/features-portrait-dark.webp",
   CTAimage: "/illustrations/cta-banner.webp",
+
+  RegisterDark: "/illustrations/register-dark.webp",
+  LoginDark: "/illustrations/login-dark.webp",
 };
