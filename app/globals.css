@@ -11,6 +11,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   overflow-x: hidden;
+  user-select: none;
 }
 
 input[type="text"],
@@ -19,6 +20,11 @@ input[type="password"] {
   @apply min-h-11;
 }
 
-button{
+input,
+textarea {
+  @apply select-text;
+}
+
+button {
   @apply min-h-11;
 }
