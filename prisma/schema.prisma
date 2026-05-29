@@ -24,27 +24,35 @@ model User {
   swapsReceived   Swap[]         @relation("Receiver")
   proofs          Proof[]
   notifications   Notification[]
+  messages        Message[]
+  deliveries      Delivery[]
 }
 
 model Swap {
-  id             String     @id @default(cuid())
-  initiatorId    String
-  receiverId     String
-  status         SwapStatus @default(PENDING)
-  adaTxHash      String?
-  initiatorDone  Boolean    @default(false)
-  receiverDone   Boolean    @default(false)
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  id                  String     @id @default(cuid())
+  initiatorId         String
+  receiverId          String
+  status              SwapStatus @default(PENDING)
+  adaTxHash           String?
+  initiatorDone       Boolean    @default(false)
+  receiverDone        Boolean    @default(false)
+  completedAt         DateTime?
+  initiatorDelivered  Boolean    @default(false)
+  receiverDelivered   Boolean    @default(false)
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
 
-  initiator  User   @relation("Initiator", fields: [initiatorId], references: [id])
-  receiver   User   @relation("Receiver", fields: [receiverId], references: [id])
-  proof      Proof?
+  initiator   User       @relation("Initiator", fields: [initiatorId], references: [id])
+  receiver    User       @relation("Receiver", fields: [receiverId], references: [id])
+  proof       Proof?
+  messages    Message[]
+  deliveries  Delivery[]
 }
 
 enum SwapStatus {
   PENDING
   ACTIVE
+  AWAITING_DELIVERY
   COMPLETED
   DECLINED
 }
@@ -57,10 +65,36 @@ model Proof {
   learnSkill    String
   adaTxHash     String
   metadataHash  String?
+  summary       String?
   createdAt     DateTime @default(now())
 
   swap  Swap @relation(fields: [swapId], references: [id])
   user  User @relation(fields: [userId], references: [id])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  swapId    String
+  senderId  String
+  content   String
+  createdAt DateTime @default(now())
+
+  swap    Swap @relation(fields: [swapId], references: [id])
+  sender  User @relation(fields: [senderId], references: [id])
+}
+
+model Delivery {
+  id            String   @id @default(cuid())
+  swapId        String
+  userId        String
+  resourceLink  String
+  notes         String?
+  submittedAt   DateTime @default(now())
+
+  swap  Swap @relation(fields: [swapId], references: [id])
+  user  User @relation(fields: [userId], references: [id])
+
+  @@unique([swapId, userId])
 }
 
 model Notification {

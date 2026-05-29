@@ -186,7 +186,7 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type UserGroupByOutputType = {
   id: string
   name: string
-  email: string
+  email: string | null
   password: string | null
   avatarUrl: string | null
   teachSkill: string | null
@@ -221,7 +221,7 @@ export type UserWhereInput = {
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   id?: Prisma.StringFilter<"User"> | string
   name?: Prisma.StringFilter<"User"> | string
-  email?: Prisma.StringFilter<"User"> | string
+  email?: Prisma.StringNullableFilter<"User"> | string | null
   password?: Prisma.StringNullableFilter<"User"> | string | null
   avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
   teachSkill?: Prisma.StringNullableFilter<"User"> | string | null
@@ -234,12 +234,14 @@ export type UserWhereInput = {
   swapsReceived?: Prisma.SwapListRelationFilter
   proofs?: Prisma.ProofListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
+  messages?: Prisma.MessageListRelationFilter
+  deliveries?: Prisma.DeliveryListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  email?: Prisma.SortOrder
+  email?: Prisma.SortOrderInput | Prisma.SortOrder
   password?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   teachSkill?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -252,6 +254,8 @@ export type UserOrderByWithRelationInput = {
   swapsReceived?: Prisma.SwapOrderByRelationAggregateInput
   proofs?: Prisma.ProofOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
+  messages?: Prisma.MessageOrderByRelationAggregateInput
+  deliveries?: Prisma.DeliveryOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -273,12 +277,14 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   swapsReceived?: Prisma.SwapListRelationFilter
   proofs?: Prisma.ProofListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
+  messages?: Prisma.MessageListRelationFilter
+  deliveries?: Prisma.DeliveryListRelationFilter
 }, "id" | "email" | "walletAddress">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  email?: Prisma.SortOrder
+  email?: Prisma.SortOrderInput | Prisma.SortOrder
   password?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   teachSkill?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -298,7 +304,7 @@ export type UserScalarWhereWithAggregatesInput = {
   NOT?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"User"> | string
   name?: Prisma.StringWithAggregatesFilter<"User"> | string
-  email?: Prisma.StringWithAggregatesFilter<"User"> | string
+  email?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   password?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   avatarUrl?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   teachSkill?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
@@ -312,7 +318,7 @@ export type UserScalarWhereWithAggregatesInput = {
 export type UserCreateInput = {
   id?: string
   name: string
-  email: string
+  email?: string | null
   password?: string | null
   avatarUrl?: string | null
   teachSkill?: string | null
@@ -325,12 +331,14 @@ export type UserCreateInput = {
   swapsReceived?: Prisma.SwapCreateNestedManyWithoutReceiverInput
   proofs?: Prisma.ProofCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  deliveries?: Prisma.DeliveryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
   id?: string
   name: string
-  email: string
+  email?: string | null
   password?: string | null
   avatarUrl?: string | null
   teachSkill?: string | null
@@ -343,12 +351,14 @@ export type UserUncheckedCreateInput = {
   swapsReceived?: Prisma.SwapUncheckedCreateNestedManyWithoutReceiverInput
   proofs?: Prisma.ProofUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -361,12 +371,14 @@ export type UserUpdateInput = {
   swapsReceived?: Prisma.SwapUpdateManyWithoutReceiverNestedInput
   proofs?: Prisma.ProofUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  deliveries?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -379,12 +391,14 @@ export type UserUncheckedUpdateInput = {
   swapsReceived?: Prisma.SwapUncheckedUpdateManyWithoutReceiverNestedInput
   proofs?: Prisma.ProofUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
   id?: string
   name: string
-  email: string
+  email?: string | null
   password?: string | null
   avatarUrl?: string | null
   teachSkill?: string | null
@@ -398,7 +412,7 @@ export type UserCreateManyInput = {
 export type UserUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -412,7 +426,7 @@ export type UserUpdateManyMutationInput = {
 export type UserUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -524,6 +538,34 @@ export type UserUpdateOneRequiredWithoutProofsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutProofsInput, Prisma.UserUpdateWithoutProofsInput>, Prisma.UserUncheckedUpdateWithoutProofsInput>
 }
 
+export type UserCreateNestedOneWithoutMessagesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMessagesInput, Prisma.UserUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMessagesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMessagesInput, Prisma.UserUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMessagesInput
+  upsert?: Prisma.UserUpsertWithoutMessagesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutMessagesInput, Prisma.UserUpdateWithoutMessagesInput>, Prisma.UserUncheckedUpdateWithoutMessagesInput>
+}
+
+export type UserCreateNestedOneWithoutDeliveriesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesInput, Prisma.UserUncheckedCreateWithoutDeliveriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeliveriesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutDeliveriesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesInput, Prisma.UserUncheckedCreateWithoutDeliveriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeliveriesInput
+  upsert?: Prisma.UserUpsertWithoutDeliveriesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDeliveriesInput, Prisma.UserUpdateWithoutDeliveriesInput>, Prisma.UserUncheckedUpdateWithoutDeliveriesInput>
+}
+
 export type UserCreateNestedOneWithoutNotificationsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotificationsInput
@@ -541,7 +583,7 @@ export type UserUpdateOneRequiredWithoutNotificationsNestedInput = {
 export type UserCreateWithoutSwapsInitiatedInput = {
   id?: string
   name: string
-  email: string
+  email?: string | null
   password?: string | null
   avatarUrl?: string | null
   teachSkill?: string | null
@@ -553,12 +595,14 @@ export type UserCreateWithoutSwapsInitiatedInput = {
   swapsReceived?: Prisma.SwapCreateNestedManyWithoutReceiverInput
   proofs?: Prisma.ProofCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  deliveries?: Prisma.DeliveryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSwapsInitiatedInput = {
   id?: string
   name: string
-  email: string
+  email?: string | null
   password?: string | null
   avatarUrl?: string | null
   teachSkill?: string | null
@@ -570,6 +614,8 @@ export type UserUncheckedCreateWithoutSwapsInitiatedInput = {
   swapsReceived?: Prisma.SwapUncheckedCreateNestedManyWithoutReceiverInput
   proofs?: Prisma.ProofUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSwapsInitiatedInput = {
@@ -580,7 +626,7 @@ export type UserCreateOrConnectWithoutSwapsInitiatedInput = {
 export type UserCreateWithoutSwapsReceivedInput = {
   id?: string
   name: string
-  email: string
+  email?: string | null
   password?: string | null
   avatarUrl?: string | null
   teachSkill?: string | null
@@ -592,12 +638,14 @@ export type UserCreateWithoutSwapsReceivedInput = {
   swapsInitiated?: Prisma.SwapCreateNestedManyWithoutInitiatorInput
   proofs?: Prisma.ProofCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  deliveries?: Prisma.DeliveryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSwapsReceivedInput = {
   id?: string
   name: string
-  email: string
+  email?: string | null
   password?: string | null
   avatarUrl?: string | null
   teachSkill?: string | null
@@ -609,6 +657,8 @@ export type UserUncheckedCreateWithoutSwapsReceivedInput = {
   swapsInitiated?: Prisma.SwapUncheckedCreateNestedManyWithoutInitiatorInput
   proofs?: Prisma.ProofUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSwapsReceivedInput = {
@@ -630,7 +680,7 @@ export type UserUpdateToOneWithWhereWithoutSwapsInitiatedInput = {
 export type UserUpdateWithoutSwapsInitiatedInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -642,12 +692,14 @@ export type UserUpdateWithoutSwapsInitiatedInput = {
   swapsReceived?: Prisma.SwapUpdateManyWithoutReceiverNestedInput
   proofs?: Prisma.ProofUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  deliveries?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSwapsInitiatedInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -659,6 +711,8 @@ export type UserUncheckedUpdateWithoutSwapsInitiatedInput = {
   swapsReceived?: Prisma.SwapUncheckedUpdateManyWithoutReceiverNestedInput
   proofs?: Prisma.ProofUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutSwapsReceivedInput = {
@@ -675,7 +729,7 @@ export type UserUpdateToOneWithWhereWithoutSwapsReceivedInput = {
 export type UserUpdateWithoutSwapsReceivedInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -687,12 +741,14 @@ export type UserUpdateWithoutSwapsReceivedInput = {
   swapsInitiated?: Prisma.SwapUpdateManyWithoutInitiatorNestedInput
   proofs?: Prisma.ProofUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  deliveries?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSwapsReceivedInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -704,12 +760,14 @@ export type UserUncheckedUpdateWithoutSwapsReceivedInput = {
   swapsInitiated?: Prisma.SwapUncheckedUpdateManyWithoutInitiatorNestedInput
   proofs?: Prisma.ProofUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutProofsInput = {
   id?: string
   name: string
-  email: string
+  email?: string | null
   password?: string | null
   avatarUrl?: string | null
   teachSkill?: string | null
@@ -721,12 +779,14 @@ export type UserCreateWithoutProofsInput = {
   swapsInitiated?: Prisma.SwapCreateNestedManyWithoutInitiatorInput
   swapsReceived?: Prisma.SwapCreateNestedManyWithoutReceiverInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  deliveries?: Prisma.DeliveryCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutProofsInput = {
   id?: string
   name: string
-  email: string
+  email?: string | null
   password?: string | null
   avatarUrl?: string | null
   teachSkill?: string | null
@@ -738,6 +798,8 @@ export type UserUncheckedCreateWithoutProofsInput = {
   swapsInitiated?: Prisma.SwapUncheckedCreateNestedManyWithoutInitiatorInput
   swapsReceived?: Prisma.SwapUncheckedCreateNestedManyWithoutReceiverInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutProofsInput = {
@@ -759,7 +821,7 @@ export type UserUpdateToOneWithWhereWithoutProofsInput = {
 export type UserUpdateWithoutProofsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -771,12 +833,14 @@ export type UserUpdateWithoutProofsInput = {
   swapsInitiated?: Prisma.SwapUpdateManyWithoutInitiatorNestedInput
   swapsReceived?: Prisma.SwapUpdateManyWithoutReceiverNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  deliveries?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProofsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -788,12 +852,14 @@ export type UserUncheckedUpdateWithoutProofsInput = {
   swapsInitiated?: Prisma.SwapUncheckedUpdateManyWithoutInitiatorNestedInput
   swapsReceived?: Prisma.SwapUncheckedUpdateManyWithoutReceiverNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
 }
 
-export type UserCreateWithoutNotificationsInput = {
+export type UserCreateWithoutMessagesInput = {
   id?: string
   name: string
-  email: string
+  email?: string | null
   password?: string | null
   avatarUrl?: string | null
   teachSkill?: string | null
@@ -805,12 +871,14 @@ export type UserCreateWithoutNotificationsInput = {
   swapsInitiated?: Prisma.SwapCreateNestedManyWithoutInitiatorInput
   swapsReceived?: Prisma.SwapCreateNestedManyWithoutReceiverInput
   proofs?: Prisma.ProofCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  deliveries?: Prisma.DeliveryCreateNestedManyWithoutUserInput
 }
 
-export type UserUncheckedCreateWithoutNotificationsInput = {
+export type UserUncheckedCreateWithoutMessagesInput = {
   id?: string
   name: string
-  email: string
+  email?: string | null
   password?: string | null
   avatarUrl?: string | null
   teachSkill?: string | null
@@ -822,6 +890,192 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   swapsInitiated?: Prisma.SwapUncheckedCreateNestedManyWithoutInitiatorInput
   swapsReceived?: Prisma.SwapUncheckedCreateNestedManyWithoutReceiverInput
   proofs?: Prisma.ProofUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutMessagesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutMessagesInput, Prisma.UserUncheckedCreateWithoutMessagesInput>
+}
+
+export type UserUpsertWithoutMessagesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutMessagesInput, Prisma.UserUncheckedUpdateWithoutMessagesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutMessagesInput, Prisma.UserUncheckedCreateWithoutMessagesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutMessagesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutMessagesInput, Prisma.UserUncheckedUpdateWithoutMessagesInput>
+}
+
+export type UserUpdateWithoutMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletNonce?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  swapsInitiated?: Prisma.SwapUpdateManyWithoutInitiatorNestedInput
+  swapsReceived?: Prisma.SwapUpdateManyWithoutReceiverNestedInput
+  proofs?: Prisma.ProofUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  deliveries?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletNonce?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  swapsInitiated?: Prisma.SwapUncheckedUpdateManyWithoutInitiatorNestedInput
+  swapsReceived?: Prisma.SwapUncheckedUpdateManyWithoutReceiverNestedInput
+  proofs?: Prisma.ProofUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutDeliveriesInput = {
+  id?: string
+  name: string
+  email?: string | null
+  password?: string | null
+  avatarUrl?: string | null
+  teachSkill?: string | null
+  learnSkill?: string | null
+  walletAddress?: string | null
+  walletNonce?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  swapsInitiated?: Prisma.SwapCreateNestedManyWithoutInitiatorInput
+  swapsReceived?: Prisma.SwapCreateNestedManyWithoutReceiverInput
+  proofs?: Prisma.ProofCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+}
+
+export type UserUncheckedCreateWithoutDeliveriesInput = {
+  id?: string
+  name: string
+  email?: string | null
+  password?: string | null
+  avatarUrl?: string | null
+  teachSkill?: string | null
+  learnSkill?: string | null
+  walletAddress?: string | null
+  walletNonce?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  swapsInitiated?: Prisma.SwapUncheckedCreateNestedManyWithoutInitiatorInput
+  swapsReceived?: Prisma.SwapUncheckedCreateNestedManyWithoutReceiverInput
+  proofs?: Prisma.ProofUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+}
+
+export type UserCreateOrConnectWithoutDeliveriesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesInput, Prisma.UserUncheckedCreateWithoutDeliveriesInput>
+}
+
+export type UserUpsertWithoutDeliveriesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDeliveriesInput, Prisma.UserUncheckedUpdateWithoutDeliveriesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesInput, Prisma.UserUncheckedCreateWithoutDeliveriesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDeliveriesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDeliveriesInput, Prisma.UserUncheckedUpdateWithoutDeliveriesInput>
+}
+
+export type UserUpdateWithoutDeliveriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletNonce?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  swapsInitiated?: Prisma.SwapUpdateManyWithoutInitiatorNestedInput
+  swapsReceived?: Prisma.SwapUpdateManyWithoutReceiverNestedInput
+  proofs?: Prisma.ProofUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDeliveriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletNonce?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  swapsInitiated?: Prisma.SwapUncheckedUpdateManyWithoutInitiatorNestedInput
+  swapsReceived?: Prisma.SwapUncheckedUpdateManyWithoutReceiverNestedInput
+  proofs?: Prisma.ProofUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+}
+
+export type UserCreateWithoutNotificationsInput = {
+  id?: string
+  name: string
+  email?: string | null
+  password?: string | null
+  avatarUrl?: string | null
+  teachSkill?: string | null
+  learnSkill?: string | null
+  walletAddress?: string | null
+  walletNonce?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  swapsInitiated?: Prisma.SwapCreateNestedManyWithoutInitiatorInput
+  swapsReceived?: Prisma.SwapCreateNestedManyWithoutReceiverInput
+  proofs?: Prisma.ProofCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  deliveries?: Prisma.DeliveryCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutNotificationsInput = {
+  id?: string
+  name: string
+  email?: string | null
+  password?: string | null
+  avatarUrl?: string | null
+  teachSkill?: string | null
+  learnSkill?: string | null
+  walletAddress?: string | null
+  walletNonce?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  swapsInitiated?: Prisma.SwapUncheckedCreateNestedManyWithoutInitiatorInput
+  swapsReceived?: Prisma.SwapUncheckedCreateNestedManyWithoutReceiverInput
+  proofs?: Prisma.ProofUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -843,7 +1097,7 @@ export type UserUpdateToOneWithWhereWithoutNotificationsInput = {
 export type UserUpdateWithoutNotificationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -855,12 +1109,14 @@ export type UserUpdateWithoutNotificationsInput = {
   swapsInitiated?: Prisma.SwapUpdateManyWithoutInitiatorNestedInput
   swapsReceived?: Prisma.SwapUpdateManyWithoutReceiverNestedInput
   proofs?: Prisma.ProofUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  deliveries?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -872,6 +1128,8 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   swapsInitiated?: Prisma.SwapUncheckedUpdateManyWithoutInitiatorNestedInput
   swapsReceived?: Prisma.SwapUncheckedUpdateManyWithoutReceiverNestedInput
   proofs?: Prisma.ProofUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -884,6 +1142,8 @@ export type UserCountOutputType = {
   swapsReceived: number
   proofs: number
   notifications: number
+  messages: number
+  deliveries: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -891,6 +1151,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   swapsReceived?: boolean | UserCountOutputTypeCountSwapsReceivedArgs
   proofs?: boolean | UserCountOutputTypeCountProofsArgs
   notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
+  messages?: boolean | UserCountOutputTypeCountMessagesArgs
+  deliveries?: boolean | UserCountOutputTypeCountDeliveriesArgs
 }
 
 /**
@@ -931,6 +1193,20 @@ export type UserCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.NotificationWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MessageWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDeliveriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeliveryWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -948,6 +1224,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   swapsReceived?: boolean | Prisma.User$swapsReceivedArgs<ExtArgs>
   proofs?: boolean | Prisma.User$proofsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
+  messages?: boolean | Prisma.User$messagesArgs<ExtArgs>
+  deliveries?: boolean | Prisma.User$deliveriesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -999,6 +1277,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   swapsReceived?: boolean | Prisma.User$swapsReceivedArgs<ExtArgs>
   proofs?: boolean | Prisma.User$proofsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
+  messages?: boolean | Prisma.User$messagesArgs<ExtArgs>
+  deliveries?: boolean | Prisma.User$deliveriesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1011,11 +1291,13 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     swapsReceived: Prisma.$SwapPayload<ExtArgs>[]
     proofs: Prisma.$ProofPayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
+    messages: Prisma.$MessagePayload<ExtArgs>[]
+    deliveries: Prisma.$DeliveryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
-    email: string
+    email: string | null
     password: string | null
     avatarUrl: string | null
     teachSkill: string | null
@@ -1422,6 +1704,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   swapsReceived<T extends Prisma.User$swapsReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$swapsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SwapPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   proofs<T extends Prisma.User$proofsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$proofsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProofPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  messages<T extends Prisma.User$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  deliveries<T extends Prisma.User$deliveriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$deliveriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1948,6 +2232,54 @@ export type User$notificationsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
+}
+
+/**
+ * User.messages
+ */
+export type User$messagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Message
+   */
+  select?: Prisma.MessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Message
+   */
+  omit?: Prisma.MessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MessageInclude<ExtArgs> | null
+  where?: Prisma.MessageWhereInput
+  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[]
+  cursor?: Prisma.MessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
+}
+
+/**
+ * User.deliveries
+ */
+export type User$deliveriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Delivery
+   */
+  select?: Prisma.DeliverySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Delivery
+   */
+  omit?: Prisma.DeliveryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeliveryInclude<ExtArgs> | null
+  where?: Prisma.DeliveryWhereInput
+  orderBy?: Prisma.DeliveryOrderByWithRelationInput | Prisma.DeliveryOrderByWithRelationInput[]
+  cursor?: Prisma.DeliveryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeliveryScalarFieldEnum | Prisma.DeliveryScalarFieldEnum[]
 }
 
 /**

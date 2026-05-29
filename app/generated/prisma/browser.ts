@@ -33,6 +33,16 @@ export type Swap = Prisma.SwapModel
  */
 export type Proof = Prisma.ProofModel
 /**
+ * Model Message
+ * 
+ */
+export type Message = Prisma.MessageModel
+/**
+ * Model Delivery
+ * 
+ */
+export type Delivery = Prisma.DeliveryModel
+/**
  * Model Notification
  * 
  */

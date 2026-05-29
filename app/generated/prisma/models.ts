@@ -11,5 +11,7 @@
 export type * from './models/User'
 export type * from './models/Swap'
 export type * from './models/Proof'
+export type * from './models/Message'
+export type * from './models/Delivery'
 export type * from './models/Notification'
 export type * from './commonInputTypes'

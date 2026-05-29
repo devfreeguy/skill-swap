@@ -32,6 +32,9 @@ export type SwapMinAggregateOutputType = {
   adaTxHash: string | null
   initiatorDone: boolean | null
   receiverDone: boolean | null
+  completedAt: Date | null
+  initiatorDelivered: boolean | null
+  receiverDelivered: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -44,6 +47,9 @@ export type SwapMaxAggregateOutputType = {
   adaTxHash: string | null
   initiatorDone: boolean | null
   receiverDone: boolean | null
+  completedAt: Date | null
+  initiatorDelivered: boolean | null
+  receiverDelivered: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -56,6 +62,9 @@ export type SwapCountAggregateOutputType = {
   adaTxHash: number
   initiatorDone: number
   receiverDone: number
+  completedAt: number
+  initiatorDelivered: number
+  receiverDelivered: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -70,6 +79,9 @@ export type SwapMinAggregateInputType = {
   adaTxHash?: true
   initiatorDone?: true
   receiverDone?: true
+  completedAt?: true
+  initiatorDelivered?: true
+  receiverDelivered?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -82,6 +94,9 @@ export type SwapMaxAggregateInputType = {
   adaTxHash?: true
   initiatorDone?: true
   receiverDone?: true
+  completedAt?: true
+  initiatorDelivered?: true
+  receiverDelivered?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -94,6 +109,9 @@ export type SwapCountAggregateInputType = {
   adaTxHash?: true
   initiatorDone?: true
   receiverDone?: true
+  completedAt?: true
+  initiatorDelivered?: true
+  receiverDelivered?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -179,6 +197,9 @@ export type SwapGroupByOutputType = {
   adaTxHash: string | null
   initiatorDone: boolean
   receiverDone: boolean
+  completedAt: Date | null
+  initiatorDelivered: boolean
+  receiverDelivered: boolean
   createdAt: Date
   updatedAt: Date
   _count: SwapCountAggregateOutputType | null
@@ -212,11 +233,16 @@ export type SwapWhereInput = {
   adaTxHash?: Prisma.StringNullableFilter<"Swap"> | string | null
   initiatorDone?: Prisma.BoolFilter<"Swap"> | boolean
   receiverDone?: Prisma.BoolFilter<"Swap"> | boolean
+  completedAt?: Prisma.DateTimeNullableFilter<"Swap"> | Date | string | null
+  initiatorDelivered?: Prisma.BoolFilter<"Swap"> | boolean
+  receiverDelivered?: Prisma.BoolFilter<"Swap"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Swap"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Swap"> | Date | string
   initiator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   receiver?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   proof?: Prisma.XOR<Prisma.ProofNullableScalarRelationFilter, Prisma.ProofWhereInput> | null
+  messages?: Prisma.MessageListRelationFilter
+  deliveries?: Prisma.DeliveryListRelationFilter
 }
 
 export type SwapOrderByWithRelationInput = {
@@ -227,11 +253,16 @@ export type SwapOrderByWithRelationInput = {
   adaTxHash?: Prisma.SortOrderInput | Prisma.SortOrder
   initiatorDone?: Prisma.SortOrder
   receiverDone?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  initiatorDelivered?: Prisma.SortOrder
+  receiverDelivered?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   initiator?: Prisma.UserOrderByWithRelationInput
   receiver?: Prisma.UserOrderByWithRelationInput
   proof?: Prisma.ProofOrderByWithRelationInput
+  messages?: Prisma.MessageOrderByRelationAggregateInput
+  deliveries?: Prisma.DeliveryOrderByRelationAggregateInput
 }
 
 export type SwapWhereUniqueInput = Prisma.AtLeast<{
@@ -245,11 +276,16 @@ export type SwapWhereUniqueInput = Prisma.AtLeast<{
   adaTxHash?: Prisma.StringNullableFilter<"Swap"> | string | null
   initiatorDone?: Prisma.BoolFilter<"Swap"> | boolean
   receiverDone?: Prisma.BoolFilter<"Swap"> | boolean
+  completedAt?: Prisma.DateTimeNullableFilter<"Swap"> | Date | string | null
+  initiatorDelivered?: Prisma.BoolFilter<"Swap"> | boolean
+  receiverDelivered?: Prisma.BoolFilter<"Swap"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Swap"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Swap"> | Date | string
   initiator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   receiver?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   proof?: Prisma.XOR<Prisma.ProofNullableScalarRelationFilter, Prisma.ProofWhereInput> | null
+  messages?: Prisma.MessageListRelationFilter
+  deliveries?: Prisma.DeliveryListRelationFilter
 }, "id">
 
 export type SwapOrderByWithAggregationInput = {
@@ -260,6 +296,9 @@ export type SwapOrderByWithAggregationInput = {
   adaTxHash?: Prisma.SortOrderInput | Prisma.SortOrder
   initiatorDone?: Prisma.SortOrder
   receiverDone?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  initiatorDelivered?: Prisma.SortOrder
+  receiverDelivered?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.SwapCountOrderByAggregateInput
@@ -278,6 +317,9 @@ export type SwapScalarWhereWithAggregatesInput = {
   adaTxHash?: Prisma.StringNullableWithAggregatesFilter<"Swap"> | string | null
   initiatorDone?: Prisma.BoolWithAggregatesFilter<"Swap"> | boolean
   receiverDone?: Prisma.BoolWithAggregatesFilter<"Swap"> | boolean
+  completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Swap"> | Date | string | null
+  initiatorDelivered?: Prisma.BoolWithAggregatesFilter<"Swap"> | boolean
+  receiverDelivered?: Prisma.BoolWithAggregatesFilter<"Swap"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Swap"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Swap"> | Date | string
 }
@@ -288,11 +330,16 @@ export type SwapCreateInput = {
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
+  completedAt?: Date | string | null
+  initiatorDelivered?: boolean
+  receiverDelivered?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   initiator: Prisma.UserCreateNestedOneWithoutSwapsInitiatedInput
   receiver: Prisma.UserCreateNestedOneWithoutSwapsReceivedInput
   proof?: Prisma.ProofCreateNestedOneWithoutSwapInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSwapInput
+  deliveries?: Prisma.DeliveryCreateNestedManyWithoutSwapInput
 }
 
 export type SwapUncheckedCreateInput = {
@@ -303,9 +350,14 @@ export type SwapUncheckedCreateInput = {
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
+  completedAt?: Date | string | null
+  initiatorDelivered?: boolean
+  receiverDelivered?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   proof?: Prisma.ProofUncheckedCreateNestedOneWithoutSwapInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSwapInput
+  deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutSwapInput
 }
 
 export type SwapUpdateInput = {
@@ -314,11 +366,16 @@ export type SwapUpdateInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   initiator?: Prisma.UserUpdateOneRequiredWithoutSwapsInitiatedNestedInput
   receiver?: Prisma.UserUpdateOneRequiredWithoutSwapsReceivedNestedInput
   proof?: Prisma.ProofUpdateOneWithoutSwapNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSwapNestedInput
+  deliveries?: Prisma.DeliveryUpdateManyWithoutSwapNestedInput
 }
 
 export type SwapUncheckedUpdateInput = {
@@ -329,9 +386,14 @@ export type SwapUncheckedUpdateInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   proof?: Prisma.ProofUncheckedUpdateOneWithoutSwapNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSwapNestedInput
+  deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutSwapNestedInput
 }
 
 export type SwapCreateManyInput = {
@@ -342,6 +404,9 @@ export type SwapCreateManyInput = {
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
+  completedAt?: Date | string | null
+  initiatorDelivered?: boolean
+  receiverDelivered?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -352,6 +417,9 @@ export type SwapUpdateManyMutationInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -364,6 +432,9 @@ export type SwapUncheckedUpdateManyInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -386,6 +457,9 @@ export type SwapCountOrderByAggregateInput = {
   adaTxHash?: Prisma.SortOrder
   initiatorDone?: Prisma.SortOrder
   receiverDone?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
+  initiatorDelivered?: Prisma.SortOrder
+  receiverDelivered?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -398,6 +472,9 @@ export type SwapMaxOrderByAggregateInput = {
   adaTxHash?: Prisma.SortOrder
   initiatorDone?: Prisma.SortOrder
   receiverDone?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
+  initiatorDelivered?: Prisma.SortOrder
+  receiverDelivered?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -410,6 +487,9 @@ export type SwapMinOrderByAggregateInput = {
   adaTxHash?: Prisma.SortOrder
   initiatorDone?: Prisma.SortOrder
   receiverDone?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
+  initiatorDelivered?: Prisma.SortOrder
+  receiverDelivered?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -511,6 +591,10 @@ export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
 
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
 export type SwapCreateNestedOneWithoutProofInput = {
   create?: Prisma.XOR<Prisma.SwapCreateWithoutProofInput, Prisma.SwapUncheckedCreateWithoutProofInput>
   connectOrCreate?: Prisma.SwapCreateOrConnectWithoutProofInput
@@ -525,16 +609,49 @@ export type SwapUpdateOneRequiredWithoutProofNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SwapUpdateToOneWithWhereWithoutProofInput, Prisma.SwapUpdateWithoutProofInput>, Prisma.SwapUncheckedUpdateWithoutProofInput>
 }
 
+export type SwapCreateNestedOneWithoutMessagesInput = {
+  create?: Prisma.XOR<Prisma.SwapCreateWithoutMessagesInput, Prisma.SwapUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.SwapCreateOrConnectWithoutMessagesInput
+  connect?: Prisma.SwapWhereUniqueInput
+}
+
+export type SwapUpdateOneRequiredWithoutMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.SwapCreateWithoutMessagesInput, Prisma.SwapUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.SwapCreateOrConnectWithoutMessagesInput
+  upsert?: Prisma.SwapUpsertWithoutMessagesInput
+  connect?: Prisma.SwapWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SwapUpdateToOneWithWhereWithoutMessagesInput, Prisma.SwapUpdateWithoutMessagesInput>, Prisma.SwapUncheckedUpdateWithoutMessagesInput>
+}
+
+export type SwapCreateNestedOneWithoutDeliveriesInput = {
+  create?: Prisma.XOR<Prisma.SwapCreateWithoutDeliveriesInput, Prisma.SwapUncheckedCreateWithoutDeliveriesInput>
+  connectOrCreate?: Prisma.SwapCreateOrConnectWithoutDeliveriesInput
+  connect?: Prisma.SwapWhereUniqueInput
+}
+
+export type SwapUpdateOneRequiredWithoutDeliveriesNestedInput = {
+  create?: Prisma.XOR<Prisma.SwapCreateWithoutDeliveriesInput, Prisma.SwapUncheckedCreateWithoutDeliveriesInput>
+  connectOrCreate?: Prisma.SwapCreateOrConnectWithoutDeliveriesInput
+  upsert?: Prisma.SwapUpsertWithoutDeliveriesInput
+  connect?: Prisma.SwapWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SwapUpdateToOneWithWhereWithoutDeliveriesInput, Prisma.SwapUpdateWithoutDeliveriesInput>, Prisma.SwapUncheckedUpdateWithoutDeliveriesInput>
+}
+
 export type SwapCreateWithoutInitiatorInput = {
   id?: string
   status?: $Enums.SwapStatus
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
+  completedAt?: Date | string | null
+  initiatorDelivered?: boolean
+  receiverDelivered?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   receiver: Prisma.UserCreateNestedOneWithoutSwapsReceivedInput
   proof?: Prisma.ProofCreateNestedOneWithoutSwapInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSwapInput
+  deliveries?: Prisma.DeliveryCreateNestedManyWithoutSwapInput
 }
 
 export type SwapUncheckedCreateWithoutInitiatorInput = {
@@ -544,9 +661,14 @@ export type SwapUncheckedCreateWithoutInitiatorInput = {
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
+  completedAt?: Date | string | null
+  initiatorDelivered?: boolean
+  receiverDelivered?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   proof?: Prisma.ProofUncheckedCreateNestedOneWithoutSwapInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSwapInput
+  deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutSwapInput
 }
 
 export type SwapCreateOrConnectWithoutInitiatorInput = {
@@ -565,10 +687,15 @@ export type SwapCreateWithoutReceiverInput = {
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
+  completedAt?: Date | string | null
+  initiatorDelivered?: boolean
+  receiverDelivered?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   initiator: Prisma.UserCreateNestedOneWithoutSwapsInitiatedInput
   proof?: Prisma.ProofCreateNestedOneWithoutSwapInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSwapInput
+  deliveries?: Prisma.DeliveryCreateNestedManyWithoutSwapInput
 }
 
 export type SwapUncheckedCreateWithoutReceiverInput = {
@@ -578,9 +705,14 @@ export type SwapUncheckedCreateWithoutReceiverInput = {
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
+  completedAt?: Date | string | null
+  initiatorDelivered?: boolean
+  receiverDelivered?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   proof?: Prisma.ProofUncheckedCreateNestedOneWithoutSwapInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSwapInput
+  deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutSwapInput
 }
 
 export type SwapCreateOrConnectWithoutReceiverInput = {
@@ -620,6 +752,9 @@ export type SwapScalarWhereInput = {
   adaTxHash?: Prisma.StringNullableFilter<"Swap"> | string | null
   initiatorDone?: Prisma.BoolFilter<"Swap"> | boolean
   receiverDone?: Prisma.BoolFilter<"Swap"> | boolean
+  completedAt?: Prisma.DateTimeNullableFilter<"Swap"> | Date | string | null
+  initiatorDelivered?: Prisma.BoolFilter<"Swap"> | boolean
+  receiverDelivered?: Prisma.BoolFilter<"Swap"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Swap"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Swap"> | Date | string
 }
@@ -646,10 +781,15 @@ export type SwapCreateWithoutProofInput = {
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
+  completedAt?: Date | string | null
+  initiatorDelivered?: boolean
+  receiverDelivered?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   initiator: Prisma.UserCreateNestedOneWithoutSwapsInitiatedInput
   receiver: Prisma.UserCreateNestedOneWithoutSwapsReceivedInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSwapInput
+  deliveries?: Prisma.DeliveryCreateNestedManyWithoutSwapInput
 }
 
 export type SwapUncheckedCreateWithoutProofInput = {
@@ -660,8 +800,13 @@ export type SwapUncheckedCreateWithoutProofInput = {
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
+  completedAt?: Date | string | null
+  initiatorDelivered?: boolean
+  receiverDelivered?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSwapInput
+  deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutSwapInput
 }
 
 export type SwapCreateOrConnectWithoutProofInput = {
@@ -686,10 +831,15 @@ export type SwapUpdateWithoutProofInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   initiator?: Prisma.UserUpdateOneRequiredWithoutSwapsInitiatedNestedInput
   receiver?: Prisma.UserUpdateOneRequiredWithoutSwapsReceivedNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSwapNestedInput
+  deliveries?: Prisma.DeliveryUpdateManyWithoutSwapNestedInput
 }
 
 export type SwapUncheckedUpdateWithoutProofInput = {
@@ -700,8 +850,181 @@ export type SwapUncheckedUpdateWithoutProofInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSwapNestedInput
+  deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutSwapNestedInput
+}
+
+export type SwapCreateWithoutMessagesInput = {
+  id?: string
+  status?: $Enums.SwapStatus
+  adaTxHash?: string | null
+  initiatorDone?: boolean
+  receiverDone?: boolean
+  completedAt?: Date | string | null
+  initiatorDelivered?: boolean
+  receiverDelivered?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  initiator: Prisma.UserCreateNestedOneWithoutSwapsInitiatedInput
+  receiver: Prisma.UserCreateNestedOneWithoutSwapsReceivedInput
+  proof?: Prisma.ProofCreateNestedOneWithoutSwapInput
+  deliveries?: Prisma.DeliveryCreateNestedManyWithoutSwapInput
+}
+
+export type SwapUncheckedCreateWithoutMessagesInput = {
+  id?: string
+  initiatorId: string
+  receiverId: string
+  status?: $Enums.SwapStatus
+  adaTxHash?: string | null
+  initiatorDone?: boolean
+  receiverDone?: boolean
+  completedAt?: Date | string | null
+  initiatorDelivered?: boolean
+  receiverDelivered?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  proof?: Prisma.ProofUncheckedCreateNestedOneWithoutSwapInput
+  deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutSwapInput
+}
+
+export type SwapCreateOrConnectWithoutMessagesInput = {
+  where: Prisma.SwapWhereUniqueInput
+  create: Prisma.XOR<Prisma.SwapCreateWithoutMessagesInput, Prisma.SwapUncheckedCreateWithoutMessagesInput>
+}
+
+export type SwapUpsertWithoutMessagesInput = {
+  update: Prisma.XOR<Prisma.SwapUpdateWithoutMessagesInput, Prisma.SwapUncheckedUpdateWithoutMessagesInput>
+  create: Prisma.XOR<Prisma.SwapCreateWithoutMessagesInput, Prisma.SwapUncheckedCreateWithoutMessagesInput>
+  where?: Prisma.SwapWhereInput
+}
+
+export type SwapUpdateToOneWithWhereWithoutMessagesInput = {
+  where?: Prisma.SwapWhereInput
+  data: Prisma.XOR<Prisma.SwapUpdateWithoutMessagesInput, Prisma.SwapUncheckedUpdateWithoutMessagesInput>
+}
+
+export type SwapUpdateWithoutMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  initiator?: Prisma.UserUpdateOneRequiredWithoutSwapsInitiatedNestedInput
+  receiver?: Prisma.UserUpdateOneRequiredWithoutSwapsReceivedNestedInput
+  proof?: Prisma.ProofUpdateOneWithoutSwapNestedInput
+  deliveries?: Prisma.DeliveryUpdateManyWithoutSwapNestedInput
+}
+
+export type SwapUncheckedUpdateWithoutMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  initiatorId?: Prisma.StringFieldUpdateOperationsInput | string
+  receiverId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  proof?: Prisma.ProofUncheckedUpdateOneWithoutSwapNestedInput
+  deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutSwapNestedInput
+}
+
+export type SwapCreateWithoutDeliveriesInput = {
+  id?: string
+  status?: $Enums.SwapStatus
+  adaTxHash?: string | null
+  initiatorDone?: boolean
+  receiverDone?: boolean
+  completedAt?: Date | string | null
+  initiatorDelivered?: boolean
+  receiverDelivered?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  initiator: Prisma.UserCreateNestedOneWithoutSwapsInitiatedInput
+  receiver: Prisma.UserCreateNestedOneWithoutSwapsReceivedInput
+  proof?: Prisma.ProofCreateNestedOneWithoutSwapInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSwapInput
+}
+
+export type SwapUncheckedCreateWithoutDeliveriesInput = {
+  id?: string
+  initiatorId: string
+  receiverId: string
+  status?: $Enums.SwapStatus
+  adaTxHash?: string | null
+  initiatorDone?: boolean
+  receiverDone?: boolean
+  completedAt?: Date | string | null
+  initiatorDelivered?: boolean
+  receiverDelivered?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  proof?: Prisma.ProofUncheckedCreateNestedOneWithoutSwapInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSwapInput
+}
+
+export type SwapCreateOrConnectWithoutDeliveriesInput = {
+  where: Prisma.SwapWhereUniqueInput
+  create: Prisma.XOR<Prisma.SwapCreateWithoutDeliveriesInput, Prisma.SwapUncheckedCreateWithoutDeliveriesInput>
+}
+
+export type SwapUpsertWithoutDeliveriesInput = {
+  update: Prisma.XOR<Prisma.SwapUpdateWithoutDeliveriesInput, Prisma.SwapUncheckedUpdateWithoutDeliveriesInput>
+  create: Prisma.XOR<Prisma.SwapCreateWithoutDeliveriesInput, Prisma.SwapUncheckedCreateWithoutDeliveriesInput>
+  where?: Prisma.SwapWhereInput
+}
+
+export type SwapUpdateToOneWithWhereWithoutDeliveriesInput = {
+  where?: Prisma.SwapWhereInput
+  data: Prisma.XOR<Prisma.SwapUpdateWithoutDeliveriesInput, Prisma.SwapUncheckedUpdateWithoutDeliveriesInput>
+}
+
+export type SwapUpdateWithoutDeliveriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  initiator?: Prisma.UserUpdateOneRequiredWithoutSwapsInitiatedNestedInput
+  receiver?: Prisma.UserUpdateOneRequiredWithoutSwapsReceivedNestedInput
+  proof?: Prisma.ProofUpdateOneWithoutSwapNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSwapNestedInput
+}
+
+export type SwapUncheckedUpdateWithoutDeliveriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  initiatorId?: Prisma.StringFieldUpdateOperationsInput | string
+  receiverId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  proof?: Prisma.ProofUncheckedUpdateOneWithoutSwapNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSwapNestedInput
 }
 
 export type SwapCreateManyInitiatorInput = {
@@ -711,6 +1034,9 @@ export type SwapCreateManyInitiatorInput = {
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
+  completedAt?: Date | string | null
+  initiatorDelivered?: boolean
+  receiverDelivered?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -722,6 +1048,9 @@ export type SwapCreateManyReceiverInput = {
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
+  completedAt?: Date | string | null
+  initiatorDelivered?: boolean
+  receiverDelivered?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -732,10 +1061,15 @@ export type SwapUpdateWithoutInitiatorInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   receiver?: Prisma.UserUpdateOneRequiredWithoutSwapsReceivedNestedInput
   proof?: Prisma.ProofUpdateOneWithoutSwapNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSwapNestedInput
+  deliveries?: Prisma.DeliveryUpdateManyWithoutSwapNestedInput
 }
 
 export type SwapUncheckedUpdateWithoutInitiatorInput = {
@@ -745,9 +1079,14 @@ export type SwapUncheckedUpdateWithoutInitiatorInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   proof?: Prisma.ProofUncheckedUpdateOneWithoutSwapNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSwapNestedInput
+  deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutSwapNestedInput
 }
 
 export type SwapUncheckedUpdateManyWithoutInitiatorInput = {
@@ -757,6 +1096,9 @@ export type SwapUncheckedUpdateManyWithoutInitiatorInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -767,10 +1109,15 @@ export type SwapUpdateWithoutReceiverInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   initiator?: Prisma.UserUpdateOneRequiredWithoutSwapsInitiatedNestedInput
   proof?: Prisma.ProofUpdateOneWithoutSwapNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSwapNestedInput
+  deliveries?: Prisma.DeliveryUpdateManyWithoutSwapNestedInput
 }
 
 export type SwapUncheckedUpdateWithoutReceiverInput = {
@@ -780,9 +1127,14 @@ export type SwapUncheckedUpdateWithoutReceiverInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   proof?: Prisma.ProofUncheckedUpdateOneWithoutSwapNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSwapNestedInput
+  deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutSwapNestedInput
 }
 
 export type SwapUncheckedUpdateManyWithoutReceiverInput = {
@@ -792,10 +1144,51 @@ export type SwapUncheckedUpdateManyWithoutReceiverInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type SwapCountOutputType
+ */
+
+export type SwapCountOutputType = {
+  messages: number
+  deliveries: number
+}
+
+export type SwapCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  messages?: boolean | SwapCountOutputTypeCountMessagesArgs
+  deliveries?: boolean | SwapCountOutputTypeCountDeliveriesArgs
+}
+
+/**
+ * SwapCountOutputType without action
+ */
+export type SwapCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SwapCountOutputType
+   */
+  select?: Prisma.SwapCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * SwapCountOutputType without action
+ */
+export type SwapCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MessageWhereInput
+}
+
+/**
+ * SwapCountOutputType without action
+ */
+export type SwapCountOutputTypeCountDeliveriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeliveryWhereInput
+}
 
 
 export type SwapSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -806,11 +1199,17 @@ export type SwapSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   adaTxHash?: boolean
   initiatorDone?: boolean
   receiverDone?: boolean
+  completedAt?: boolean
+  initiatorDelivered?: boolean
+  receiverDelivered?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   initiator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   receiver?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   proof?: boolean | Prisma.Swap$proofArgs<ExtArgs>
+  messages?: boolean | Prisma.Swap$messagesArgs<ExtArgs>
+  deliveries?: boolean | Prisma.Swap$deliveriesArgs<ExtArgs>
+  _count?: boolean | Prisma.SwapCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["swap"]>
 
 export type SwapSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -821,6 +1220,9 @@ export type SwapSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   adaTxHash?: boolean
   initiatorDone?: boolean
   receiverDone?: boolean
+  completedAt?: boolean
+  initiatorDelivered?: boolean
+  receiverDelivered?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   initiator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -835,6 +1237,9 @@ export type SwapSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   adaTxHash?: boolean
   initiatorDone?: boolean
   receiverDone?: boolean
+  completedAt?: boolean
+  initiatorDelivered?: boolean
+  receiverDelivered?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   initiator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -849,15 +1254,21 @@ export type SwapSelectScalar = {
   adaTxHash?: boolean
   initiatorDone?: boolean
   receiverDone?: boolean
+  completedAt?: boolean
+  initiatorDelivered?: boolean
+  receiverDelivered?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type SwapOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "initiatorId" | "receiverId" | "status" | "adaTxHash" | "initiatorDone" | "receiverDone" | "createdAt" | "updatedAt", ExtArgs["result"]["swap"]>
+export type SwapOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "initiatorId" | "receiverId" | "status" | "adaTxHash" | "initiatorDone" | "receiverDone" | "completedAt" | "initiatorDelivered" | "receiverDelivered" | "createdAt" | "updatedAt", ExtArgs["result"]["swap"]>
 export type SwapInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   initiator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   receiver?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   proof?: boolean | Prisma.Swap$proofArgs<ExtArgs>
+  messages?: boolean | Prisma.Swap$messagesArgs<ExtArgs>
+  deliveries?: boolean | Prisma.Swap$deliveriesArgs<ExtArgs>
+  _count?: boolean | Prisma.SwapCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SwapIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   initiator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -874,6 +1285,8 @@ export type $SwapPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     initiator: Prisma.$UserPayload<ExtArgs>
     receiver: Prisma.$UserPayload<ExtArgs>
     proof: Prisma.$ProofPayload<ExtArgs> | null
+    messages: Prisma.$MessagePayload<ExtArgs>[]
+    deliveries: Prisma.$DeliveryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -883,6 +1296,9 @@ export type $SwapPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     adaTxHash: string | null
     initiatorDone: boolean
     receiverDone: boolean
+    completedAt: Date | null
+    initiatorDelivered: boolean
+    receiverDelivered: boolean
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["swap"]>
@@ -1282,6 +1698,8 @@ export interface Prisma__SwapClient<T, Null = never, ExtArgs extends runtime.Typ
   initiator<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   receiver<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   proof<T extends Prisma.Swap$proofArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Swap$proofArgs<ExtArgs>>): Prisma.Prisma__ProofClient<runtime.Types.Result.GetResult<Prisma.$ProofPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  messages<T extends Prisma.Swap$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Swap$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  deliveries<T extends Prisma.Swap$deliveriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Swap$deliveriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1318,6 +1736,9 @@ export interface SwapFieldRefs {
   readonly adaTxHash: Prisma.FieldRef<"Swap", 'String'>
   readonly initiatorDone: Prisma.FieldRef<"Swap", 'Boolean'>
   readonly receiverDone: Prisma.FieldRef<"Swap", 'Boolean'>
+  readonly completedAt: Prisma.FieldRef<"Swap", 'DateTime'>
+  readonly initiatorDelivered: Prisma.FieldRef<"Swap", 'Boolean'>
+  readonly receiverDelivered: Prisma.FieldRef<"Swap", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Swap", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Swap", 'DateTime'>
 }
@@ -1737,6 +2158,54 @@ export type Swap$proofArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    */
   include?: Prisma.ProofInclude<ExtArgs> | null
   where?: Prisma.ProofWhereInput
+}
+
+/**
+ * Swap.messages
+ */
+export type Swap$messagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Message
+   */
+  select?: Prisma.MessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Message
+   */
+  omit?: Prisma.MessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MessageInclude<ExtArgs> | null
+  where?: Prisma.MessageWhereInput
+  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[]
+  cursor?: Prisma.MessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
+}
+
+/**
+ * Swap.deliveries
+ */
+export type Swap$deliveriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Delivery
+   */
+  select?: Prisma.DeliverySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Delivery
+   */
+  omit?: Prisma.DeliveryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeliveryInclude<ExtArgs> | null
+  where?: Prisma.DeliveryWhereInput
+  orderBy?: Prisma.DeliveryOrderByWithRelationInput | Prisma.DeliveryOrderByWithRelationInput[]
+  cursor?: Prisma.DeliveryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeliveryScalarFieldEnum | Prisma.DeliveryScalarFieldEnum[]
 }
 
 /**
