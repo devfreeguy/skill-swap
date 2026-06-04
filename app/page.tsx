@@ -1,17 +1,21 @@
 import { Metadata } from "next";
 
-import HeroSection from "@/components/sections/HeroSection";
-import StatsSection from "@/components/sections/StatsSection";
-import HowItWorksSection from "@/components/sections/HowItWorksSection";
-import FeaturesSection from "@/components/sections/FeaturesSection";
-import CTASection from "@/components/sections/CTASection";
 import PublicHeader from "@/components/layouts/PublicHeader";
 import PublicFooter from "@/components/layouts/PublicFooter";
+import HeroSection from "@/components/sections/HeroSection";
+import PerfectMatchSection from "@/components/sections/PerfectMatchSection";
+import StatsSection from "@/components/sections/StatsSection";
+import HowItWorksSection from "@/components/sections/HowItWorksSection";
+import ContributionLedgerSection from "@/components/sections/ContributionLedgerSection";
+import FeaturesSection from "@/components/sections/FeaturesSection";
+import CardanoSection from "@/components/sections/CardanoSection";
+import DiscoverySection from "@/components/sections/DiscoverySection";
+import CTASection from "@/components/sections/CTASection";
 
 export const metadata: Metadata = {
-  title: "SkillSwap - Trade Skills, Not Money",
+  title: "SkillSwap — Exchange Skills. Build Reputation.",
   description:
-    "Join SkillSwap, the community where you trade skills instead of cash. Teach what you know, learn what you don't. Start swapping today!",
+    "A peer-to-peer skill exchange network where every completed exchange creates a verifiable contribution record and builds your portable reputation on Cardano.",
 };
 
 export default function HomePage() {
@@ -19,9 +23,13 @@ export default function HomePage() {
     <main className="min-h-full">
       <PublicHeader />
       <HeroSection />
+      <PerfectMatchSection />
       <StatsSection />
       <HowItWorksSection />
+      <ContributionLedgerSection />
       <FeaturesSection />
+      <CardanoSection />
+      <DiscoverySection />
       <CTASection />
       <PublicFooter />
     </main>

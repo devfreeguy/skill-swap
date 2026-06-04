@@ -11,13 +11,13 @@ import {
 import SectionWrapper from "@/components/layouts/SectionWrapper";
 import { cn } from "@/lib/utils";
 import { Card } from "@heroui/react";
-import { IconBriefcase, IconTransform, IconUsers } from "@tabler/icons-react";
+import { IconBriefcase, IconArrowsExchange, IconCircleCheck } from "@tabler/icons-react";
 import { fadeUp, stagger } from "@/lib/animations";
 
 const stats = [
-  { Icon: IconUsers, rawValue: 1200, suffix: "+", label: "Users" },
-  { Icon: IconTransform, rawValue: 340, suffix: "+", label: "Swaps" },
-  { Icon: IconBriefcase, rawValue: 80, suffix: "+", label: "Skills" },
+  { Icon: IconCircleCheck, rawValue: 1247, suffix: "+", label: "Contributions" },
+  { Icon: IconArrowsExchange, rawValue: 340, suffix: "+", label: "Exchanges" },
+  { Icon: IconBriefcase, rawValue: 89, suffix: "+", label: "Skills" },
 ];
 
 function StatValue({

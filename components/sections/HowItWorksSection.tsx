@@ -3,30 +3,58 @@
 import { motion } from "framer-motion";
 import SectionWrapper from "@/components/layouts/SectionWrapper";
 import StepCard from "@/components/elements/StepCard";
-import { IconUser, IconTransfer, IconCircleCheck } from "@tabler/icons-react";
+import {
+  IconUser,
+  IconTargetArrow,
+  IconCurrencyBitcoin,
+  IconTransfer,
+  IconCircleCheck,
+  IconCertificate,
+} from "@tabler/icons-react";
 import { fadeUp, stagger } from "@/lib/animations";
 
 const steps = [
   {
     step: "01",
     icon: IconUser,
-    title: "Tell Us What You've Got",
+    title: "Set Your Skills",
     description:
-      "Register and drop your skills in two lines. What you can teach. What you want to learn. Your profile is ready.",
+      "Register and declare two things: what you can teach, and what you want to learn. Your profile is your position in the network.",
   },
   {
     step: "02",
-    icon: IconTransfer,
-    title: "We Find Your Match",
+    icon: IconTargetArrow,
+    title: "Find a Match",
     description:
-      "Our engine surfaces people whose skills align with yours, both ways. No searching. No filtering. Just your matches, waiting.",
+      "The system surfaces only bidirectional matches — users who teach what you want and want what you teach. No one-sided connections.",
   },
   {
     step: "03",
-    icon: IconCircleCheck,
-    title: "Swap. Prove. Grow.",
+    icon: IconCurrencyBitcoin,
+    title: "Request Exchange",
     description:
-      "Request a swap with a small ADA commitment. Complete the exchange. Walk away with a verified proof record tied to your wallet.",
+      "Submit an ADA-gated swap request. The small commitment filters uncommitted users. Every request that reaches you is intentional.",
+  },
+  {
+    step: "04",
+    icon: IconTransfer,
+    title: "Complete Session",
+    description:
+      "Deliver your skill to your match. Receive theirs. Both sides fulfil their side of the exchange before the record is created.",
+  },
+  {
+    step: "05",
+    icon: IconCircleCheck,
+    title: "Submit Proof",
+    description:
+      "Both parties confirm delivery independently. When both sides confirm, the system moves to verification. No single party controls this.",
+  },
+  {
+    step: "06",
+    icon: IconCertificate,
+    title: "Earn Your Record",
+    description:
+      "A verified contribution record is created with the exchange details, ADA transaction hash, and timestamp. It belongs to you.",
   },
 ];
 
@@ -44,7 +72,7 @@ export default function HowItWorksSection() {
           How It Works
         </h2>
         <p className="text-base text-muted max-w-lg">
-          Three steps between you and your next skill exchange.
+          Six steps from profile to verified contribution record.
         </p>
       </motion.div>
 
@@ -53,7 +81,7 @@ export default function HowItWorksSection() {
         variants={stagger}
         whileInView="visible"
         initial="hidden"
-        viewport={{ once: true, amount: 0.4 }}
+        viewport={{ once: true, amount: 0.2 }}
       >
         {steps.map((step) => (
           <motion.div key={step.step} variants={fadeUp}>

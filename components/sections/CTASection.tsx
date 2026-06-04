@@ -36,7 +36,7 @@ export default function CTASection() {
 
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center gap-6 px-6 py-16">
           <p className="text-xs font-medium uppercase tracking-widest text-white/50">
-            Get Started Today
+            Start Building Your Reputation
           </p>
 
           <motion.h2
@@ -47,7 +47,7 @@ export default function CTASection() {
             viewport={{ once: true, amount: 0.4 }}
             transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
           >
-            Your Next Skill Is One Swap Away
+            Build Your Reputation. One Exchange at a Time.
           </motion.h2>
 
           <motion.div
@@ -59,8 +59,8 @@ export default function CTASection() {
             transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
           >
             <p className="text-base text-white/60 max-w-lg">
-              Join a growing community trading knowledge, building skills, and
-              proving every exchange on the blockchain.
+              Every exchange you complete becomes a verifiable contribution
+              record. Your reputation is earned, not claimed.
             </p>
 
             <div className="flex items-center gap-4 flex-wrap justify-center">
@@ -69,7 +69,7 @@ export default function CTASection() {
                   size="lg"
                   className="rounded-full bg-white text-[#01060C] font-semibold px-8"
                 >
-                  Start Swapping
+                  Find a Match
                 </Button>
               </Link>
               <Link href="#how-it-works">
@@ -78,7 +78,7 @@ export default function CTASection() {
                   size="lg"
                   className="rounded-full border-white text-white px-8"
                 >
-                  See How It Works
+                  How It Works
                 </Button>
               </Link>
             </div>

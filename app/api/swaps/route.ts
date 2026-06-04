@@ -14,10 +14,22 @@ export async function GET(request: NextRequest) {
     },
     include: {
       initiator: {
-        select: { id: true, name: true, avatarUrl: true, teachSkill: true, learnSkill: true },
+        select: {
+          id: true,
+          name: true,
+          avatarUrl: true,
+          teachSkill: true,
+          learnSkill: true,
+        },
       },
       receiver: {
-        select: { id: true, name: true, avatarUrl: true, teachSkill: true, learnSkill: true },
+        select: {
+          id: true,
+          name: true,
+          avatarUrl: true,
+          teachSkill: true,
+          learnSkill: true,
+        },
       },
     },
     orderBy: { createdAt: "desc" },
@@ -38,7 +50,7 @@ export async function POST(request: NextRequest) {
   if (!receiverId || !adaTxHash) {
     return NextResponse.json(
       { error: "receiverId and adaTxHash are required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -55,7 +67,7 @@ export async function POST(request: NextRequest) {
     if (!txRes.ok) {
       return NextResponse.json(
         { error: "Invalid or unconfirmed transaction hash" },
-        { status: 400 }
+        { status: 400 },
       );
     }
   }

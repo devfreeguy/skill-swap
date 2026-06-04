@@ -12,7 +12,8 @@ import { fadeUp, fadeIn } from "@/lib/animations";
 
 const links = [
   { label: "How it Works", href: "#how-it-works" },
-  { label: "Features", href: "#features" },
+  { label: "Contribution Ledger", href: "#ledger" },
+  { label: "Community", href: "#discovery" },
   { label: "Register", href: "/register" },
   { label: "Login", href: "/login" },
 ];

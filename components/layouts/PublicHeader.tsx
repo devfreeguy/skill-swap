@@ -11,8 +11,8 @@ import ThemeToggle from "@/components/elements/ThemeToggle";
 
 const links = [
   { label: "How it Works", href: "#how-it-works" },
-  { label: "Features", href: "#features" },
-  { label: "About", href: "#about" },
+  { label: "Ledger", href: "#ledger" },
+  { label: "Community", href: "#discovery" },
 ];
 
 export default function PublicHeader() {
@@ -52,16 +52,16 @@ export default function PublicHeader() {
               How it works
             </Link>
             <Link
-              href="#features"
+              href="#ledger"
               className="no-underline text-sm transition-colors text-muted hover:text-foreground"
             >
-              Features
+              Ledger
             </Link>
             <Link
-              href="#about"
+              href="#discovery"
               className="no-underline text-sm transition-colors text-muted hover:text-foreground"
             >
-              About
+              Community
             </Link>
           </div>
 

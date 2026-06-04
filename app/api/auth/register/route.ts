@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
   if (!name || !email || !password) {
     return NextResponse.json(
       { error: "name, email, and password are required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
   if (existing) {
     return NextResponse.json(
       { error: "Email already in use" },
-      { status: 409 }
+      { status: 409 },
     );
   }
 
@@ -28,7 +28,12 @@ export async function POST(request: NextRequest) {
     data: { name, email, password: hashed },
   });
 
-  const token = await signToken({ id: user.id, email: user.email, name: user.name, onboarded: false });
+  const token = await signToken({
+    id: user.id,
+    email: user.email ?? "",
+    name: user.name ?? "",
+    onboarded: false,
+  });
   const response = NextResponse.json({
     id: user.id,
     name: user.name,

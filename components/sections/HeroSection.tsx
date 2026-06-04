@@ -35,16 +35,17 @@ export default function HeroSection() {
             className="text-[40px] md:text-6xl text-foreground leading-tight"
             variants={fadeUp}
           >
-            Teach What You <span className="text-accent">Know</span>.<br></br>{" "}
-            Learn What You <span className="text-accent">Don&apos;t</span>.
+            Exchange Skills.<br />
+            Build Reputation.<br />
+            Own Your <span className="text-accent">Contributions</span>.
           </motion.h1>
           <motion.p
             className="text-base md:text-lg text-muted max-w-xl"
             variants={fadeUp}
             transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
           >
-            SkillSwap matches you with people who need your skill and have the
-            skill you need.
+            Every completed skill exchange creates a verifiable contribution
+            record that builds your portable reputation on the network.
           </motion.p>
         </div>
 
@@ -58,16 +59,16 @@ export default function HeroSection() {
               size="lg"
               className="rounded-full w-48 bg-accent text-accent-foreground font-semibold shadow"
             >
-              Get Started
+              Find a Match
             </Button>
           </Link>
-          <Link href="#how-it-works">
+          <Link href="#discovery">
             <Button
               variant="secondary"
               size="lg"
               className="rounded-full w-48 border-border text-foreground shadow"
             >
-              See How It Works
+              Browse Community
             </Button>
           </Link>
         </motion.div>

@@ -50,10 +50,10 @@ export default function FeaturesSection() {
         viewport={{ once: true, amount: 0.4 }}
       >
         <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-          Built Different
+          Protocol, Not a Platform
         </h2>
         <p className="text-base text-muted max-w-lg">
-          Four features you will not find anywhere else.
+          Four structural properties that make SkillSwap a reputation network, not a marketplace.
         </p>
       </motion.div>
 
