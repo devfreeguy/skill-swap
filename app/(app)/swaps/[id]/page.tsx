@@ -1,8 +1,10 @@
 "use client";
 
 import LemniscateLoader from "@/components/layouts/Loader";
-import SwapProgressTracker, { type ProgressStep } from "@/components/swap/SwapProgressTracker";
 import DeliverableItem from "@/components/swap/DeliverableItem";
+import SwapProgressTracker, {
+  type ProgressStep,
+} from "@/components/swap/SwapProgressTracker";
 import { parseSkills } from "@/lib/skills";
 import {
   Alert,
@@ -18,6 +20,7 @@ import {
   TextField,
 } from "@heroui/react";
 import {
+  IconArrowLeft,
   IconArrowsExchange,
   IconCheck,
   IconFlag,
@@ -76,7 +79,10 @@ type Swap = {
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const STATUS_COLOR: Record<string, "warning" | "success" | "accent" | "danger" | "default"> = {
+const STATUS_COLOR: Record<
+  string,
+  "warning" | "success" | "accent" | "danger" | "default"
+> = {
   PENDING: "warning",
   ACTIVE: "success",
   COMPLETED: "accent",
@@ -147,7 +153,11 @@ function ParticipantCard({
           <div className="flex flex-wrap gap-1">
             {learn.length > 0 ? (
               learn.map((s) => (
-                <Chip key={s} size="sm" className="border border-success/40 text-success">
+                <Chip
+                  key={s}
+                  size="sm"
+                  className="border border-success/40 text-success"
+                >
                   {s}
                 </Chip>
               ))
@@ -187,9 +197,19 @@ export default function SwapDetailPage() {
       fetch("/api/auth/me"),
       fetch(`/api/swaps/${swapId}`),
     ]);
-    const [meData, swapData] = await Promise.all([meRes.json(), swapRes.json()]);
-    if (meData.error) { router.replace("/login"); return; }
-    if (swapData.error) { setNotFound(true); setLoading(false); return; }
+    const [meData, swapData] = await Promise.all([
+      meRes.json(),
+      swapRes.json(),
+    ]);
+    if (meData.error) {
+      router.replace("/login");
+      return;
+    }
+    if (swapData.error) {
+      setNotFound(true);
+      setLoading(false);
+      return;
+    }
     setMe(meData);
     setSwap(swapData);
     setLoading(false);
@@ -209,7 +229,10 @@ export default function SwapDetailPage() {
         body: JSON.stringify({ action }),
       });
       const data = await res.json();
-      if (!res.ok) { setActionError(data.error || "Action failed."); return; }
+      if (!res.ok) {
+        setActionError(data.error || "Action failed.");
+        return;
+      }
       await loadSwap();
     } catch {
       setActionError("Something went wrong.");
@@ -219,7 +242,10 @@ export default function SwapDetailPage() {
   }
 
   async function submitDelivery() {
-    if (!resourceLink.trim()) { setDeliveryError("Please enter a resource link."); return; }
+    if (!resourceLink.trim()) {
+      setDeliveryError("Please enter a resource link.");
+      return;
+    }
     setDeliveryError("");
     setSubmitting(true);
     try {
@@ -229,7 +255,10 @@ export default function SwapDetailPage() {
         body: JSON.stringify({ resourceLink: resourceLink.trim(), notes }),
       });
       const data = await res.json();
-      if (!res.ok) { setDeliveryError(data.error || "Delivery failed."); return; }
+      if (!res.ok) {
+        setDeliveryError(data.error || "Delivery failed.");
+        return;
+      }
       setDeliverOpen(false);
       setResourceLink("");
       setNotes("");
@@ -241,14 +270,18 @@ export default function SwapDetailPage() {
     }
   }
 
-  if (loading) return <LemniscateLoader loading text="Loading..." overlayOpacity={1} />;
+  if (loading)
+    return <LemniscateLoader loading text="Loading..." overlayOpacity={1} />;
   if (!me) return null;
 
   if (notFound || !swap) {
     return (
       <main className="flex-1 px-6 py-16 text-center">
         <p className="text-muted">Swap not found.</p>
-        <Link href="/swaps" className="text-success text-sm mt-2 inline-block hover:underline">
+        <Link
+          href="/swaps"
+          className="text-success text-sm mt-2 inline-block hover:underline"
+        >
           ← Back to Swaps
         </Link>
       </main>
@@ -305,7 +338,12 @@ export default function SwapDetailPage() {
 
   // ─── Activity feed (derived from real timestamps) ────────────────────────────
 
-  type ActivityItem = { id: string; label: string; time: string; active: boolean };
+  type ActivityItem = {
+    id: string;
+    label: string;
+    time: string;
+    active: boolean;
+  };
   const activityItems: ActivityItem[] = [];
 
   if (swap.proof) {
@@ -318,7 +356,10 @@ export default function SwapDetailPage() {
   }
 
   [...swap.deliveries]
-    .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime(),
+    )
     .forEach((d) => {
       const who = d.userId === me.id ? "You" : partner.name;
       activityItems.push({
@@ -346,15 +387,22 @@ export default function SwapDetailPage() {
     <div className="flex flex-1 min-h-0">
       {/* ── Main column ─────────────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-6 min-w-0">
-
         {/* Back + header */}
         <div>
-          <Link href="/swaps" className="text-sm text-muted hover:text-foreground transition-colors">
-            ← Swaps
+          <Link
+            href="/swaps"
+            className="flex items-center gap-2 text-sm text-muted hover:text-foreground transition-colors"
+          >
+            <IconArrowLeft className="size-5" /> <span>Swaps</span>
           </Link>
           <div className="flex items-start justify-between gap-4 mt-3">
-            <h1 className="text-2xl font-bold text-foreground leading-tight">{swapTitle}</h1>
-            <Chip color={STATUS_COLOR[swap.status] ?? "default"} className="shrink-0 mt-1">
+            <h1 className="text-2xl font-bold text-foreground leading-tight">
+              {swapTitle}
+            </h1>
+            <Chip
+              color={STATUS_COLOR[swap.status] ?? "default"}
+              className="shrink-0 mt-1"
+            >
               {swap.status.charAt(0) + swap.status.slice(1).toLowerCase()}
             </Chip>
           </div>
@@ -365,7 +413,9 @@ export default function SwapDetailPage() {
           <Alert status="danger">
             <Alert.Indicator />
             <Alert.Content>
-              <Alert.Description>This swap request was declined.</Alert.Description>
+              <Alert.Description>
+                This swap request was declined.
+              </Alert.Description>
             </Alert.Content>
           </Alert>
         )}
@@ -403,7 +453,9 @@ export default function SwapDetailPage() {
 
         {/* Participants */}
         <section>
-          <h2 className="text-lg font-semibold text-foreground mb-4">Participants</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-4">
+            Participants
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <ParticipantCard participant={swap.initiator} role="Initiator" />
             <ParticipantCard participant={swap.receiver} role="Receiver" />
@@ -412,7 +464,9 @@ export default function SwapDetailPage() {
 
         {/* Swap Progress */}
         <Card className="bg-surface border border-border rounded-2xl p-6">
-          <h2 className="text-base font-semibold text-foreground mb-6">Swap Progress</h2>
+          <h2 className="text-base font-semibold text-foreground mb-6">
+            Swap Progress
+          </h2>
           <div className="overflow-x-auto">
             <SwapProgressTracker steps={progressSteps} />
           </div>
@@ -425,7 +479,9 @@ export default function SwapDetailPage() {
             <section>
               <div className="flex items-center gap-2 mb-3">
                 <IconUpload size={15} className="text-muted" />
-                <h3 className="text-sm font-semibold text-foreground">My Deliverables</h3>
+                <h3 className="text-sm font-semibold text-foreground">
+                  My Deliverables
+                </h3>
               </div>
               <div className="flex flex-col gap-2">
                 {myDelivery && (
@@ -455,7 +511,9 @@ export default function SwapDetailPage() {
                   </button>
                 )}
                 {!myDelivery && isCompleted && (
-                  <p className="text-sm text-muted italic">No deliverable submitted.</p>
+                  <p className="text-sm text-muted italic">
+                    No deliverable submitted.
+                  </p>
                 )}
               </div>
             </section>
@@ -464,7 +522,9 @@ export default function SwapDetailPage() {
             <section>
               <div className="flex items-center gap-2 mb-3">
                 <IconCheck size={15} className="text-muted" />
-                <h3 className="text-sm font-semibold text-foreground">Partner Deliverables</h3>
+                <h3 className="text-sm font-semibold text-foreground">
+                  Partner Deliverables
+                </h3>
                 {partnerDelivery && !isCompleted && (
                   <Chip size="sm" color="warning">
                     Pending
@@ -500,7 +560,12 @@ export default function SwapDetailPage() {
                               Approve
                             </Button>
                             {/* TODO: Request Changes requires messaging API */}
-                            <Button variant="secondary" size="sm" isDisabled className="flex-1">
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              isDisabled
+                              className="flex-1"
+                            >
                               Request Changes
                             </Button>
                           </>
@@ -515,7 +580,9 @@ export default function SwapDetailPage() {
                   </>
                 ) : (
                   <div className="border border-dashed border-border rounded-xl px-4 py-6 text-center">
-                    <p className="text-sm text-muted">Waiting for partner&apos;s delivery…</p>
+                    <p className="text-sm text-muted">
+                      Waiting for partner&apos;s delivery…
+                    </p>
                   </div>
                 )}
               </div>
@@ -526,14 +593,12 @@ export default function SwapDetailPage() {
 
       {/* ── Right sidebar ────────────────────────────────────────────── */}
       <aside className="hidden lg:flex flex-col w-64 shrink-0 border-l border-border px-5 py-6 gap-5 overflow-y-auto">
-
         {/* ACTIONS */}
         <section>
           <p className="text-[10px] font-semibold tracking-widest text-muted uppercase mb-3">
             Actions
           </p>
           <div className="flex flex-col gap-2">
-
             {isPending && isReceiver && (
               <>
                 <Button
@@ -592,7 +657,9 @@ export default function SwapDetailPage() {
                 variant="secondary"
                 className="w-full"
                 onPress={() =>
-                  document.getElementById("proof-record")?.scrollIntoView({ behavior: "smooth" })
+                  document
+                    .getElementById("proof-record")
+                    ?.scrollIntoView({ behavior: "smooth" })
                 }
               >
                 <IconShieldCheck size={15} />
@@ -616,7 +683,9 @@ export default function SwapDetailPage() {
         <section id="proof-record">
           <Card className="bg-surface border border-border rounded-2xl p-4 flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-foreground">Proof Record</p>
+              <p className="text-sm font-semibold text-foreground">
+                Proof Record
+              </p>
               <IconShieldCheck size={17} className="text-success" />
             </div>
             <Separator />

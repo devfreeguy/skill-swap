@@ -2,7 +2,7 @@ allowBuilds:
   '@prisma/client': true
   '@prisma/engines': true
   chacha-native: false
-  esbuild: set this to true or false
+  esbuild: true
   prisma: true
   protobufjs: false
   sharp: true
