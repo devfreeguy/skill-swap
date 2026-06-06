@@ -19,7 +19,12 @@
       "Bash(pnpm remove *)",
       "Bash(npx tsc *)",
       "Bash(pnpm prisma *)",
-      "Bash(pnpm tsc *)"
+      "Bash(pnpm tsc *)",
+      "Bash(mkdir -p \"C:\\\\devfreeguy\\\\projects\\\\clients\\\\others\\\\next-js\\\\skill-swap\\\\app\\\\users\\\\[id]\")",
+      "Bash(mkdir -p \"C:\\\\devfreeguy\\\\projects\\\\clients\\\\others\\\\next-js\\\\skill-swap\\\\app\\\\swaps\\\\[id]\")",
+      "Bash(pnpm lint *)",
+      "Bash(pnpm seed *)",
+      "Bash(node_modules/.bin/tsx *)"
     ]
   }
 }

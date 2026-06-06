@@ -5,6 +5,29 @@ import { uploadAvatar } from "@/lib/cloudinary";
 import { signToken } from "@/lib/jwt";
 import { setAuthCookie } from "@/lib/cookies";
 
+export async function GET(request: NextRequest) {
+  const currentUser = await getCurrentUser(request);
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: currentUser.id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      avatarUrl: true,
+      teachSkill: true,
+      learnSkill: true,
+      walletAddress: true,
+      createdAt: true,
+    },
+  });
+
+  return NextResponse.json(user);
+}
+
 export async function PATCH(request: NextRequest) {
   const currentUser = await getCurrentUser(request);
   if (!currentUser) {

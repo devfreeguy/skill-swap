@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { scoreMatch } from "@/lib/matching";
+import { parseSkills } from "@/lib/skills";
 
 export async function GET(request: NextRequest) {
   const currentUser = await getCurrentUser(request);
@@ -9,7 +9,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const candidates = await prisma.user.findMany({
+  const { searchParams } = new URL(request.url);
+  const skill = searchParams.get("skill");
+
+  const users = await prisma.user.findMany({
     where: {
       id: { not: currentUser.id },
       OR: [{ teachSkill: { not: null } }, { learnSkill: { not: null } }],
@@ -20,12 +23,22 @@ export async function GET(request: NextRequest) {
       avatarUrl: true,
       teachSkill: true,
       learnSkill: true,
+      createdAt: true,
     },
+    orderBy: { createdAt: "desc" },
+    take: 50,
   });
 
-  const results = candidates
-    .map((c) => ({ ...c, ...scoreMatch(currentUser, c) }))
-    .sort((a, b) => b.score - a.score);
+  if (skill) {
+    const q = skill.toLowerCase();
+    return NextResponse.json(
+      users.filter((u) =>
+        [...parseSkills(u.teachSkill), ...parseSkills(u.learnSkill)].some((s) =>
+          s.toLowerCase().includes(q)
+        )
+      )
+    );
+  }
 
-  return NextResponse.json(results);
+  return NextResponse.json(users);
 }

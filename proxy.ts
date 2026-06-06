@@ -5,6 +5,7 @@ const protectedPaths = [
   "/dashboard",
   "/discover",
   "/swaps",
+  "/users",
   "/profile",
   "/notifications",
 ];
@@ -39,6 +40,7 @@ export const config = {
     "/dashboard/:path*",
     "/discover/:path*",
     "/swaps/:path*",
+    "/users/:path*",
     "/profile/:path*",
     "/notifications/:path*",
   ],

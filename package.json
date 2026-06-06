@@ -1,12 +1,13 @@
 {
   "name": "skill-swap",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "node_modules/.bin/tsx --env-file=.env prisma/seed.ts"
   },
   "dependencies": {
     "@cardano-foundation/cardano-connect-with-wallet": "^0.2.20",
@@ -20,7 +21,6 @@
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.7.0",
     "clsx": "^2.1.1",
-    "dotenv": "^16.5.0",
     "framer-motion": "^12.38.0",
     "jose": "^6.0.10",
     "next": "16.2.4",
@@ -39,10 +39,12 @@
     "@types/pg": "^8.11.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^16.6.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
     "prisma": "^7.0.0",
     "tailwindcss": "^4",
+    "tsx": "^4.22.4",
     "typescript": "^5"
   },
   "packageManager": "pnpm@11.1.2"

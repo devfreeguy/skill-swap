@@ -7,103 +7,226 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id            String    @id @default(cuid())
-  name          String
-  email         String?   @unique
-  password      String?
-  avatarUrl     String?
-  teachSkill    String?
-  learnSkill    String?
-  walletAddress String?   @unique
-  walletNonce   String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+//
+// USERS
+//
 
-  swapsInitiated  Swap[]         @relation("Initiator")
-  swapsReceived   Swap[]         @relation("Receiver")
-  proofs          Proof[]
-  notifications   Notification[]
-  messages        Message[]
-  deliveries      Delivery[]
+model User {
+  id        String  @id @default(cuid())
+  name      String
+  email     String? @unique
+  password  String?
+  avatarUrl String?
+  bio       String?
+
+  walletAddress String? @unique
+  walletNonce   String?
+
+  reputationScore Int @default(0)
+  completedSwaps  Int @default(0)
+  skillsTaught    Int @default(0)
+  skillsLearned   Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  swapsInitiated Swap[] @relation("Initiator")
+  swapsReceived  Swap[] @relation("Receiver")
+
+  userSkills           UserSkill[]
+  proofs               Proof[]
+  verifications        Verification[]
+  messages             Message[]
+  notifications        Notification[]
+  endorsementsGiven    Endorsement[]  @relation("EndorsementsGiven")
+  endorsementsReceived Endorsement[]  @relation("EndorsementsReceived")
+  deliveries           Delivery[]
 }
 
-model Swap {
-  id                  String     @id @default(cuid())
-  initiatorId         String
-  receiverId          String
-  status              SwapStatus @default(PENDING)
-  adaTxHash           String?
-  initiatorDone       Boolean    @default(false)
-  receiverDone        Boolean    @default(false)
-  completedAt         DateTime?
-  initiatorDelivered  Boolean    @default(false)
-  receiverDelivered   Boolean    @default(false)
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
+//
+// SKILLS
+//
 
-  initiator   User       @relation("Initiator", fields: [initiatorId], references: [id])
-  receiver    User       @relation("Receiver", fields: [receiverId], references: [id])
-  proof       Proof?
-  messages    Message[]
-  deliveries  Delivery[]
+model Skill {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  userSkills   UserSkill[]
+  swapSkills   SwapSkill[]
+  endorsements Endorsement[]
+}
+
+model UserSkill {
+  id String @id @default(cuid())
+
+  userId  String
+  skillId String
+
+  type  SkillType
+  level SkillLevel @default(BEGINNER)
+
+  user  User  @relation(fields: [userId], references: [id])
+  skill Skill @relation(fields: [skillId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, skillId, type])
+}
+
+enum SkillType {
+  TEACH
+  LEARN
+}
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+//
+// SWAPS (CORE EXCHANGE LAYER)
+//
+
+model Swap {
+  id String @id @default(cuid())
+
+  initiatorId String
+  receiverId  String
+
+  status SwapStatus @default(PENDING)
+
+  adaTxHash String?
+
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  initiator User @relation("Initiator", fields: [initiatorId], references: [id])
+  receiver  User @relation("Receiver", fields: [receiverId], references: [id])
+
+  skills     SwapSkill[]
+  messages   Message[]
+  deliveries Delivery[]
+  proof      Proof?
 }
 
 enum SwapStatus {
   PENDING
   ACTIVE
   AWAITING_DELIVERY
+  VERIFICATION
   COMPLETED
   DECLINED
+  CANCELLED
 }
+
+model SwapSkill {
+  id String @id @default(cuid())
+
+  swapId  String
+  skillId String
+
+  teacherId String
+  learnerId String
+
+  swap  Swap  @relation(fields: [swapId], references: [id])
+  skill Skill @relation(fields: [skillId], references: [id])
+
+  @@index([swapId])
+}
+
+//
+// PROOF LAYER
+//
 
 model Proof {
-  id            String   @id @default(cuid())
-  swapId        String   @unique
-  userId        String
-  teachSkill    String
-  learnSkill    String
-  adaTxHash     String
-  metadataHash  String?
-  summary       String?
-  createdAt     DateTime @default(now())
+  id String @id @default(cuid())
 
-  swap  Swap @relation(fields: [swapId], references: [id])
-  user  User @relation(fields: [userId], references: [id])
+  swapId String @unique
+  userId String
+
+  title           String?
+  description     String?
+  outcomes        String?
+  durationMinutes Int?
+
+  metadataHash String?
+  createdAt    DateTime @default(now())
+
+  swap Swap @relation(fields: [swapId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  verifications Verification[]
 }
 
-model Message {
-  id        String   @id @default(cuid())
-  swapId    String
-  senderId  String
-  content   String
+model Verification {
+  id String @id @default(cuid())
+
+  proofId    String
+  verifierId String
+
+  approved Boolean
+  comment  String?
+
   createdAt DateTime @default(now())
 
-  swap    Swap @relation(fields: [swapId], references: [id])
-  sender  User @relation(fields: [senderId], references: [id])
+  proof    Proof @relation(fields: [proofId], references: [id])
+  verifier User  @relation(fields: [verifierId], references: [id])
 }
 
-model Delivery {
-  id            String   @id @default(cuid())
-  swapId        String
-  userId        String
-  resourceLink  String
-  notes         String?
-  submittedAt   DateTime @default(now())
+//
+// DELIVERY
+//
 
-  swap  Swap @relation(fields: [swapId], references: [id])
-  user  User @relation(fields: [userId], references: [id])
+model Delivery {
+  id String @id @default(cuid())
+
+  swapId String
+  userId String
+
+  resourceLinks Json
+  notes         String?
+
+  submittedAt DateTime @default(now())
+
+  swap Swap @relation(fields: [swapId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
   @@unique([swapId, userId])
 }
 
+//
+// SOCIAL LAYER
+//
+
+model Message {
+  id String @id @default(cuid())
+
+  swapId   String
+  senderId String
+
+  content String
+
+  createdAt DateTime @default(now())
+
+  swap   Swap @relation(fields: [swapId], references: [id])
+  sender User @relation(fields: [senderId], references: [id])
+}
+
 model Notification {
-  id        String           @id @default(cuid())
-  userId    String
-  type      NotificationType
-  message   String
-  read      Boolean          @default(false)
-  createdAt DateTime         @default(now())
+  id String @id @default(cuid())
+
+  userId String
+
+  type    NotificationType
+  message String
+  read    Boolean          @default(false)
+
+  createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
 }
@@ -114,4 +237,42 @@ enum NotificationType {
   SWAP_DECLINED
   SWAP_COMPLETED
   PERFECT_MATCH
+}
+
+//
+// ENDORSEMENTS (REPUTATION BOOSTER)
+//
+
+model Endorsement {
+  id String @id @default(cuid())
+
+  giverId    String
+  receiverId String
+  skillId    String
+
+  comment String?
+
+  createdAt DateTime @default(now())
+
+  skill    Skill @relation(fields: [skillId], references: [id])
+  giver    User  @relation("EndorsementsGiven", fields: [giverId], references: [id])
+  receiver User  @relation("EndorsementsReceived", fields: [receiverId], references: [id])
+
+  @@index([giverId, receiverId])
+}
+
+//
+// FUTURE BLOCKCHAIN ANCHOR
+//
+
+model BlockchainRecord {
+  id String @id @default(cuid())
+
+  swapId  String
+  proofId String
+
+  txHash  String
+  network String @default("cardano")
+
+  anchoredAt DateTime @default(now())
 }

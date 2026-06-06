@@ -16,6 +16,39 @@ npx prisma studio       # open DB browser UI
 
 Package manager is **pnpm**. Use `pnpm` not `npm`.
 
+## Critical Gotchas
+
+**Read this before touching anything database-related.**
+
+### `prisma/schema.prisma` ≠ actual database
+
+`schema.prisma` is an aspirational redesign that **has never been pushed to the database**. The generated client in `app/generated/prisma/` reflects the real DB. These two are **incompatible** — running `npx prisma db push` from the current `schema.prisma` would destroy live data.
+
+Key divergences to be aware of:
+
+- **`User` in the real DB** has `teachSkill: String?` and `learnSkill: String?` as plain scalar strings. The schema.prisma `User` has `userSkills UserSkill[]` and reputation counter fields (`reputationScore`, `completedSwaps`, etc.) — none of those exist in the actual DB.
+- **`Swap` in the real DB** has four boolean fields not in `schema.prisma`: `initiatorDone`, `receiverDone`, `initiatorDelivered`, `receiverDelivered`. The swap completion logic in `app/api/swaps/[id]/route.ts` uses these flags.
+- **`Proof` in the real DB** has `teachSkill String`, `learnSkill String`, `adaTxHash String`, `summary String?` — not the `title`/`description`/`outcomes`/`durationMinutes` from `schema.prisma`.
+- `Skill`, `UserSkill`, `SwapSkill`, `Endorsement`, `Verification`, `BlockchainRecord` **do not exist** in the actual DB.
+
+To safely evolve the schema: reverse-engineer the actual DB state first, then plan a migration.
+
+### Skills are stored as JSON-stringified arrays
+
+The onboarding page sends `{ teachSkills: string[], learnSkills: string[] }` (arrays), which `app/api/users/profile/route.ts` serializes via `JSON.stringify()` into the single `teachSkill`/`learnSkill` string columns. When reading `user.teachSkill`, it may be a raw string like `"Python"` (legacy) or a JSON array string like `'["Python","React"]'`. The match algorithm in `app/api/users/matches/route.ts` does **exact string equality** and is therefore broken for any multi-skill user.
+
+### `/dashboard` does not exist
+
+Four places in the codebase redirect to `/dashboard` after auth, but `app/dashboard/` has never been created. This is the highest-priority missing page.
+
+### Wallet signature verification is a stub
+
+`app/api/auth/wallet/route.ts` and `app/api/auth/register/wallet/route.ts` both receive a `signature` parameter but **never cryptographically verify it**. The wallet auth is effectively based on nonce possession, not wallet ownership. Do not build more on top of this without fixing it first.
+
+### Route protection uses `proxy.ts`, not `middleware.ts`
+
+Next.js 16 uses `proxy.ts` as the middleware file (not `middleware.ts`). The file already exists at `proxy.ts` and protects `/dashboard`, `/swaps`, `/users`, `/profile`, `/discover`, `/notifications`. It checks the JWT cookie and redirects unauthenticated users to `/login`. It also redirects non-onboarded users to `/onboarding`.
+
 ## Architecture
 
 **Next.js 16.2.4** (App Router) + **React 19** + **TypeScript**. Despite the README saying v15, the actual version is 16. Consult `node_modules/next/dist/docs/` for any unfamiliar APIs.
@@ -27,9 +60,12 @@ app/
   (auth)/            # login + register pages — no shared layout wrapper
   api/
     auth/            # login, register, logout, me, wallet/, wallet/nonce
-    swaps/           # GET+POST list; [id]/ PATCH with action param
-    users/           # profile, matches
+    swaps/           # GET+POST list; [id]/ GET+PATCH; [id]/deliver/ POST+GET
+    users/           # profile (GET+PATCH), matches, [id]/ GET, route.ts GET (discovery)
     notifications/   # list + mark-read
+  dashboard/         # authenticated home: profile, matches, swaps, notifications
+  users/             # [page.tsx] discovery grid; [id]/page.tsx public profile + swap request
+  swaps/             # [page.tsx] swaps list; [id]/page.tsx swap detail + delivery form + proof
   onboarding/        # skill setup page (teachSkill + learnSkill)
   layout.tsx         # root layout — fonts, ThemeProvider
   providers.tsx      # client wrapper: next-themes ThemeProvider
@@ -60,10 +96,13 @@ import type { User } from "@/app/generated/prisma/client";
 
 Schema models: `User`, `Swap`, `Proof`, `Message`, `Delivery`, `Notification`.
 
-**Swap lifecycle:** `PENDING → ACTIVE → AWAITING_DELIVERY → COMPLETED | DECLINED`
-- Initiator pays ADA tx hash upfront (verified via Blockfrost API on creation)
-- Both parties mark done independently; `COMPLETED` + `Proof` created when both are done
-- `Proof` stores ADA tx hash + skills + timestamp (structured for future Cardano on-chain anchoring)
+**Swap lifecycle (actual code behaviour):** `PENDING → ACTIVE → COMPLETED | DECLINED`
+- `schema.prisma` defines additional statuses (`AWAITING_DELIVERY`, `VERIFICATION`, `CANCELLED`) but the API code does not use them yet
+- Initiator pays ADA tx hash upfront (verified via Blockfrost API on creation, skipped if key absent)
+- Both parties mark done independently via `initiatorDone`/`receiverDone` boolean fields; `COMPLETED` + `Proof` auto-created server-side when both are true
+- `Message` and `Delivery` tables exist in the real DB but have **no API endpoints** — they are unreachable
+
+**What is not yet built:** messaging UI, delivery display improvements, public reputation pages.
 
 ### Key lib utilities
 
@@ -75,6 +114,8 @@ Schema models: `User`, `Swap`, `Proof`, `Message`, `Delivery`, `Notification`.
 | `lib/mailer.ts` | Nodemailer for transactional email |
 | `lib/cloudinary.ts` | Avatar image uploads |
 | `lib/wallet-nonce-store.ts` | In-memory nonce store (resets on server restart) |
+| `lib/skills.ts` | `parseSkills(raw)` — normalizes null/string/"[...]" → `string[]` |
+| `lib/matching.ts` | `scoreMatch(me, candidate)` → `{ score, type, teachOverlap, learnOverlap }` |
 
 ### Styling
 
