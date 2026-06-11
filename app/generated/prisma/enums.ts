@@ -12,12 +12,24 @@
 export const SwapStatus = {
   PENDING: 'PENDING',
   ACTIVE: 'ACTIVE',
-  AWAITING_DELIVERY: 'AWAITING_DELIVERY',
   COMPLETED: 'COMPLETED',
   DECLINED: 'DECLINED'
 } as const
 
 export type SwapStatus = (typeof SwapStatus)[keyof typeof SwapStatus]
+
+
+export const MessageType = {
+  TEXT: 'TEXT',
+  SWAP_ACCEPTED: 'SWAP_ACCEPTED',
+  SWAP_DECLINED: 'SWAP_DECLINED',
+  SESSION_SCHEDULED: 'SESSION_SCHEDULED',
+  DELIVERABLE_SUBMITTED: 'DELIVERABLE_SUBMITTED',
+  PROOF_CREATED: 'PROOF_CREATED',
+  VERIFICATION_COMPLETED: 'VERIFICATION_COMPLETED'
+} as const
+
+export type MessageType = (typeof MessageType)[keyof typeof MessageType]
 
 
 export const NotificationType = {

@@ -233,8 +233,8 @@ export type UserWhereInput = {
   swapsInitiated?: Prisma.SwapListRelationFilter
   swapsReceived?: Prisma.SwapListRelationFilter
   proofs?: Prisma.ProofListRelationFilter
-  notifications?: Prisma.NotificationListRelationFilter
   messages?: Prisma.MessageListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
   deliveries?: Prisma.DeliveryListRelationFilter
 }
 
@@ -253,8 +253,8 @@ export type UserOrderByWithRelationInput = {
   swapsInitiated?: Prisma.SwapOrderByRelationAggregateInput
   swapsReceived?: Prisma.SwapOrderByRelationAggregateInput
   proofs?: Prisma.ProofOrderByRelationAggregateInput
-  notifications?: Prisma.NotificationOrderByRelationAggregateInput
   messages?: Prisma.MessageOrderByRelationAggregateInput
+  notifications?: Prisma.NotificationOrderByRelationAggregateInput
   deliveries?: Prisma.DeliveryOrderByRelationAggregateInput
 }
 
@@ -276,8 +276,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   swapsInitiated?: Prisma.SwapListRelationFilter
   swapsReceived?: Prisma.SwapListRelationFilter
   proofs?: Prisma.ProofListRelationFilter
-  notifications?: Prisma.NotificationListRelationFilter
   messages?: Prisma.MessageListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
   deliveries?: Prisma.DeliveryListRelationFilter
 }, "id" | "email" | "walletAddress">
 
@@ -330,8 +330,8 @@ export type UserCreateInput = {
   swapsInitiated?: Prisma.SwapCreateNestedManyWithoutInitiatorInput
   swapsReceived?: Prisma.SwapCreateNestedManyWithoutReceiverInput
   proofs?: Prisma.ProofCreateNestedManyWithoutUserInput
-  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutUserInput
 }
 
@@ -350,8 +350,8 @@ export type UserUncheckedCreateInput = {
   swapsInitiated?: Prisma.SwapUncheckedCreateNestedManyWithoutInitiatorInput
   swapsReceived?: Prisma.SwapUncheckedCreateNestedManyWithoutReceiverInput
   proofs?: Prisma.ProofUncheckedCreateNestedManyWithoutUserInput
-  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -370,8 +370,8 @@ export type UserUpdateInput = {
   swapsInitiated?: Prisma.SwapUpdateManyWithoutInitiatorNestedInput
   swapsReceived?: Prisma.SwapUpdateManyWithoutReceiverNestedInput
   proofs?: Prisma.ProofUpdateManyWithoutUserNestedInput
-  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
 }
 
@@ -390,8 +390,8 @@ export type UserUncheckedUpdateInput = {
   swapsInitiated?: Prisma.SwapUncheckedUpdateManyWithoutInitiatorNestedInput
   swapsReceived?: Prisma.SwapUncheckedUpdateManyWithoutReceiverNestedInput
   proofs?: Prisma.ProofUncheckedUpdateManyWithoutUserNestedInput
-  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -538,20 +538,6 @@ export type UserUpdateOneRequiredWithoutProofsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutProofsInput, Prisma.UserUpdateWithoutProofsInput>, Prisma.UserUncheckedUpdateWithoutProofsInput>
 }
 
-export type UserCreateNestedOneWithoutMessagesInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutMessagesInput, Prisma.UserUncheckedCreateWithoutMessagesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMessagesInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserUpdateOneRequiredWithoutMessagesNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutMessagesInput, Prisma.UserUncheckedCreateWithoutMessagesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMessagesInput
-  upsert?: Prisma.UserUpsertWithoutMessagesInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutMessagesInput, Prisma.UserUpdateWithoutMessagesInput>, Prisma.UserUncheckedUpdateWithoutMessagesInput>
-}
-
 export type UserCreateNestedOneWithoutDeliveriesInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesInput, Prisma.UserUncheckedCreateWithoutDeliveriesInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutDeliveriesInput
@@ -564,6 +550,20 @@ export type UserUpdateOneRequiredWithoutDeliveriesNestedInput = {
   upsert?: Prisma.UserUpsertWithoutDeliveriesInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDeliveriesInput, Prisma.UserUpdateWithoutDeliveriesInput>, Prisma.UserUncheckedUpdateWithoutDeliveriesInput>
+}
+
+export type UserCreateNestedOneWithoutMessagesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMessagesInput, Prisma.UserUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMessagesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMessagesInput, Prisma.UserUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMessagesInput
+  upsert?: Prisma.UserUpsertWithoutMessagesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutMessagesInput, Prisma.UserUpdateWithoutMessagesInput>, Prisma.UserUncheckedUpdateWithoutMessagesInput>
 }
 
 export type UserCreateNestedOneWithoutNotificationsInput = {
@@ -594,8 +594,8 @@ export type UserCreateWithoutSwapsInitiatedInput = {
   updatedAt?: Date | string
   swapsReceived?: Prisma.SwapCreateNestedManyWithoutReceiverInput
   proofs?: Prisma.ProofCreateNestedManyWithoutUserInput
-  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutUserInput
 }
 
@@ -613,8 +613,8 @@ export type UserUncheckedCreateWithoutSwapsInitiatedInput = {
   updatedAt?: Date | string
   swapsReceived?: Prisma.SwapUncheckedCreateNestedManyWithoutReceiverInput
   proofs?: Prisma.ProofUncheckedCreateNestedManyWithoutUserInput
-  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -637,8 +637,8 @@ export type UserCreateWithoutSwapsReceivedInput = {
   updatedAt?: Date | string
   swapsInitiated?: Prisma.SwapCreateNestedManyWithoutInitiatorInput
   proofs?: Prisma.ProofCreateNestedManyWithoutUserInput
-  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutUserInput
 }
 
@@ -656,8 +656,8 @@ export type UserUncheckedCreateWithoutSwapsReceivedInput = {
   updatedAt?: Date | string
   swapsInitiated?: Prisma.SwapUncheckedCreateNestedManyWithoutInitiatorInput
   proofs?: Prisma.ProofUncheckedCreateNestedManyWithoutUserInput
-  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -691,8 +691,8 @@ export type UserUpdateWithoutSwapsInitiatedInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   swapsReceived?: Prisma.SwapUpdateManyWithoutReceiverNestedInput
   proofs?: Prisma.ProofUpdateManyWithoutUserNestedInput
-  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
 }
 
@@ -710,8 +710,8 @@ export type UserUncheckedUpdateWithoutSwapsInitiatedInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   swapsReceived?: Prisma.SwapUncheckedUpdateManyWithoutReceiverNestedInput
   proofs?: Prisma.ProofUncheckedUpdateManyWithoutUserNestedInput
-  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -740,8 +740,8 @@ export type UserUpdateWithoutSwapsReceivedInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   swapsInitiated?: Prisma.SwapUpdateManyWithoutInitiatorNestedInput
   proofs?: Prisma.ProofUpdateManyWithoutUserNestedInput
-  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
 }
 
@@ -759,8 +759,8 @@ export type UserUncheckedUpdateWithoutSwapsReceivedInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   swapsInitiated?: Prisma.SwapUncheckedUpdateManyWithoutInitiatorNestedInput
   proofs?: Prisma.ProofUncheckedUpdateManyWithoutUserNestedInput
-  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -778,8 +778,8 @@ export type UserCreateWithoutProofsInput = {
   updatedAt?: Date | string
   swapsInitiated?: Prisma.SwapCreateNestedManyWithoutInitiatorInput
   swapsReceived?: Prisma.SwapCreateNestedManyWithoutReceiverInput
-  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   deliveries?: Prisma.DeliveryCreateNestedManyWithoutUserInput
 }
 
@@ -797,8 +797,8 @@ export type UserUncheckedCreateWithoutProofsInput = {
   updatedAt?: Date | string
   swapsInitiated?: Prisma.SwapUncheckedCreateNestedManyWithoutInitiatorInput
   swapsReceived?: Prisma.SwapUncheckedCreateNestedManyWithoutReceiverInput
-  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   deliveries?: Prisma.DeliveryUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -832,8 +832,8 @@ export type UserUpdateWithoutProofsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   swapsInitiated?: Prisma.SwapUpdateManyWithoutInitiatorNestedInput
   swapsReceived?: Prisma.SwapUpdateManyWithoutReceiverNestedInput
-  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   deliveries?: Prisma.DeliveryUpdateManyWithoutUserNestedInput
 }
 
@@ -851,9 +851,101 @@ export type UserUncheckedUpdateWithoutProofsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   swapsInitiated?: Prisma.SwapUncheckedUpdateManyWithoutInitiatorNestedInput
   swapsReceived?: Prisma.SwapUncheckedUpdateManyWithoutReceiverNestedInput
-  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutDeliveriesInput = {
+  id?: string
+  name: string
+  email?: string | null
+  password?: string | null
+  avatarUrl?: string | null
+  teachSkill?: string | null
+  learnSkill?: string | null
+  walletAddress?: string | null
+  walletNonce?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  swapsInitiated?: Prisma.SwapCreateNestedManyWithoutInitiatorInput
+  swapsReceived?: Prisma.SwapCreateNestedManyWithoutReceiverInput
+  proofs?: Prisma.ProofCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutDeliveriesInput = {
+  id?: string
+  name: string
+  email?: string | null
+  password?: string | null
+  avatarUrl?: string | null
+  teachSkill?: string | null
+  learnSkill?: string | null
+  walletAddress?: string | null
+  walletNonce?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  swapsInitiated?: Prisma.SwapUncheckedCreateNestedManyWithoutInitiatorInput
+  swapsReceived?: Prisma.SwapUncheckedCreateNestedManyWithoutReceiverInput
+  proofs?: Prisma.ProofUncheckedCreateNestedManyWithoutUserInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutDeliveriesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesInput, Prisma.UserUncheckedCreateWithoutDeliveriesInput>
+}
+
+export type UserUpsertWithoutDeliveriesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDeliveriesInput, Prisma.UserUncheckedUpdateWithoutDeliveriesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesInput, Prisma.UserUncheckedCreateWithoutDeliveriesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDeliveriesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDeliveriesInput, Prisma.UserUncheckedUpdateWithoutDeliveriesInput>
+}
+
+export type UserUpdateWithoutDeliveriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletNonce?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  swapsInitiated?: Prisma.SwapUpdateManyWithoutInitiatorNestedInput
+  swapsReceived?: Prisma.SwapUpdateManyWithoutReceiverNestedInput
+  proofs?: Prisma.ProofUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDeliveriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletNonce?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  swapsInitiated?: Prisma.SwapUncheckedUpdateManyWithoutInitiatorNestedInput
+  swapsReceived?: Prisma.SwapUncheckedUpdateManyWithoutReceiverNestedInput
+  proofs?: Prisma.ProofUncheckedUpdateManyWithoutUserNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMessagesInput = {
@@ -946,98 +1038,6 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   proofs?: Prisma.ProofUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   deliveries?: Prisma.DeliveryUncheckedUpdateManyWithoutUserNestedInput
-}
-
-export type UserCreateWithoutDeliveriesInput = {
-  id?: string
-  name: string
-  email?: string | null
-  password?: string | null
-  avatarUrl?: string | null
-  teachSkill?: string | null
-  learnSkill?: string | null
-  walletAddress?: string | null
-  walletNonce?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  swapsInitiated?: Prisma.SwapCreateNestedManyWithoutInitiatorInput
-  swapsReceived?: Prisma.SwapCreateNestedManyWithoutReceiverInput
-  proofs?: Prisma.ProofCreateNestedManyWithoutUserInput
-  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
-}
-
-export type UserUncheckedCreateWithoutDeliveriesInput = {
-  id?: string
-  name: string
-  email?: string | null
-  password?: string | null
-  avatarUrl?: string | null
-  teachSkill?: string | null
-  learnSkill?: string | null
-  walletAddress?: string | null
-  walletNonce?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  swapsInitiated?: Prisma.SwapUncheckedCreateNestedManyWithoutInitiatorInput
-  swapsReceived?: Prisma.SwapUncheckedCreateNestedManyWithoutReceiverInput
-  proofs?: Prisma.ProofUncheckedCreateNestedManyWithoutUserInput
-  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
-}
-
-export type UserCreateOrConnectWithoutDeliveriesInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesInput, Prisma.UserUncheckedCreateWithoutDeliveriesInput>
-}
-
-export type UserUpsertWithoutDeliveriesInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutDeliveriesInput, Prisma.UserUncheckedUpdateWithoutDeliveriesInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutDeliveriesInput, Prisma.UserUncheckedCreateWithoutDeliveriesInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutDeliveriesInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutDeliveriesInput, Prisma.UserUncheckedUpdateWithoutDeliveriesInput>
-}
-
-export type UserUpdateWithoutDeliveriesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  walletNonce?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  swapsInitiated?: Prisma.SwapUpdateManyWithoutInitiatorNestedInput
-  swapsReceived?: Prisma.SwapUpdateManyWithoutReceiverNestedInput
-  proofs?: Prisma.ProofUpdateManyWithoutUserNestedInput
-  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
-}
-
-export type UserUncheckedUpdateWithoutDeliveriesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  walletNonce?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  swapsInitiated?: Prisma.SwapUncheckedUpdateManyWithoutInitiatorNestedInput
-  swapsReceived?: Prisma.SwapUncheckedUpdateManyWithoutReceiverNestedInput
-  proofs?: Prisma.ProofUncheckedUpdateManyWithoutUserNestedInput
-  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -1141,8 +1141,8 @@ export type UserCountOutputType = {
   swapsInitiated: number
   swapsReceived: number
   proofs: number
-  notifications: number
   messages: number
+  notifications: number
   deliveries: number
 }
 
@@ -1150,8 +1150,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   swapsInitiated?: boolean | UserCountOutputTypeCountSwapsInitiatedArgs
   swapsReceived?: boolean | UserCountOutputTypeCountSwapsReceivedArgs
   proofs?: boolean | UserCountOutputTypeCountProofsArgs
-  notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
   messages?: boolean | UserCountOutputTypeCountMessagesArgs
+  notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
   deliveries?: boolean | UserCountOutputTypeCountDeliveriesArgs
 }
 
@@ -1189,15 +1189,15 @@ export type UserCountOutputTypeCountProofsArgs<ExtArgs extends runtime.Types.Ext
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.NotificationWhereInput
+export type UserCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MessageWhereInput
 }
 
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.MessageWhereInput
+export type UserCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationWhereInput
 }
 
 /**
@@ -1223,8 +1223,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   swapsInitiated?: boolean | Prisma.User$swapsInitiatedArgs<ExtArgs>
   swapsReceived?: boolean | Prisma.User$swapsReceivedArgs<ExtArgs>
   proofs?: boolean | Prisma.User$proofsArgs<ExtArgs>
-  notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   messages?: boolean | Prisma.User$messagesArgs<ExtArgs>
+  notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   deliveries?: boolean | Prisma.User$deliveriesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
@@ -1276,8 +1276,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   swapsInitiated?: boolean | Prisma.User$swapsInitiatedArgs<ExtArgs>
   swapsReceived?: boolean | Prisma.User$swapsReceivedArgs<ExtArgs>
   proofs?: boolean | Prisma.User$proofsArgs<ExtArgs>
-  notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   messages?: boolean | Prisma.User$messagesArgs<ExtArgs>
+  notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   deliveries?: boolean | Prisma.User$deliveriesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1290,8 +1290,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     swapsInitiated: Prisma.$SwapPayload<ExtArgs>[]
     swapsReceived: Prisma.$SwapPayload<ExtArgs>[]
     proofs: Prisma.$ProofPayload<ExtArgs>[]
-    notifications: Prisma.$NotificationPayload<ExtArgs>[]
     messages: Prisma.$MessagePayload<ExtArgs>[]
+    notifications: Prisma.$NotificationPayload<ExtArgs>[]
     deliveries: Prisma.$DeliveryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1703,8 +1703,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   swapsInitiated<T extends Prisma.User$swapsInitiatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$swapsInitiatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SwapPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   swapsReceived<T extends Prisma.User$swapsReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$swapsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SwapPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   proofs<T extends Prisma.User$proofsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$proofsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProofPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   messages<T extends Prisma.User$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   deliveries<T extends Prisma.User$deliveriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$deliveriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2211,30 +2211,6 @@ export type User$proofsArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 }
 
 /**
- * User.notifications
- */
-export type User$notificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Notification
-   */
-  select?: Prisma.NotificationSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Notification
-   */
-  omit?: Prisma.NotificationOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.NotificationInclude<ExtArgs> | null
-  where?: Prisma.NotificationWhereInput
-  orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[]
-  cursor?: Prisma.NotificationWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
-}
-
-/**
  * User.messages
  */
 export type User$messagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2256,6 +2232,30 @@ export type User$messagesArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
+}
+
+/**
+ * User.notifications
+ */
+export type User$notificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Notification
+   */
+  select?: Prisma.NotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Notification
+   */
+  omit?: Prisma.NotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationInclude<ExtArgs> | null
+  where?: Prisma.NotificationWhereInput
+  orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
 }
 
 /**

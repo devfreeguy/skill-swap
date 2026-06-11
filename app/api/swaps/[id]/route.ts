@@ -93,6 +93,14 @@ export async function PATCH(
         message: `Your swap request was accepted!`,
       },
     });
+    await prisma.message.create({
+      data: {
+        swapId: id,
+        senderId: swap.receiverId,
+        content: "Swap accepted",
+        type: "SWAP_ACCEPTED",
+      },
+    });
     return NextResponse.json(updated);
   }
 
@@ -118,6 +126,14 @@ export async function PATCH(
         userId: swap.initiatorId,
         type: "SWAP_DECLINED",
         message: `Your swap request was declined.`,
+      },
+    });
+    await prisma.message.create({
+      data: {
+        swapId: id,
+        senderId: swap.receiverId,
+        content: "Swap declined",
+        type: "SWAP_DECLINED",
       },
     });
     return NextResponse.json(updated);
@@ -186,6 +202,14 @@ export async function PATCH(
                 message: `Your swap with ${initiator?.name} is complete!`,
               },
             ],
+          }),
+          prisma.message.create({
+            data: {
+              swapId: id,
+              senderId: swap.initiatorId,
+              content: "Swap completed",
+              type: "PROOF_CREATED",
+            },
           }),
         ]);
 

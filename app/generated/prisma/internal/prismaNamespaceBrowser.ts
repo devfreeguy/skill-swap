@@ -54,8 +54,8 @@ export const ModelName = {
   User: 'User',
   Swap: 'Swap',
   Proof: 'Proof',
-  Message: 'Message',
   Delivery: 'Delivery',
+  Message: 'Message',
   Notification: 'Notification'
 } as const
 
@@ -100,9 +100,9 @@ export const SwapScalarFieldEnum = {
   adaTxHash: 'adaTxHash',
   initiatorDone: 'initiatorDone',
   receiverDone: 'receiverDone',
-  completedAt: 'completedAt',
   initiatorDelivered: 'initiatorDelivered',
   receiverDelivered: 'receiverDelivered',
+  completedAt: 'completedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -125,17 +125,6 @@ export const ProofScalarFieldEnum = {
 export type ProofScalarFieldEnum = (typeof ProofScalarFieldEnum)[keyof typeof ProofScalarFieldEnum]
 
 
-export const MessageScalarFieldEnum = {
-  id: 'id',
-  swapId: 'swapId',
-  senderId: 'senderId',
-  content: 'content',
-  createdAt: 'createdAt'
-} as const
-
-export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
-
-
 export const DeliveryScalarFieldEnum = {
   id: 'id',
   swapId: 'swapId',
@@ -146,6 +135,19 @@ export const DeliveryScalarFieldEnum = {
 } as const
 
 export type DeliveryScalarFieldEnum = (typeof DeliveryScalarFieldEnum)[keyof typeof DeliveryScalarFieldEnum]
+
+
+export const MessageScalarFieldEnum = {
+  id: 'id',
+  swapId: 'swapId',
+  senderId: 'senderId',
+  content: 'content',
+  type: 'type',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
 
 
 export const NotificationScalarFieldEnum = {

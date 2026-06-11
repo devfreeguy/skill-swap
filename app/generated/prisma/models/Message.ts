@@ -29,6 +29,8 @@ export type MessageMinAggregateOutputType = {
   swapId: string | null
   senderId: string | null
   content: string | null
+  type: $Enums.MessageType | null
+  metadata: string | null
   createdAt: Date | null
 }
 
@@ -37,6 +39,8 @@ export type MessageMaxAggregateOutputType = {
   swapId: string | null
   senderId: string | null
   content: string | null
+  type: $Enums.MessageType | null
+  metadata: string | null
   createdAt: Date | null
 }
 
@@ -45,6 +49,8 @@ export type MessageCountAggregateOutputType = {
   swapId: number
   senderId: number
   content: number
+  type: number
+  metadata: number
   createdAt: number
   _all: number
 }
@@ -55,6 +61,8 @@ export type MessageMinAggregateInputType = {
   swapId?: true
   senderId?: true
   content?: true
+  type?: true
+  metadata?: true
   createdAt?: true
 }
 
@@ -63,6 +71,8 @@ export type MessageMaxAggregateInputType = {
   swapId?: true
   senderId?: true
   content?: true
+  type?: true
+  metadata?: true
   createdAt?: true
 }
 
@@ -71,6 +81,8 @@ export type MessageCountAggregateInputType = {
   swapId?: true
   senderId?: true
   content?: true
+  type?: true
+  metadata?: true
   createdAt?: true
   _all?: true
 }
@@ -152,6 +164,8 @@ export type MessageGroupByOutputType = {
   swapId: string
   senderId: string
   content: string
+  type: $Enums.MessageType
+  metadata: string | null
   createdAt: Date
   _count: MessageCountAggregateOutputType | null
   _min: MessageMinAggregateOutputType | null
@@ -181,6 +195,8 @@ export type MessageWhereInput = {
   swapId?: Prisma.StringFilter<"Message"> | string
   senderId?: Prisma.StringFilter<"Message"> | string
   content?: Prisma.StringFilter<"Message"> | string
+  type?: Prisma.EnumMessageTypeFilter<"Message"> | $Enums.MessageType
+  metadata?: Prisma.StringNullableFilter<"Message"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   swap?: Prisma.XOR<Prisma.SwapScalarRelationFilter, Prisma.SwapWhereInput>
   sender?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -191,6 +207,8 @@ export type MessageOrderByWithRelationInput = {
   swapId?: Prisma.SortOrder
   senderId?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  metadata?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   swap?: Prisma.SwapOrderByWithRelationInput
   sender?: Prisma.UserOrderByWithRelationInput
@@ -204,6 +222,8 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
   swapId?: Prisma.StringFilter<"Message"> | string
   senderId?: Prisma.StringFilter<"Message"> | string
   content?: Prisma.StringFilter<"Message"> | string
+  type?: Prisma.EnumMessageTypeFilter<"Message"> | $Enums.MessageType
+  metadata?: Prisma.StringNullableFilter<"Message"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   swap?: Prisma.XOR<Prisma.SwapScalarRelationFilter, Prisma.SwapWhereInput>
   sender?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -214,6 +234,8 @@ export type MessageOrderByWithAggregationInput = {
   swapId?: Prisma.SortOrder
   senderId?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  metadata?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.MessageCountOrderByAggregateInput
   _max?: Prisma.MessageMaxOrderByAggregateInput
@@ -228,12 +250,16 @@ export type MessageScalarWhereWithAggregatesInput = {
   swapId?: Prisma.StringWithAggregatesFilter<"Message"> | string
   senderId?: Prisma.StringWithAggregatesFilter<"Message"> | string
   content?: Prisma.StringWithAggregatesFilter<"Message"> | string
+  type?: Prisma.EnumMessageTypeWithAggregatesFilter<"Message"> | $Enums.MessageType
+  metadata?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Message"> | Date | string
 }
 
 export type MessageCreateInput = {
   id?: string
   content: string
+  type?: $Enums.MessageType
+  metadata?: string | null
   createdAt?: Date | string
   swap: Prisma.SwapCreateNestedOneWithoutMessagesInput
   sender: Prisma.UserCreateNestedOneWithoutMessagesInput
@@ -244,12 +270,16 @@ export type MessageUncheckedCreateInput = {
   swapId: string
   senderId: string
   content: string
+  type?: $Enums.MessageType
+  metadata?: string | null
   createdAt?: Date | string
 }
 
 export type MessageUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   swap?: Prisma.SwapUpdateOneRequiredWithoutMessagesNestedInput
   sender?: Prisma.UserUpdateOneRequiredWithoutMessagesNestedInput
@@ -260,6 +290,8 @@ export type MessageUncheckedUpdateInput = {
   swapId?: Prisma.StringFieldUpdateOperationsInput | string
   senderId?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -268,12 +300,16 @@ export type MessageCreateManyInput = {
   swapId: string
   senderId: string
   content: string
+  type?: $Enums.MessageType
+  metadata?: string | null
   createdAt?: Date | string
 }
 
 export type MessageUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -282,6 +318,8 @@ export type MessageUncheckedUpdateManyInput = {
   swapId?: Prisma.StringFieldUpdateOperationsInput | string
   senderId?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -300,6 +338,8 @@ export type MessageCountOrderByAggregateInput = {
   swapId?: Prisma.SortOrder
   senderId?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  metadata?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -308,6 +348,8 @@ export type MessageMaxOrderByAggregateInput = {
   swapId?: Prisma.SortOrder
   senderId?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  metadata?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -316,6 +358,8 @@ export type MessageMinOrderByAggregateInput = {
   swapId?: Prisma.SortOrder
   senderId?: Prisma.SortOrder
   content?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  metadata?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -403,9 +447,15 @@ export type MessageUncheckedUpdateManyWithoutSwapNestedInput = {
   deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
 }
 
+export type EnumMessageTypeFieldUpdateOperationsInput = {
+  set?: $Enums.MessageType
+}
+
 export type MessageCreateWithoutSenderInput = {
   id?: string
   content: string
+  type?: $Enums.MessageType
+  metadata?: string | null
   createdAt?: Date | string
   swap: Prisma.SwapCreateNestedOneWithoutMessagesInput
 }
@@ -414,6 +464,8 @@ export type MessageUncheckedCreateWithoutSenderInput = {
   id?: string
   swapId: string
   content: string
+  type?: $Enums.MessageType
+  metadata?: string | null
   createdAt?: Date | string
 }
 
@@ -451,12 +503,16 @@ export type MessageScalarWhereInput = {
   swapId?: Prisma.StringFilter<"Message"> | string
   senderId?: Prisma.StringFilter<"Message"> | string
   content?: Prisma.StringFilter<"Message"> | string
+  type?: Prisma.EnumMessageTypeFilter<"Message"> | $Enums.MessageType
+  metadata?: Prisma.StringNullableFilter<"Message"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
 }
 
 export type MessageCreateWithoutSwapInput = {
   id?: string
   content: string
+  type?: $Enums.MessageType
+  metadata?: string | null
   createdAt?: Date | string
   sender: Prisma.UserCreateNestedOneWithoutMessagesInput
 }
@@ -465,6 +521,8 @@ export type MessageUncheckedCreateWithoutSwapInput = {
   id?: string
   senderId: string
   content: string
+  type?: $Enums.MessageType
+  metadata?: string | null
   createdAt?: Date | string
 }
 
@@ -498,12 +556,16 @@ export type MessageCreateManySenderInput = {
   id?: string
   swapId: string
   content: string
+  type?: $Enums.MessageType
+  metadata?: string | null
   createdAt?: Date | string
 }
 
 export type MessageUpdateWithoutSenderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   swap?: Prisma.SwapUpdateOneRequiredWithoutMessagesNestedInput
 }
@@ -512,6 +574,8 @@ export type MessageUncheckedUpdateWithoutSenderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   swapId?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -519,6 +583,8 @@ export type MessageUncheckedUpdateManyWithoutSenderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   swapId?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -526,12 +592,16 @@ export type MessageCreateManySwapInput = {
   id?: string
   senderId: string
   content: string
+  type?: $Enums.MessageType
+  metadata?: string | null
   createdAt?: Date | string
 }
 
 export type MessageUpdateWithoutSwapInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sender?: Prisma.UserUpdateOneRequiredWithoutMessagesNestedInput
 }
@@ -540,6 +610,8 @@ export type MessageUncheckedUpdateWithoutSwapInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   senderId?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -547,6 +619,8 @@ export type MessageUncheckedUpdateManyWithoutSwapInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   senderId?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -557,6 +631,8 @@ export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   swapId?: boolean
   senderId?: boolean
   content?: boolean
+  type?: boolean
+  metadata?: boolean
   createdAt?: boolean
   swap?: boolean | Prisma.SwapDefaultArgs<ExtArgs>
   sender?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -567,6 +643,8 @@ export type MessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   swapId?: boolean
   senderId?: boolean
   content?: boolean
+  type?: boolean
+  metadata?: boolean
   createdAt?: boolean
   swap?: boolean | Prisma.SwapDefaultArgs<ExtArgs>
   sender?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -577,6 +655,8 @@ export type MessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   swapId?: boolean
   senderId?: boolean
   content?: boolean
+  type?: boolean
+  metadata?: boolean
   createdAt?: boolean
   swap?: boolean | Prisma.SwapDefaultArgs<ExtArgs>
   sender?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -587,10 +667,12 @@ export type MessageSelectScalar = {
   swapId?: boolean
   senderId?: boolean
   content?: boolean
+  type?: boolean
+  metadata?: boolean
   createdAt?: boolean
 }
 
-export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "swapId" | "senderId" | "content" | "createdAt", ExtArgs["result"]["message"]>
+export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "swapId" | "senderId" | "content" | "type" | "metadata" | "createdAt", ExtArgs["result"]["message"]>
 export type MessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   swap?: boolean | Prisma.SwapDefaultArgs<ExtArgs>
   sender?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -615,6 +697,8 @@ export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     swapId: string
     senderId: string
     content: string
+    type: $Enums.MessageType
+    metadata: string | null
     createdAt: Date
   }, ExtArgs["result"]["message"]>
   composites: {}
@@ -1045,6 +1129,8 @@ export interface MessageFieldRefs {
   readonly swapId: Prisma.FieldRef<"Message", 'String'>
   readonly senderId: Prisma.FieldRef<"Message", 'String'>
   readonly content: Prisma.FieldRef<"Message", 'String'>
+  readonly type: Prisma.FieldRef<"Message", 'MessageType'>
+  readonly metadata: Prisma.FieldRef<"Message", 'String'>
   readonly createdAt: Prisma.FieldRef<"Message", 'DateTime'>
 }
     

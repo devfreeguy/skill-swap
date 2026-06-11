@@ -49,6 +49,15 @@ export async function POST(
     update: { resourceLink, notes },
   });
 
+  await prisma.message.create({
+    data: {
+      swapId: id,
+      senderId: currentUser.id,
+      content: "Deliverable submitted",
+      type: "DELIVERABLE_SUBMITTED",
+    },
+  });
+
   const deliveryCount = await prisma.delivery.count({
     where: {
       swapId: id,
@@ -99,6 +108,14 @@ export async function POST(
               message: `Your swap with ${initiator?.name} is complete! Both deliveries received.`,
             },
           ],
+        }),
+        prisma.message.create({
+          data: {
+            swapId: id,
+            senderId: swap.initiatorId,
+            content: "Swap completed",
+            type: "PROOF_CREATED",
+          },
         }),
       ]);
 
