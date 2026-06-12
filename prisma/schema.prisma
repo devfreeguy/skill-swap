@@ -62,9 +62,10 @@ model Swap {
   initiator User @relation("Initiator", fields: [initiatorId], references: [id])
   receiver  User @relation("Receiver", fields: [receiverId], references: [id])
 
-  messages   Message[]
-  deliveries Delivery[]
-  proof      Proof?
+  messages      Message[]
+  deliveries    Delivery[]
+  proof         Proof?
+  notifications Notification[]
 }
 
 enum SwapStatus {
@@ -159,6 +160,7 @@ model Notification {
   id String @id @default(cuid())
 
   userId String
+  swapId String?
 
   type    NotificationType
   message String
@@ -166,7 +168,8 @@ model Notification {
 
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id])
+  user User  @relation(fields: [userId], references: [id])
+  swap Swap? @relation(fields: [swapId], references: [id])
 }
 
 enum NotificationType {
@@ -175,4 +178,5 @@ enum NotificationType {
   SWAP_DECLINED
   SWAP_COMPLETED
   PERFECT_MATCH
+  PROOF_CREATED
 }

@@ -40,7 +40,8 @@ export const NotificationType = {
   SWAP_ACCEPTED: 'SWAP_ACCEPTED',
   SWAP_DECLINED: 'SWAP_DECLINED',
   SWAP_COMPLETED: 'SWAP_COMPLETED',
-  PERFECT_MATCH: 'PERFECT_MATCH'
+  PERFECT_MATCH: 'PERFECT_MATCH',
+  PROOF_CREATED: 'PROOF_CREATED'
 } as const
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]

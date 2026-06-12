@@ -91,6 +91,7 @@ export async function PATCH(
         userId: swap.initiatorId,
         type: "SWAP_ACCEPTED",
         message: `Your swap request was accepted!`,
+        swapId: id,
       },
     });
     await prisma.message.create({
@@ -126,6 +127,7 @@ export async function PATCH(
         userId: swap.initiatorId,
         type: "SWAP_DECLINED",
         message: `Your swap request was declined.`,
+        swapId: id,
       },
     });
     await prisma.message.create({
@@ -195,11 +197,13 @@ export async function PATCH(
                 userId: swap.initiatorId,
                 type: "SWAP_COMPLETED",
                 message: `Your swap with ${receiver?.name} is complete!`,
+                swapId: id,
               },
               {
                 userId: swap.receiverId,
                 type: "SWAP_COMPLETED",
                 message: `Your swap with ${initiator?.name} is complete!`,
+                swapId: id,
               },
             ],
           }),

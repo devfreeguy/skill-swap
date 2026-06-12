@@ -101,11 +101,13 @@ export async function POST(
               userId: swap.initiatorId,
               type: "SWAP_COMPLETED",
               message: `Your swap with ${receiver?.name} is complete! Both deliveries received.`,
+              swapId: id,
             },
             {
               userId: swap.receiverId,
               type: "SWAP_COMPLETED",
               message: `Your swap with ${initiator?.name} is complete! Both deliveries received.`,
+              swapId: id,
             },
           ],
         }),

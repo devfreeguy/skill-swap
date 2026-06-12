@@ -26,7 +26,7 @@ const NAV_ITEMS = [
   { label: "Discover", icon: IconCompass, href: "/users" },
   { label: "Swaps", icon: IconSwitchHorizontal, href: "/swaps" },
   { label: "Messages", icon: IconMessageCircle, href: "/messages" },
-  { label: "Notifications", icon: IconBell, href: "/notifications" }, // TODO: notifications page
+  { label: "Notifications", icon: IconBell, href: "/notifications" },
   { label: "Profile", icon: IconUser, href: "/profile" }, // TODO: profile page
   { label: "Settings", icon: IconSettings, href: "#" }, // TODO: settings page not built yet
 ];

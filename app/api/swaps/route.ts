@@ -86,6 +86,7 @@ export async function POST(request: NextRequest) {
       userId: receiverId,
       type: "SWAP_REQUEST",
       message: `${currentUser.name} wants to swap skills with you!`,
+      swapId: swap.id,
     },
   });
 

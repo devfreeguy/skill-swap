@@ -156,6 +156,7 @@ export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeo
 export const NotificationScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  swapId: 'swapId',
   type: 'type',
   message: 'message',
   read: 'read',
