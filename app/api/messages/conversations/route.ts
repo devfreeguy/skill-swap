@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import { scoreMatch } from "@/lib/matching";
 
 export async function GET(request: NextRequest) {
   const currentUser = await getCurrentUser(request);
@@ -15,10 +16,22 @@ export async function GET(request: NextRequest) {
     },
     include: {
       initiator: {
-        select: { id: true, name: true, avatarUrl: true },
+        select: {
+          id: true,
+          name: true,
+          avatarUrl: true,
+          teachSkill: true,
+          learnSkill: true,
+        },
       },
       receiver: {
-        select: { id: true, name: true, avatarUrl: true },
+        select: {
+          id: true,
+          name: true,
+          avatarUrl: true,
+          teachSkill: true,
+          learnSkill: true,
+        },
       },
       messages: {
         orderBy: { createdAt: "desc" },
@@ -36,15 +49,20 @@ export async function GET(request: NextRequest) {
   });
 
   const conversations = swaps.map((swap) => {
+    const me =
+      swap.initiatorId === currentUser.id ? swap.initiator : swap.receiver;
     const other =
       swap.initiatorId === currentUser.id ? swap.receiver : swap.initiator;
     const lastMessage = swap.messages[0] ?? null;
+    const { type: matchType } = scoreMatch(me, other);
 
     return {
       swapId: swap.id,
       status: swap.status,
       other,
+      myTeachSkill: me.teachSkill ?? null,
       lastMessage,
+      matchType,
       updatedAt: swap.updatedAt,
     };
   });
