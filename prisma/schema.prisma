@@ -124,6 +124,9 @@ model Delivery {
 
 enum MessageType {
   TEXT
+  LINK
+  IMAGE
+  DOCUMENT
   SWAP_ACCEPTED
   SWAP_DECLINED
   SESSION_SCHEDULED
@@ -141,6 +144,10 @@ model Message {
   content  String
   type     MessageType @default(TEXT)
   metadata String?
+
+  fileUrl  String?
+  fileName String?
+  fileSize Int?
 
   createdAt DateTime @default(now())
 

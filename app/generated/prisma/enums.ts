@@ -21,6 +21,9 @@ export type SwapStatus = (typeof SwapStatus)[keyof typeof SwapStatus]
 
 export const MessageType = {
   TEXT: 'TEXT',
+  LINK: 'LINK',
+  IMAGE: 'IMAGE',
+  DOCUMENT: 'DOCUMENT',
   SWAP_ACCEPTED: 'SWAP_ACCEPTED',
   SWAP_DECLINED: 'SWAP_DECLINED',
   SESSION_SCHEDULED: 'SESSION_SCHEDULED',

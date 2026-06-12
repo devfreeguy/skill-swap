@@ -144,6 +144,9 @@ export const MessageScalarFieldEnum = {
   content: 'content',
   type: 'type',
   metadata: 'metadata',
+  fileUrl: 'fileUrl',
+  fileName: 'fileName',
+  fileSize: 'fileSize',
   createdAt: 'createdAt'
 } as const
 

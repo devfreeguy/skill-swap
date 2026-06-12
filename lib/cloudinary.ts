@@ -19,4 +19,18 @@ export async function uploadAvatar(
   return result.secure_url;
 }
 
+export async function uploadMessageFile(
+  file: string,
+  messageId: string,
+  resourceType: "image" | "raw"
+): Promise<{ url: string }> {
+  const result = await cloudinary.uploader.upload(file, {
+    folder: "skillswap/messages",
+    public_id: messageId,
+    overwrite: true,
+    resource_type: resourceType,
+  });
+  return { url: result.secure_url };
+}
+
 export default cloudinary;
