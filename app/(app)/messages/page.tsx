@@ -66,13 +66,16 @@ export default function MessagesPage() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Initial load
+  // Initial load — run once on mount only; router is stable and must NOT be a dep
   useEffect(() => {
+    let cancelled = false;
+
     Promise.all([
       fetch("/api/auth/me").then((r) => r.json()),
       fetch("/api/messages/conversations").then((r) => r.json()),
     ])
       .then(([meData, convData]) => {
+        if (cancelled) return;
         if (meData.error) {
           router.replace("/login");
           return;
@@ -81,8 +84,15 @@ export default function MessagesPage() {
         setConversations(Array.isArray(convData) ? convData : []);
         setLoading(false);
       })
-      .catch(() => router.replace("/login"));
-  }, [router]);
+      .catch(() => {
+        if (!cancelled) router.replace("/login");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Scroll to bottom when messages change
   useEffect(() => {
