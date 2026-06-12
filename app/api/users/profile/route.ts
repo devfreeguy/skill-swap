@@ -11,21 +11,37 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: currentUser.id },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      avatarUrl: true,
-      teachSkill: true,
-      learnSkill: true,
-      walletAddress: true,
-      createdAt: true,
-    },
-  });
+  const [user, completedSwaps, proofsEarned] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: currentUser.id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        avatarUrl: true,
+        teachSkill: true,
+        learnSkill: true,
+        walletAddress: true,
+        createdAt: true,
+      },
+    }),
+    prisma.swap.count({
+      where: {
+        status: "COMPLETED",
+        OR: [{ initiatorId: currentUser.id }, { receiverId: currentUser.id }],
+      },
+    }),
+    prisma.proof.count({
+      where: { userId: currentUser.id },
+    }),
+  ]);
 
-  return NextResponse.json(user);
+  return NextResponse.json({
+    ...user,
+    completedSwaps,
+    proofsEarned,
+    reputationScore: completedSwaps * 10,
+  });
 }
 
 export async function PATCH(request: NextRequest) {
@@ -35,7 +51,7 @@ export async function PATCH(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { name, teachSkill, learnSkill, teachSkills, learnSkills, avatarFile } = body;
+  const { name, email, teachSkill, learnSkill, teachSkills, learnSkills, avatarFile } = body;
 
   let avatarUrl = currentUser.avatarUrl;
   if (avatarFile) {
@@ -52,6 +68,7 @@ export async function PATCH(request: NextRequest) {
     where: { id: currentUser.id },
     data: {
       ...(name !== undefined && { name }),
+      ...(email !== undefined && { email: email || null }),
       ...(finalTeachSkill !== undefined && { teachSkill: finalTeachSkill }),
       ...(finalLearnSkill !== undefined && { learnSkill: finalLearnSkill }),
       ...(avatarUrl !== undefined && { avatarUrl }),
