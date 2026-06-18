@@ -187,7 +187,7 @@ export async function PATCH(
               userId: swap.initiatorId,
               teachSkill: initiator?.teachSkill ?? "",
               learnSkill: initiator?.learnSkill ?? "",
-              adaTxHash: swap.adaTxHash ?? "",
+              adaTxHash: swap.adaTxHash,
               ...(summary && { summary }),
             },
           }),

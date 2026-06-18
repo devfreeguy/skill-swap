@@ -177,7 +177,7 @@ export type ProofGroupByOutputType = {
   userId: string
   teachSkill: string
   learnSkill: string
-  adaTxHash: string
+  adaTxHash: string | null
   metadataHash: string | null
   summary: string | null
   createdAt: Date
@@ -210,7 +210,7 @@ export type ProofWhereInput = {
   userId?: Prisma.StringFilter<"Proof"> | string
   teachSkill?: Prisma.StringFilter<"Proof"> | string
   learnSkill?: Prisma.StringFilter<"Proof"> | string
-  adaTxHash?: Prisma.StringFilter<"Proof"> | string
+  adaTxHash?: Prisma.StringNullableFilter<"Proof"> | string | null
   metadataHash?: Prisma.StringNullableFilter<"Proof"> | string | null
   summary?: Prisma.StringNullableFilter<"Proof"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Proof"> | Date | string
@@ -224,7 +224,7 @@ export type ProofOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   teachSkill?: Prisma.SortOrder
   learnSkill?: Prisma.SortOrder
-  adaTxHash?: Prisma.SortOrder
+  adaTxHash?: Prisma.SortOrderInput | Prisma.SortOrder
   metadataHash?: Prisma.SortOrderInput | Prisma.SortOrder
   summary?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -241,7 +241,7 @@ export type ProofWhereUniqueInput = Prisma.AtLeast<{
   userId?: Prisma.StringFilter<"Proof"> | string
   teachSkill?: Prisma.StringFilter<"Proof"> | string
   learnSkill?: Prisma.StringFilter<"Proof"> | string
-  adaTxHash?: Prisma.StringFilter<"Proof"> | string
+  adaTxHash?: Prisma.StringNullableFilter<"Proof"> | string | null
   metadataHash?: Prisma.StringNullableFilter<"Proof"> | string | null
   summary?: Prisma.StringNullableFilter<"Proof"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Proof"> | Date | string
@@ -255,7 +255,7 @@ export type ProofOrderByWithAggregationInput = {
   userId?: Prisma.SortOrder
   teachSkill?: Prisma.SortOrder
   learnSkill?: Prisma.SortOrder
-  adaTxHash?: Prisma.SortOrder
+  adaTxHash?: Prisma.SortOrderInput | Prisma.SortOrder
   metadataHash?: Prisma.SortOrderInput | Prisma.SortOrder
   summary?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -273,7 +273,7 @@ export type ProofScalarWhereWithAggregatesInput = {
   userId?: Prisma.StringWithAggregatesFilter<"Proof"> | string
   teachSkill?: Prisma.StringWithAggregatesFilter<"Proof"> | string
   learnSkill?: Prisma.StringWithAggregatesFilter<"Proof"> | string
-  adaTxHash?: Prisma.StringWithAggregatesFilter<"Proof"> | string
+  adaTxHash?: Prisma.StringNullableWithAggregatesFilter<"Proof"> | string | null
   metadataHash?: Prisma.StringNullableWithAggregatesFilter<"Proof"> | string | null
   summary?: Prisma.StringNullableWithAggregatesFilter<"Proof"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Proof"> | Date | string
@@ -283,7 +283,7 @@ export type ProofCreateInput = {
   id?: string
   teachSkill: string
   learnSkill: string
-  adaTxHash: string
+  adaTxHash?: string | null
   metadataHash?: string | null
   summary?: string | null
   createdAt?: Date | string
@@ -297,7 +297,7 @@ export type ProofUncheckedCreateInput = {
   userId: string
   teachSkill: string
   learnSkill: string
-  adaTxHash: string
+  adaTxHash?: string | null
   metadataHash?: string | null
   summary?: string | null
   createdAt?: Date | string
@@ -307,7 +307,7 @@ export type ProofUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   teachSkill?: Prisma.StringFieldUpdateOperationsInput | string
   learnSkill?: Prisma.StringFieldUpdateOperationsInput | string
-  adaTxHash?: Prisma.StringFieldUpdateOperationsInput | string
+  adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -321,7 +321,7 @@ export type ProofUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   teachSkill?: Prisma.StringFieldUpdateOperationsInput | string
   learnSkill?: Prisma.StringFieldUpdateOperationsInput | string
-  adaTxHash?: Prisma.StringFieldUpdateOperationsInput | string
+  adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -333,7 +333,7 @@ export type ProofCreateManyInput = {
   userId: string
   teachSkill: string
   learnSkill: string
-  adaTxHash: string
+  adaTxHash?: string | null
   metadataHash?: string | null
   summary?: string | null
   createdAt?: Date | string
@@ -343,7 +343,7 @@ export type ProofUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   teachSkill?: Prisma.StringFieldUpdateOperationsInput | string
   learnSkill?: Prisma.StringFieldUpdateOperationsInput | string
-  adaTxHash?: Prisma.StringFieldUpdateOperationsInput | string
+  adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -355,7 +355,7 @@ export type ProofUncheckedUpdateManyInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   teachSkill?: Prisma.StringFieldUpdateOperationsInput | string
   learnSkill?: Prisma.StringFieldUpdateOperationsInput | string
-  adaTxHash?: Prisma.StringFieldUpdateOperationsInput | string
+  adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -490,7 +490,7 @@ export type ProofCreateWithoutUserInput = {
   id?: string
   teachSkill: string
   learnSkill: string
-  adaTxHash: string
+  adaTxHash?: string | null
   metadataHash?: string | null
   summary?: string | null
   createdAt?: Date | string
@@ -502,7 +502,7 @@ export type ProofUncheckedCreateWithoutUserInput = {
   swapId: string
   teachSkill: string
   learnSkill: string
-  adaTxHash: string
+  adaTxHash?: string | null
   metadataHash?: string | null
   summary?: string | null
   createdAt?: Date | string
@@ -543,7 +543,7 @@ export type ProofScalarWhereInput = {
   userId?: Prisma.StringFilter<"Proof"> | string
   teachSkill?: Prisma.StringFilter<"Proof"> | string
   learnSkill?: Prisma.StringFilter<"Proof"> | string
-  adaTxHash?: Prisma.StringFilter<"Proof"> | string
+  adaTxHash?: Prisma.StringNullableFilter<"Proof"> | string | null
   metadataHash?: Prisma.StringNullableFilter<"Proof"> | string | null
   summary?: Prisma.StringNullableFilter<"Proof"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Proof"> | Date | string
@@ -553,7 +553,7 @@ export type ProofCreateWithoutSwapInput = {
   id?: string
   teachSkill: string
   learnSkill: string
-  adaTxHash: string
+  adaTxHash?: string | null
   metadataHash?: string | null
   summary?: string | null
   createdAt?: Date | string
@@ -565,7 +565,7 @@ export type ProofUncheckedCreateWithoutSwapInput = {
   userId: string
   teachSkill: string
   learnSkill: string
-  adaTxHash: string
+  adaTxHash?: string | null
   metadataHash?: string | null
   summary?: string | null
   createdAt?: Date | string
@@ -591,7 +591,7 @@ export type ProofUpdateWithoutSwapInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   teachSkill?: Prisma.StringFieldUpdateOperationsInput | string
   learnSkill?: Prisma.StringFieldUpdateOperationsInput | string
-  adaTxHash?: Prisma.StringFieldUpdateOperationsInput | string
+  adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -603,7 +603,7 @@ export type ProofUncheckedUpdateWithoutSwapInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   teachSkill?: Prisma.StringFieldUpdateOperationsInput | string
   learnSkill?: Prisma.StringFieldUpdateOperationsInput | string
-  adaTxHash?: Prisma.StringFieldUpdateOperationsInput | string
+  adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -614,7 +614,7 @@ export type ProofCreateManyUserInput = {
   swapId: string
   teachSkill: string
   learnSkill: string
-  adaTxHash: string
+  adaTxHash?: string | null
   metadataHash?: string | null
   summary?: string | null
   createdAt?: Date | string
@@ -624,7 +624,7 @@ export type ProofUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   teachSkill?: Prisma.StringFieldUpdateOperationsInput | string
   learnSkill?: Prisma.StringFieldUpdateOperationsInput | string
-  adaTxHash?: Prisma.StringFieldUpdateOperationsInput | string
+  adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -636,7 +636,7 @@ export type ProofUncheckedUpdateWithoutUserInput = {
   swapId?: Prisma.StringFieldUpdateOperationsInput | string
   teachSkill?: Prisma.StringFieldUpdateOperationsInput | string
   learnSkill?: Prisma.StringFieldUpdateOperationsInput | string
-  adaTxHash?: Prisma.StringFieldUpdateOperationsInput | string
+  adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -647,7 +647,7 @@ export type ProofUncheckedUpdateManyWithoutUserInput = {
   swapId?: Prisma.StringFieldUpdateOperationsInput | string
   teachSkill?: Prisma.StringFieldUpdateOperationsInput | string
   learnSkill?: Prisma.StringFieldUpdateOperationsInput | string
-  adaTxHash?: Prisma.StringFieldUpdateOperationsInput | string
+  adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -735,7 +735,7 @@ export type $ProofPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     userId: string
     teachSkill: string
     learnSkill: string
-    adaTxHash: string
+    adaTxHash: string | null
     metadataHash: string | null
     summary: string | null
     createdAt: Date

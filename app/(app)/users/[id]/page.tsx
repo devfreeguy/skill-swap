@@ -9,11 +9,8 @@ import {
   Button,
   Card,
   Chip,
-  Input,
-  Label,
   Modal,
   Surface,
-  TextField,
 } from "@heroui/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -45,7 +42,6 @@ export default function UserProfilePage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
-  const [adaTxHash, setAdaTxHash] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [swapError, setSwapError] = useState("");
   const [swapSuccess, setSwapSuccess] = useState(false);
@@ -66,14 +62,13 @@ export default function UserProfilePage() {
   }, [router, userId]);
 
   async function requestSwap() {
-    if (!adaTxHash.trim()) { setSwapError("Please enter your ADA transaction hash."); return; }
     setSwapError("");
     setSubmitting(true);
     try {
       const res = await fetch("/api/swaps", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ receiverId: userId, adaTxHash: adaTxHash.trim() }),
+        body: JSON.stringify({ receiverId: userId }),
       });
       const data = await res.json();
       if (!res.ok) { setSwapError(data.error || "Failed to create swap request."); return; }
@@ -169,15 +164,11 @@ export default function UserProfilePage() {
                   <Modal.CloseTrigger />
                   <Modal.Header>
                     <Modal.Heading>Request Swap with {profile.name}</Modal.Heading>
-                    <p className="mt-1.5 text-sm text-muted">Attach your ADA transaction hash as a commitment to the exchange.</p>
+                    <p className="mt-1.5 text-sm text-muted">Send a swap request to {profile.name}. They&apos;ll be notified and can accept or decline.</p>
                   </Modal.Header>
                   <Modal.Body className="p-6">
                     <Surface variant="default">
                       <div className="flex flex-col gap-4">
-                        <TextField className="w-full" isRequired>
-                          <Label>ADA Transaction Hash</Label>
-                          <Input placeholder="e.g. a1b2c3d4..." value={adaTxHash} onChange={(e) => setAdaTxHash(e.target.value)} />
-                        </TextField>
                         {swapError && (
                           <Alert status="danger"><Alert.Indicator /><Alert.Content><Alert.Description>{swapError}</Alert.Description></Alert.Content></Alert>
                         )}

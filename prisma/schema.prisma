@@ -87,7 +87,7 @@ model Proof {
 
   teachSkill String
   learnSkill String
-  adaTxHash  String
+  adaTxHash  String?
 
   metadataHash String?
   summary      String?
