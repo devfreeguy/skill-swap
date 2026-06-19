@@ -22,7 +22,6 @@ model User {
   learnSkill String?
 
   walletAddress String? @unique
-  walletNonce   String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

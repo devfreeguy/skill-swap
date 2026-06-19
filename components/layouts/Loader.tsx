@@ -8,6 +8,11 @@ type LemniscateLoaderProps = {
   text?: string;
 
   /**
+   * Secondary, readable instruction shown below the status text
+   */
+  hint?: string;
+
+  /**
    * Background opacity (0 → 1)
    */
   overlayOpacity?: number;
@@ -124,6 +129,7 @@ function getParticle(
 export default function Loader({
   loading = true,
   text = "Loading",
+  hint,
   overlayOpacity = 0.8,
   blur = true,
   size = 256,
@@ -239,6 +245,12 @@ export default function Loader({
       {text && (
         <p className="mt-6 text-xs uppercase tracking-[0.3em] text-foreground">
           {text}
+        </p>
+      )}
+
+      {hint && (
+        <p className="mt-3 max-w-xs text-center text-sm leading-relaxed text-muted">
+          {hint}
         </p>
       )}
     </div>

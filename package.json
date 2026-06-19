@@ -12,6 +12,7 @@
   "dependencies": {
     "@cardano-foundation/cardano-connect-with-wallet": "^0.2.20",
     "@cardano-foundation/cardano-connect-with-wallet-core": "^0.2.11",
+    "@cardano-foundation/cardano-verify-datasignature": "^1.0.11",
     "@heroui/react": "^3.0.3",
     "@heroui/styles": "^3.0.3",
     "@prisma/adapter-pg": "^7.0.0",

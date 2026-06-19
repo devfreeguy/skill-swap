@@ -1,16 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
+import verifySignature from "@cardano-foundation/cardano-verify-datasignature";
 import prisma from "@/lib/prisma";
 import { signToken } from "@/lib/jwt";
 import { setAuthCookie } from "@/lib/cookies";
 import { consumeNonce } from "@/lib/wallet-nonce-store";
 
+// CIP-8 verification (cardano-verify-datasignature) needs Node APIs.
+export const runtime = "nodejs";
+
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { name, walletAddress, signature, nonce, email } = body;
+  const { name, walletAddress, signature, key, nonce, email } = body;
 
-  if (!name || !walletAddress || !signature || !nonce) {
+  console.log("[api/auth/register/wallet] request received:", {
+    name,
+    email,
+    walletAddress,
+    nonce,
+    signature: typeof signature === "string" ? signature.slice(0, 40) + "…" : signature,
+    key: typeof key === "string" ? key.slice(0, 40) + "…" : key,
+  });
+
+  if (!name || !walletAddress || !signature || !key || !nonce) {
     return NextResponse.json(
-      { error: "name, walletAddress, signature, and nonce are required" },
+      { error: "name, walletAddress, signature, key, and nonce are required" },
       { status: 400 }
     );
   }
@@ -18,6 +31,29 @@ export async function POST(request: NextRequest) {
   if (!consumeNonce(nonce)) {
     return NextResponse.json(
       { error: "Invalid or expired nonce" },
+      { status: 401 }
+    );
+  }
+
+  // Verify the CIP-8 signature proves the wallet owning `walletAddress`
+  // signed this exact nonce before creating the account.
+  let verified = false;
+  try {
+    console.log("[api/auth/register/wallet] calling verifySignature with:", {
+      signature: typeof signature === "string" ? signature.slice(0, 24) + "…" : signature,
+      key: typeof key === "string" ? key.slice(0, 24) + "…" : key,
+      nonce,
+      walletAddress,
+    });
+    verified = verifySignature(signature, key, nonce, walletAddress);
+    console.log("[api/auth/register/wallet] verifySignature returned:", verified);
+  } catch (e) {
+    console.log("[api/auth/register/wallet] verifySignature threw:", e);
+    verified = false;
+  }
+  if (!verified) {
+    return NextResponse.json(
+      { error: "Signature verification failed" },
       { status: 401 }
     );
   }

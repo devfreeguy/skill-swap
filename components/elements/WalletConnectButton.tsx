@@ -1,20 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import {
-  Alert,
-  Button,
-  Popover,
-  TextField,
-  Label,
-  Input,
-  Modal,
-} from "@heroui/react";
+import { useEffect, useRef, useState } from "react";
+import { Alert, Button, Chip, Popover } from "@heroui/react";
 import Image from "next/image";
-import { useEffect } from "react";
 import { useCardano } from "@cardano-foundation/cardano-connect-with-wallet";
-import { NetworkType } from "@cardano-foundation/cardano-connect-with-wallet-core";
 import { useWalletAuth } from "@/hooks/useWalletAuth";
+import {
+  CARDANO_LIMIT_NETWORK,
+  CARDANO_NETWORK_LABEL,
+  IS_MAINNET,
+} from "@/lib/cardano";
 import LemniscateLoader from "@/components/layouts/Loader";
 
 type WalletInfo = {
@@ -51,165 +46,100 @@ function truncateAddress(addr: string): string {
 }
 
 interface WalletConnectButtonProps {
+  /**
+   * Kept for call-site compatibility. The wallet flow now signs in if an
+   * account exists and creates one otherwise, regardless of mode.
+   */
   mode?: "login" | "register";
 }
 
-export default function WalletConnectButton({
-  mode = "login",
-}: WalletConnectButtonProps) {
-  const { isConnected, stakeAddress, disconnect } = useCardano({
-    limitNetwork: NetworkType.MAINNET,
+export default function WalletConnectButton(_props: WalletConnectButtonProps) {
+  const { isConnected, disconnect } = useCardano({
+    limitNetwork: CARDANO_LIMIT_NETWORK,
   });
-  const { connectAndAuth, registerWithWallet, isLoading, loadingText, error } =
-    useWalletAuth();
+  const {
+    connectAndAuth,
+    stakeAddress,
+    enabledWallet,
+    isLoading,
+    loadingText,
+    loadingHint,
+    error,
+  } = useWalletAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [selectedWallet, setSelectedWallet] = useState<string | null>(null);
-  const [nameError, setNameError] = useState("");
-  const [originalPath, setOriginalPath] = useState("");
+  // Guards the auto-auth effect so it runs once per connection (not on every
+  // re-render). Reset when the wallet disconnects so a reconnect retries.
+  const autoTriggered = useRef(false);
 
   const wallets = getAvailableWallets();
 
-  const isFormOpen =
-    mode === "register" && selectedWallet !== null && !isConnected;
-
-  useEffect(() => {
-    if (isFormOpen) {
-      setOriginalPath(window.location.pathname);
-      window.history.pushState(null, "", "/onboarding");
-    }
-  }, [isFormOpen]);
-
-  function handleCloseModal() {
-    setSelectedWallet(null);
-    if (originalPath) {
-      window.history.pushState(null, "", originalPath);
-      setOriginalPath("");
-    }
-  }
-
   function handleWalletSelect(walletId: string) {
     setIsOpen(false);
-    if (mode === "login") {
-      connectAndAuth(walletId);
-    } else {
-      setSelectedWallet(walletId);
-    }
+    autoTriggered.current = true;
+    connectAndAuth(walletId);
   }
 
-  async function handleRegisterSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!name.trim()) {
-      setNameError("Name is required");
+  // As soon as a wallet is connected (freshly or already-connected on load),
+  // automatically request the signature and sign in / sign up. No manual step.
+  useEffect(() => {
+    if (!isConnected) {
+      autoTriggered.current = false;
       return;
     }
-    setNameError("");
-    if (!selectedWallet) return;
-    await registerWithWallet(selectedWallet, name.trim(), email.trim());
-  }
+    if (autoTriggered.current || !enabledWallet) return;
+    autoTriggered.current = true;
+    connectAndAuth(enabledWallet);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, enabledWallet]);
+
+  const networkBadge = (
+    <div className="flex items-center justify-center gap-2">
+      <span className="text-xs text-muted">Network</span>
+      <Chip size="sm" color={IS_MAINNET ? "success" : "warning"}>
+        {CARDANO_NETWORK_LABEL}
+      </Chip>
+    </div>
+  );
+
+  const errorAlert = error ? (
+    <Alert status="danger">
+      <Alert.Indicator />
+      <Alert.Content>
+        <Alert.Description>{error}</Alert.Description>
+      </Alert.Content>
+    </Alert>
+  ) : null;
 
   return (
     <>
       <LemniscateLoader
         loading={isLoading}
         text={loadingText}
-        overlayOpacity={0.6}
+        hint={loadingHint}
+        overlayOpacity={0.92}
       />
 
-      <Modal>
-        <Modal.Backdrop
-          isOpen={isFormOpen}
-          onOpenChange={(open) => !open && handleCloseModal()}
-          className="bg-black/80"
-        >
-          <Modal.Container className="items-center justify-center p-4">
-            <Modal.Dialog className="bg-surface border border-border w-full max-w-md p-6 rounded-2xl relative shadow-2xl">
-              <Modal.Header className="flex flex-col gap-1 text-center mb-6 mt-2">
-                <Modal.Heading className="text-2xl font-bold text-foreground">
-                  Complete Onboarding
-                </Modal.Heading>
-                
-                <p className="text-sm text-muted">
-                  Please provide your details to finish registration.
-                </p>
-                
-                <Modal.CloseTrigger className="absolute right-4 top-4 z-10 size-8" />
-              </Modal.Header>
-
-              <Modal.Body>
-                <form
-                  onSubmit={handleRegisterSubmit}
-                  className="flex flex-col gap-4"
-                >
-                  <TextField
-                    name="name"
-                    type="text"
-                    value={name}
-                    onChange={setName}
-                    isRequired
-                    isInvalid={!!nameError}
-                    className="w-full"
-                  >
-                    <Label>Full Name</Label>
-                    <Input placeholder="Your name" className="bg-background" />
-                  </TextField>
-
-                  <TextField
-                    name="email"
-                    type="email"
-                    value={email}
-                    onChange={setEmail}
-                    className="w-full"
-                  >
-                    <Label>Email (optional)</Label>
-                    <Input
-                      placeholder="you@example.com"
-                      className="bg-background"
-                    />
-                  </TextField>
-
-                  {(error || nameError) && (
-                    <Alert status="danger">
-                      <Alert.Indicator />
-                      <Alert.Content>
-                        <Alert.Description>
-                          {error || nameError}
-                        </Alert.Description>
-                      </Alert.Content>
-                    </Alert>
-                  )}
-
-                  <Button
-                    type="submit"
-                    isPending={isLoading}
-                    isDisabled={isLoading}
-                    className="w-full rounded-full bg-accent text-accent-foreground font-semibold mt-2"
-                  >
-                    {isLoading ? "Creating account…" : "Sign & Create Account"}
-                  </Button>
-                </form>
-              </Modal.Body>
-            </Modal.Dialog>
-          </Modal.Container>
-        </Modal.Backdrop>
-      </Modal>
-
       {isConnected && stakeAddress ? (
-        <div className="flex items-center gap-2 w-full">
-          <div className="flex-1 px-4 py-2 rounded-full border border-border text-sm text-foreground bg-transparent truncate">
-            {truncateAddress(stakeAddress)}
+        <div className="flex flex-col gap-2 w-full">
+          {networkBadge}
+          <div className="flex items-center gap-2 w-full">
+            <div className="flex-1 px-4 py-2 rounded-full border border-border text-sm text-foreground bg-transparent truncate">
+              {truncateAddress(stakeAddress)}
+            </div>
+            <Button
+              variant="outline"
+              className="rounded-full border-border text-foreground shrink-0"
+              onPress={() => disconnect()}
+              isDisabled={isLoading}
+            >
+              Disconnect
+            </Button>
           </div>
-          <Button
-            variant="outline"
-            className="rounded-full border-border text-foreground shrink-0"
-            onPress={() => disconnect()}
-          >
-            Disconnect
-          </Button>
+          {errorAlert}
         </div>
       ) : (
         <div className="flex flex-col gap-3 w-full">
+          {networkBadge}
           <Popover isOpen={isOpen} onOpenChange={setIsOpen}>
             <Popover.Trigger>
               <Button
@@ -268,14 +198,7 @@ export default function WalletConnectButton({
             </Popover.Content>
           </Popover>
 
-          {mode === "login" && error && (
-            <Alert status="danger">
-              <Alert.Indicator />
-              <Alert.Content>
-                <Alert.Description>{error}</Alert.Description>
-              </Alert.Content>
-            </Alert>
-          )}
+          {errorAlert}
         </div>
       )}
     </>

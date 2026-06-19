@@ -1,152 +1,265 @@
 "use client";
 
 import { useCardano } from "@cardano-foundation/cardano-connect-with-wallet";
-import { NetworkType } from "@cardano-foundation/cardano-connect-with-wallet-core";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { CARDANO_LIMIT_NETWORK, CARDANO_NETWORK_LABEL } from "@/lib/cardano";
+
+/**
+ * Turn a wallet/library error (CIP-30 APIError, WrongNetworkTypeError, plain
+ * Error, or string) into a clear, actionable message for the user.
+ */
+function normalizeWalletError(err: unknown): string {
+  const raw =
+    typeof err === "string"
+      ? err
+      : (err as { info?: string })?.info ??
+        (err as { message?: string })?.message ??
+        (typeof (err as { toString?: () => string })?.toString === "function"
+          ? (err as { toString: () => string }).toString()
+          : "");
+  const msg = String(raw ?? "");
+  const lower = msg.toLowerCase();
+  const code = (err as { code?: number })?.code;
+  const name = (err as { name?: string })?.name;
+
+  // Wrong Cardano network (mainnet vs testnet mismatch)
+  if (
+    name === "WrongNetworkTypeError" ||
+    lower.includes("wrongnetworktype") ||
+    lower.includes("testnet") ||
+    lower.includes("wrong network")
+  ) {
+    return `Please switch your wallet to ${CARDANO_NETWORK_LABEL}, then try again.`;
+  }
+
+  // Wallet is locked
+  if (lower.includes("lock")) {
+    return "Your wallet is locked. Unlock it in the wallet extension, then try again.";
+  }
+
+  // dApp not connected / no account authorized for this origin
+  if (
+    lower.includes("no account found") ||
+    lower.includes("reconnect") ||
+    lower.includes("not connected") ||
+    lower.includes("not been granted") ||
+    lower.includes("enable the dapp")
+  ) {
+    return "This wallet isn't connected to SkillSwap yet. Open your wallet, connect/authorize this site, then try again.";
+  }
+
+  // User declined the connection or signature request
+  // (CIP-30: APIError.Refused = -3, DataSignError.UserDeclined = 3)
+  if (
+    code === -3 ||
+    code === 3 ||
+    lower.includes("declined") ||
+    lower.includes("denied") ||
+    lower.includes("rejected") ||
+    lower.includes("cancel")
+  ) {
+    return "You declined the request in your wallet. Approve it to continue.";
+  }
+
+  // No wallet available
+  if (lower.includes("not installed") || lower.includes("no wallet")) {
+    return "No Cardano wallet detected. Install Nami, Eternl, or Lace and try again.";
+  }
+
+  // Fallback — surface the real message if we have one, otherwise generic.
+  return msg
+    ? `Wallet error: ${msg}`
+    : "Something went wrong connecting your wallet. Please try again.";
+}
 
 export function useWalletAuth() {
-  const { isConnected, stakeAddress, signMessage, connect } = useCardano({
-    limitNetwork: NetworkType.MAINNET,
-  });
+  const { isConnected, stakeAddress, signMessage, connect, enabledWallet } =
+    useCardano({
+      limitNetwork: CARDANO_LIMIT_NETWORK,
+    });
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("");
+  const [loadingHint, setLoadingHint] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  function setPhase(text: string, hint = "") {
+    setLoadingText(text);
+    setLoadingHint(hint);
+  }
+
+  function stopLoading() {
+    setIsLoading(false);
+    setPhase("");
+  }
+
+  /**
+   * Connect a wallet, prove ownership with a signed nonce, then sign in if an
+   * account already exists for the wallet — otherwise create one. Works the
+   * same regardless of which page (login or register) triggered it.
+   */
   async function connectAndAuth(walletName: string) {
     try {
       setIsLoading(true);
       setError(null);
-      setLoadingText("Connecting wallet…");
+      setPhase(
+        "Connecting wallet…",
+        "Approve the connection request in your wallet pop-up."
+      );
 
       await connect(walletName);
+      console.log("[wallet-auth] wallet connected; stakeAddress:", stakeAddress);
 
-      setLoadingText("Awaiting signature…");
+      setPhase(
+        "Awaiting signature…",
+        "Open your wallet and sign the message to continue. This is free and won't move any ADA."
+      );
       const nonceRes = await fetch("/api/auth/wallet/nonce");
       if (!nonceRes.ok) {
-        setError("Failed to get nonce. Please try again.");
+        setError("Couldn't start a secure session. Please try again.");
+        stopLoading();
         return;
       }
       const { nonce } = await nonceRes.json();
+      console.log("[wallet-auth] nonce received; about to call signMessage:", nonce);
 
-      await signMessage(
+      // The hook's signMessage is fire-and-forget (it does NOT await the wallet
+      // signing), so resolve everything from its callbacks. A timeout backstops
+      // the case where the wallet never responds (e.g. locked) so the loader
+      // can't spin forever — but normal signing won't false-trigger it.
+      let settled = false;
+      const signTimeout = setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        console.log("[wallet-auth] signature request timed out with no response");
+        setError(
+          "Couldn't get a signature from your wallet. Make sure it's unlocked and connected to this site, then try again."
+        );
+        stopLoading();
+      }, 90_000);
+
+      signMessage(
         nonce,
-        async (signature) => {
-          setLoadingText("Signing in…");
-          const res = await fetch("/api/auth/wallet", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
+        async (signature, key) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(signTimeout);
+          try {
+            console.log("[wallet-auth] signMessage SUCCESS callback fired");
+            console.log(
+              "[wallet-auth] signature:",
+              typeof signature === "string" ? signature.slice(0, 40) + "…" : signature,
+              "| key:",
+              typeof key === "string" ? key.slice(0, 40) + "…" : key
+            );
+            setPhase("Verifying…", "Confirming your wallet signature…");
+
+            // 1) Try to sign in with an existing account.
+            console.log("[wallet-auth] POSTing /api/auth/wallet", {
               walletAddress: stakeAddress,
-              signature,
               nonce,
-            }),
-          });
+            });
+            const loginRes = await fetch("/api/auth/wallet", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                walletAddress: stakeAddress,
+                signature,
+                key,
+                nonce,
+              }),
+            });
+            const loginData = await loginRes.json();
+            console.log(
+              "[wallet-auth] /api/auth/wallet status:",
+              loginRes.status,
+              "| body:",
+              loginData
+            );
 
-          const data = await res.json();
-          if (!res.ok) {
-            setError(data.message ?? "Wallet auth failed");
-            return;
+            if (loginRes.ok) {
+              router.push(
+                loginData.teachSkill && loginData.learnSkill
+                  ? "/dashboard"
+                  : "/onboarding"
+              );
+              return;
+            }
+
+            // 2) No account linked to this wallet → create one with the same
+            //    signature + nonce (the login route returns 404 before it
+            //    consumes the nonce, so it's still valid here).
+            if (loginRes.status === 404) {
+              setPhase(
+                "Creating your account…",
+                "Setting up your SkillSwap profile…"
+              );
+              const defaultName = `Cardano User ${(stakeAddress ?? "").slice(-6)}`;
+              console.log("[wallet-auth] POSTing /api/auth/register/wallet", {
+                name: defaultName,
+                walletAddress: stakeAddress,
+                nonce,
+              });
+              const regRes = await fetch("/api/auth/register/wallet", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  name: defaultName,
+                  walletAddress: stakeAddress,
+                  signature,
+                  key,
+                  nonce,
+                }),
+              });
+              const regData = await regRes.json();
+              console.log(
+                "[wallet-auth] /api/auth/register/wallet status:",
+                regRes.status,
+                "| body:",
+                regData
+              );
+              if (regRes.ok) {
+                router.push("/onboarding");
+                return;
+              }
+              setError(regData.error ?? "Couldn't create your account. Please try again.");
+              return;
+            }
+
+            // Other failures (e.g. 401 signature verification failed)
+            setError(loginData.error ?? "Wallet sign-in failed. Please try again.");
+          } catch (e) {
+            console.log("[wallet-auth] error during auth request:", e);
+            setError("Couldn't reach the server. Check your connection and try again.");
+          } finally {
+            stopLoading();
           }
-
-          router.push(data.teachSkill && data.learnSkill ? "/dashboard" : "/onboarding");
         },
         (err) => {
-          setError("Signing failed. Please try again.");
-          console.error(err);
+          if (settled) return;
+          settled = true;
+          clearTimeout(signTimeout);
+          console.log("[wallet-auth] signMessage ERROR callback fired:", err);
+          setError(normalizeWalletError(err));
+          stopLoading();
         }
       );
-    } catch (err: any) {
-      if (
-        err?.name === "WrongNetworkTypeError" ||
-        err?.message?.includes("WrongNetworkTypeError") ||
-        err?.message?.includes("Testnet")
-      ) {
-        setError("Please switch your wallet to Mainnet and try again.");
-      } else {
-        setError("Failed to connect wallet.");
-      }
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-      setLoadingText("");
-    }
-  }
-
-  async function registerWithWallet(
-    walletName: string,
-    name: string,
-    email: string
-  ) {
-    try {
-      setIsLoading(true);
-      setError(null);
-      setLoadingText("Connecting wallet…");
-
-      await connect(walletName);
-
-      setLoadingText("Awaiting signature…");
-      const nonceRes = await fetch("/api/auth/wallet/nonce");
-      if (!nonceRes.ok) {
-        setError("Failed to get nonce. Please try again.");
-        return;
-      }
-      const { nonce } = await nonceRes.json();
-
-      await signMessage(
-        nonce,
-        async (signature) => {
-          setLoadingText("Creating account…");
-          const res = await fetch("/api/auth/register/wallet", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              name,
-              walletAddress: stakeAddress,
-              signature,
-              nonce,
-              email: email || undefined,
-            }),
-          });
-
-          if (!res.ok) {
-            const data = await res.json();
-            setError(data.error ?? "Registration failed");
-            return;
-          }
-
-          router.push("/onboarding");
-        },
-        (err) => {
-          setError("Signing failed. Please try again.");
-          console.error(err);
-        }
-      );
-    } catch (err: any) {
-      if (
-        err?.name === "WrongNetworkTypeError" ||
-        err?.message?.includes("WrongNetworkTypeError") ||
-        err?.message?.includes("Testnet")
-      ) {
-        setError("Please switch your wallet to Mainnet and try again.");
-      } else {
-        setError("Failed to connect wallet.");
-      }
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-      setLoadingText("");
+    } catch (err) {
+      console.log("[wallet-auth] caught error in flow:", err);
+      setError(normalizeWalletError(err));
+      stopLoading();
     }
   }
 
   return {
     connectAndAuth,
-    registerWithWallet,
     isConnected,
     stakeAddress,
+    enabledWallet,
     isLoading,
     loadingText,
+    loadingHint,
     error,
   };
 }

@@ -76,8 +76,8 @@ Create a `.env.local` file in the root:
 DATABASE_URL=your_neon_database_url
 NEXTAUTH_SECRET=your_secret
 NEXTAUTH_URL=http://localhost:3000
-BLOCKFROST_API_KEY=your_blockfrost_api_key
-NEXT_PUBLIC_BLOCKFROST_NETWORK=mainnet
+# Cardano network: "preprod" | "preview" | "mainnet" (defaults to preprod)
+NEXT_PUBLIC_CARDANO_NETWORK=preprod
 ```
 
 ---

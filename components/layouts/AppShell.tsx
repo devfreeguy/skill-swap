@@ -1,7 +1,8 @@
 "use client";
 
 import Logo from "@/components/elements/Logo";
-import { Avatar, Button } from "@heroui/react";
+import { Avatar, Button, Chip } from "@heroui/react";
+import { CARDANO_NETWORK_LABEL, IS_MAINNET } from "@/lib/cardano";
 import {
   IconBell,
   IconCompass,
@@ -63,6 +64,11 @@ export default function AppShell({ user, children }: Props) {
           <div className="mb-4">
             <Logo />
             <p className="text-xs text-muted ml-2 -mt-1">Cardano Network</p>
+            {!IS_MAINNET && (
+              <Chip size="sm" color="warning" className="ml-2 mt-1.5">
+                {CARDANO_NETWORK_LABEL}
+              </Chip>
+            )}
           </div>
 
           {/* CTA */}

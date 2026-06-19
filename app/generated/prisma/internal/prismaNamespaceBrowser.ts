@@ -84,7 +84,6 @@ export const UserScalarFieldEnum = {
   teachSkill: 'teachSkill',
   learnSkill: 'learnSkill',
   walletAddress: 'walletAddress',
-  walletNonce: 'walletNonce',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
