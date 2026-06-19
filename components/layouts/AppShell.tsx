@@ -149,12 +149,20 @@ export default function AppShell({ user, children }: Props) {
             </p>
 
             <div className="relative">
-              <button className="p-2 rounded-lg hover:bg-surface transition-colors text-muted hover:text-foreground">
+              <Link
+                href="/notifications"
+                aria-label={
+                  unreadCount > 0
+                    ? `Notifications, ${unreadCount} unread`
+                    : "Notifications"
+                }
+                className="block p-2 rounded-lg hover:bg-surface transition-colors text-muted hover:text-foreground"
+              >
                 <IconBell size={20} />
                 {unreadCount > 0 && (
                   <span className="absolute top-1 right-1 size-2 rounded-full bg-danger" />
                 )}
-              </button>
+              </Link>
             </div>
 
             <Avatar size="sm">

@@ -634,11 +634,12 @@ export default function SwapDetailPage() {
                   <IconUpload size={15} />
                   Submit Deliverable
                 </Button>
-                {/* TODO: messaging API not implemented */}
-                <Button variant="secondary" className="w-full" isDisabled>
-                  <IconMessage size={15} />
-                  Send Message
-                </Button>
+                <Link href={`/messages?swap=${swapId}`} className="block">
+                  <Button variant="secondary" className="w-full">
+                    <IconMessage size={15} />
+                    Send Message
+                  </Button>
+                </Link>
                 <Button
                   variant="secondary"
                   className="w-full"

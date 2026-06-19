@@ -106,14 +106,16 @@ function UserCard({ user }: { user: (typeof users)[0] }) {
             Exchange
           </Button>
         </Link>
-        <Button
-          variant="secondary"
-          size="sm"
-          className="flex-shrink-0 px-2.5"
-          aria-label="Save user"
-        >
-          <IconBookmark size={13} />
-        </Button>
+        <Link href="/register" className="flex-shrink-0">
+          <Button
+            variant="secondary"
+            size="sm"
+            className="px-2.5"
+            aria-label="Save user"
+          >
+            <IconBookmark size={13} />
+          </Button>
+        </Link>
       </div>
     </div>
   );

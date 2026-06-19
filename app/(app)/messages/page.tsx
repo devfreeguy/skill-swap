@@ -83,6 +83,12 @@ export default function MessagesPage() {
         setMe(meData);
         setConversations(Array.isArray(convData) ? convData : []);
         setLoading(false);
+
+        // Deep-link: open a specific conversation when arriving via ?swap=<id>
+        const swapParam = new URLSearchParams(window.location.search).get("swap");
+        if (swapParam) {
+          selectConversation(swapParam);
+        }
       })
       .catch(() => {
         if (!cancelled) router.replace("/login");
