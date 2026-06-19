@@ -22,25 +22,26 @@ export default function HeroSection() {
       : illustrations.HeroBG;
 
   return (
-    <section className="relative min-h-dvh bg-background overflow-hidden bg-linear-to-b from-background via-background via-80% to-[#2B5139]">
+    <section className="relative min-h-dvh bg-background overflow-hidden">
       {/* Text + Buttons — top overlay */}
       <motion.div
-        className="absolute top-0 left-0 right-0 z-10 flex flex-col items-center text-center pt-36 md:pt-44 px-4 gap-6"
+        className="absolute h-full top-0 left-0 right-0 z-10 flex flex-col items-center text-center pt-36 md:pt-44 md:pb-12 px-4 gap-6"
         variants={stagger}
         initial="hidden"
         animate="visible"
       >
-        <div className="flex flex-col items-center gap-3 max-w-2xl">
+        <div className="flex flex-col items-center justify-between gap-3">
           <motion.h1
-            className="text-[40px] md:text-6xl text-foreground leading-tight"
+            className="text-[40px] lg:text-6xl text-foreground leading-tight font-medium"
             variants={fadeUp}
           >
-            Exchange Skills.<br />
-            Build Reputation.<br />
+            Exchange Skills. Build Reputation.
+            <br />
             Own Your <span className="text-accent">Contributions</span>.
           </motion.h1>
+
           <motion.p
-            className="text-base md:text-lg text-muted max-w-xl"
+            className="text-base md:text-lg text-white/90 max-w-xl"
             variants={fadeUp}
             transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
           >
@@ -50,7 +51,7 @@ export default function HeroSection() {
         </div>
 
         <motion.div
-          className="flex flex-col items-center gap-3"
+          className="flex items-center gap-3"
           variants={fadeUp}
           transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
         >
@@ -76,23 +77,25 @@ export default function HeroSection() {
 
       {/* Bottom image block */}
       <motion.div
-        className="absolute bottom-0 left-0 right-0 z-0"
+        className="absolute bottom-0 left-0 right-0 z-0 flex justify-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
       >
         {/* Single combined hero illustration */}
         <div
-          className={`relative w-full ${isMobile ? "aspect-3/4" : "aspect-video"}`}
+          className={`relative xl:-bottom-40 lg:-bottom-20 w-full ${isMobile ? "aspect-3/4" : "aspect-video"}`}
         >
           <Image
             src={heroBGSrc}
             alt="SkillSwap — Teach and Learn"
             fill
-            className="object-cover object-bottom rounded-b-3xl"
             priority
+            className="object-cover object-bottom"
           />
+          {/* Gradient shade overlay — fades the image bottom into the background */}
         </div>
+        <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(to_top,var(--background),transparent_20%)]" />
       </motion.div>
     </section>
   );

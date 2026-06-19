@@ -48,7 +48,7 @@ export default function StatsSection() {
   return (
     <SectionWrapper
       id="stats"
-      className="bg-[#2B5139] rounded-b-3xl [&_>div]:p-4! md:p-12!"
+      className="bg-[#2B5139] [&_>div]:p-4! md:p-12!"
     >
       <motion.div
         className="grid grid-cols-2 md:grid-cols-3 place-items-center gap-4 md:gap-6"
