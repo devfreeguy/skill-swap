@@ -12,13 +12,6 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const { walletAddress, signature, key, nonce } = body;
 
-  console.log("[api/auth/wallet] request received:", {
-    walletAddress,
-    nonce,
-    signature: typeof signature === "string" ? signature.slice(0, 40) + "…" : signature,
-    key: typeof key === "string" ? key.slice(0, 40) + "…" : key,
-  });
-
   if (!walletAddress || !signature || !key || !nonce) {
     return NextResponse.json(
       { error: "walletAddress, signature, key, and nonce are required" },
@@ -46,16 +39,8 @@ export async function POST(request: NextRequest) {
   // signed this exact nonce.
   let verified = false;
   try {
-    console.log("[api/auth/wallet] calling verifySignature with:", {
-      signature: typeof signature === "string" ? signature.slice(0, 24) + "…" : signature,
-      key: typeof key === "string" ? key.slice(0, 24) + "…" : key,
-      nonce,
-      walletAddress,
-    });
     verified = verifySignature(signature, key, nonce, walletAddress);
-    console.log("[api/auth/wallet] verifySignature returned:", verified);
-  } catch (e) {
-    console.log("[api/auth/wallet] verifySignature threw:", e);
+  } catch {
     verified = false;
   }
   if (!verified) {

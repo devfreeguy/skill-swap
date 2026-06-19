@@ -109,7 +109,6 @@ export function useWalletAuth() {
       );
 
       await connect(walletName);
-      console.log("[wallet-auth] wallet connected; stakeAddress:", stakeAddress);
 
       setPhase(
         "Awaiting signature…",
@@ -122,7 +121,6 @@ export function useWalletAuth() {
         return;
       }
       const { nonce } = await nonceRes.json();
-      console.log("[wallet-auth] nonce received; about to call signMessage:", nonce);
 
       // The hook's signMessage is fire-and-forget (it does NOT await the wallet
       // signing), so resolve everything from its callbacks. A timeout backstops
@@ -132,7 +130,6 @@ export function useWalletAuth() {
       const signTimeout = setTimeout(() => {
         if (settled) return;
         settled = true;
-        console.log("[wallet-auth] signature request timed out with no response");
         setError(
           "Couldn't get a signature from your wallet. Make sure it's unlocked and connected to this site, then try again."
         );
@@ -146,20 +143,9 @@ export function useWalletAuth() {
           settled = true;
           clearTimeout(signTimeout);
           try {
-            console.log("[wallet-auth] signMessage SUCCESS callback fired");
-            console.log(
-              "[wallet-auth] signature:",
-              typeof signature === "string" ? signature.slice(0, 40) + "…" : signature,
-              "| key:",
-              typeof key === "string" ? key.slice(0, 40) + "…" : key
-            );
             setPhase("Verifying…", "Confirming your wallet signature…");
 
             // 1) Try to sign in with an existing account.
-            console.log("[wallet-auth] POSTing /api/auth/wallet", {
-              walletAddress: stakeAddress,
-              nonce,
-            });
             const loginRes = await fetch("/api/auth/wallet", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -171,12 +157,6 @@ export function useWalletAuth() {
               }),
             });
             const loginData = await loginRes.json();
-            console.log(
-              "[wallet-auth] /api/auth/wallet status:",
-              loginRes.status,
-              "| body:",
-              loginData
-            );
 
             if (loginRes.ok) {
               router.push(
@@ -196,11 +176,6 @@ export function useWalletAuth() {
                 "Setting up your SkillSwap profile…"
               );
               const defaultName = `Cardano User ${(stakeAddress ?? "").slice(-6)}`;
-              console.log("[wallet-auth] POSTing /api/auth/register/wallet", {
-                name: defaultName,
-                walletAddress: stakeAddress,
-                nonce,
-              });
               const regRes = await fetch("/api/auth/register/wallet", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -213,12 +188,6 @@ export function useWalletAuth() {
                 }),
               });
               const regData = await regRes.json();
-              console.log(
-                "[wallet-auth] /api/auth/register/wallet status:",
-                regRes.status,
-                "| body:",
-                regData
-              );
               if (regRes.ok) {
                 router.push("/onboarding");
                 return;
@@ -229,8 +198,7 @@ export function useWalletAuth() {
 
             // Other failures (e.g. 401 signature verification failed)
             setError(loginData.error ?? "Wallet sign-in failed. Please try again.");
-          } catch (e) {
-            console.log("[wallet-auth] error during auth request:", e);
+          } catch {
             setError("Couldn't reach the server. Check your connection and try again.");
           } finally {
             stopLoading();
@@ -240,13 +208,11 @@ export function useWalletAuth() {
           if (settled) return;
           settled = true;
           clearTimeout(signTimeout);
-          console.log("[wallet-auth] signMessage ERROR callback fired:", err);
           setError(normalizeWalletError(err));
           stopLoading();
         }
       );
     } catch (err) {
-      console.log("[wallet-auth] caught error in flow:", err);
       setError(normalizeWalletError(err));
       stopLoading();
     }
