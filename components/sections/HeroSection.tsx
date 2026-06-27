@@ -41,7 +41,7 @@ export default function HeroSection() {
           </motion.h1>
 
           <motion.p
-            className="text-base md:text-lg text-white/90 max-w-xl"
+            className="text-base md:text-xl text-muted/90 max-w-xl"
             variants={fadeUp}
             transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
           >
@@ -51,7 +51,7 @@ export default function HeroSection() {
         </div>
 
         <motion.div
-          className="flex items-center gap-3"
+          className="flex flex-col md:flex-row items-center gap-3"
           variants={fadeUp}
           transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
         >

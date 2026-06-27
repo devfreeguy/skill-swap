@@ -55,10 +55,10 @@ const users = [
 
 function UserCard({ user }: { user: (typeof users)[0] }) {
   return (
-    <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-4 min-w-[220px] flex-shrink-0 md:min-w-0">
+    <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-4 min-w-55 md:min-w-0 w-full">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-accent text-accent-foreground flex items-center justify-center text-sm font-bold flex-shrink-0 select-none">
+        <div className="w-10 h-10 rounded-full bg-accent text-accent-foreground flex items-center justify-center text-sm font-bold select-none">
           {user.initials}
         </div>
         <div className="min-w-0">
@@ -74,29 +74,19 @@ function UserCard({ user }: { user: (typeof users)[0] }) {
       {/* Skills */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted w-14 flex-shrink-0">Teaches</span>
+          <span className="text-xs text-muted w-14 shrink-0">Teaches</span>
           <Chip color="accent" variant="soft" size="sm">
             {user.teaches}
           </Chip>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted w-14 flex-shrink-0">Wants</span>
+          <span className="text-xs text-muted w-14 shrink-0">Wants</span>
           <Chip size="sm">{user.wants}</Chip>
         </div>
       </div>
 
       {/* Actions */}
       <div className="flex gap-2 mt-auto">
-        <Link href="/register" className="flex-1">
-          <Button
-            variant="secondary"
-            size="sm"
-            className="w-full gap-1.5 text-xs"
-          >
-            <IconEye size={13} />
-            View
-          </Button>
-        </Link>
         <Link href="/register" className="flex-1">
           <Button
             size="sm"
@@ -106,12 +96,14 @@ function UserCard({ user }: { user: (typeof users)[0] }) {
             Exchange
           </Button>
         </Link>
-        <Link href="/register" className="flex-shrink-0">
+
+        <Link href="/register">
           <Button
-            variant="secondary"
+            variant="tertiary"
             size="sm"
-            className="px-2.5"
             aria-label="Save user"
+            isIconOnly
+            className="aspect-square w-fit"
           >
             <IconBookmark size={13} />
           </Button>
@@ -143,33 +135,15 @@ export default function DiscoverySection() {
         </p>
       </motion.div>
 
-      {/* Mobile: custom horizontal scroll */}
-      <ScrollArea
-        orientation="horizontal"
-        visibility="hover"
-        className="md:hidden -mx-4"
-        // viewportClassName="px-4 pb-4 snap-x snap-mandatory"
-        trackClassName="mx-4"
-      >
-        <div className="flex gap-4 w-max">
-          {users.map((user) => (
-            <div key={user.name} className="snap-start">
-              <UserCard user={user} />
-            </div>
-          ))}
-        </div>
-      </ScrollArea>
-
-      {/* Desktop: grid */}
       <motion.div
-        className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-4"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
         variants={stagger}
         whileInView="visible"
         initial="hidden"
         viewport={{ once: true, amount: 0.2 }}
       >
         {users.map((user) => (
-          <motion.div key={user.name} variants={fadeUp}>
+          <motion.div key={user.name} variants={fadeUp} className="w-full">
             <UserCard user={user} />
           </motion.div>
         ))}

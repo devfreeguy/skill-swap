@@ -124,7 +124,7 @@ export default function AppShell({ user, children }: Props) {
       </aside>
 
       {/* ── Mobile top bar ──────────────────────────────────────────── */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-20 border-b border-border bg-background px-4 h-12 flex items-center justify-between">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-20 border-b border-border bg-background px-4 h-16 flex items-center justify-between">
         <Logo />
         <nav className="flex items-center gap-3 text-sm text-muted">
           <Link href="/users">Discover</Link>
@@ -133,7 +133,7 @@ export default function AppShell({ user, children }: Props) {
       </div>
 
       {/* ── Main column ─────────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col md:pt-0 pt-12 min-w-0">
+      <div className="flex-1 flex flex-col md:pt-0 pt-16 min-w-0">
         {/* Header */}
         <header className="sticky top-0 z-10 bg-background border-b border-border px-6 py-3 flex items-center gap-4">
           <div className="flex-1 max-w-sm relative">
