@@ -15,7 +15,7 @@ const pillars = [
     icon: IconWallet,
     title: "Wallet-Based Identity",
     description:
-      "Connect with any Cardano-compatible wallet. Your identity is your address — no centralized login required.",
+      "Connect with any Cardano-compatible wallet. Your identity is your address - no centralized login required.",
   },
   {
     icon: IconFileCheck,

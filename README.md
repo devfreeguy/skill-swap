@@ -4,9 +4,9 @@
 
 SkillSwap is a peer-to-peer skill exchange platform that matches
 users based on what they can teach and what they want to learn.
-Every exchange is secured with a small ADA payment via Cardano
-wallet and generates a verifiable proof record structured for
-future on-chain anchoring.
+Each completed exchange produces a verifiable proof record that is
+anchored on the Cardano blockchain, and every conversation is
+end-to-end encrypted with wallet-derived keys.
 
 Built for the Piece of Pie Hackathon by Gimbalabs — 12 weeks,
 public commits, real users.
@@ -17,32 +17,37 @@ public commits, real users.
 
 | Layer | Technology |
 |---|---|
-| Frontend | Next.js 15 (App Router) |
-| Styling | Tailwind CSS + HeroUI v3 |
-| Database | NeonDB + Prisma |
-| Auth | Email/Password + Cardano Wallet |
-| Payments | ADA via MeshJS + Blockfrost |
-| Animations | Framer Motion |
+| Frontend | Next.js 16 (App Router) + React 19 + TypeScript |
+| Styling | Tailwind CSS v4 + HeroUI v3 + Framer Motion |
+| Database | NeonDB (PostgreSQL) + Prisma v7 |
+| Auth | Twitter/X OAuth2 + Cardano wallet (CIP-8 signature) |
+| Wallet | `@cardano-foundation/cardano-connect-with-wallet` + MeshSDK |
+| On-chain | Proof anchoring with Blockfrost → Koios → Maestro fallback |
+| Messaging | End-to-end encrypted (tweetnacl, wallet-derived keys) |
+| Realtime | Pusher Channels (primary) → Ably (fallback) |
+| Media | Cloudinary (avatars, deliverables, message files) |
 | Deployment | Vercel |
 
 ---
 
 ## Core Features
 
-- **Perfect Match Detection** — Finds users who teach what you want and want what you teach, both ways.
-- **Proof of Skill Swap** — Every completed exchange generates a verifiable record with ADA tx hash, skills, and timestamp.
-- **ADA-Gated Swap Requests** — A small ADA fee filters out time-wasters. Every request is intentional.
-- **Blockchain-Ready Records** — Proof records structured for future Cardano anchoring.
+- **Perfect Match Detection** — Finds users who teach what you want and want what you teach, both ways. Multi-skill aware (skills are normalized before scoring).
+- **End-to-End Encrypted Messaging** — Per-swap conversations encrypted with keys derived from a wallet signature; the server never sees plaintext.
+- **Two-Sided Deliverables & Completion** — Each party submits concrete deliverables; a swap only completes once both sides have delivered and confirmed.
+- **On-Chain Proof of Skill Swap** — Completed swaps produce a deterministic proof hash that the user's wallet anchors on Cardano (`PENDING → ANCHORING → ANCHORED`), with automatic provider fallback.
+- **Mandatory Wallet Gate** — A connected Cardano wallet is required to use the app; it signs proofs and secures messaging.
+- **Realtime Everything** — Swap requests, accept/decline, messages, and notifications update live without polling.
 
 ---
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+
-- npm or yarn
-- Neon database account
-- Cardano wallet (Eternl, Nami, or Lace)
+- Node.js 20+
+- **pnpm** (this project uses pnpm, not npm)
+- A Neon (PostgreSQL) database
+- A Cardano wallet (Eternl, Nami, or Lace)
 
 ### Installation
 
@@ -52,32 +57,61 @@ git clone https://github.com/yourusername/skillswap.git
 cd skillswap
 
 # Install dependencies
-npm install
+pnpm install
 
 # Set up environment variables
-cp .env.example .env.local
+cp .env.example .env
 
-# Push database schema
+# Generate the Prisma client (outputs to app/generated/prisma/)
+npx prisma generate
+
+# Push the schema to a fresh database
 npx prisma db push
 
-# Run development server
-npm run dev
+# Run the development server
+pnpm dev
 ```
 
 Open http://localhost:3000
+
+> **Note:** `pnpm build` and `pnpm dev` should not share the same `.next`
+> directory. If you switch between them and see stale-chunk 404s, run
+> `rm -rf .next` and restart.
 
 ---
 
 ## Environment Variables
 
-Create a `.env.local` file in the root:
+Create a `.env` file in the root (see `.env.example`):
 
 ```env
-DATABASE_URL=your_neon_database_url
-NEXTAUTH_SECRET=your_secret
-NEXTAUTH_URL=http://localhost:3000
-# Cardano network: "preprod" | "preview" | "mainnet" (defaults to preprod)
-NEXT_PUBLIC_CARDANO_NETWORK=preprod
+# Database
+DATABASE_URL=                    # NeonDB connection string
+
+# Auth
+JWT_SECRET=                      # secret for jose JWT signing
+NEXTAUTH_URL=                    # app base URL (cookie domain)
+TWITTER_CLIENT_ID=               # X/Twitter OAuth2 app
+TWITTER_CLIENT_SECRET=
+
+# Cardano
+NEXT_PUBLIC_CARDANO_NETWORK=     # "mainnet" | "preprod" | "preview" (default preprod)
+BLOCKFROST_API_KEY=              # on-chain submit/verify (optional; falls back to Koios/Maestro)
+MAESTRO_API_KEY=                 # optional provider fallback
+
+# Realtime (Pusher primary, Ably fallback)
+PUSHER_APP_ID=
+PUSHER_KEY=
+PUSHER_SECRET=
+PUSHER_CLUSTER=
+NEXT_PUBLIC_PUSHER_KEY=
+NEXT_PUBLIC_PUSHER_CLUSTER=
+ABLY_API_KEY=
+
+# Media
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
 ```
 
 ---
@@ -86,31 +120,44 @@ NEXT_PUBLIC_CARDANO_NETWORK=preprod
 
 ```
 skillswap/
-├── app/                    # Next.js App Router
-│   ├── (auth)/            # Auth pages
-│   ├── (dashboard)/       # Protected pages
-│   └── page.tsx           # Landing page
-├── components/
-│   ├── elements/          # Reusable UI elements
-│   ├── layouts/           # Layout components
-│   └── sections/          # Landing page sections
-├── constants/             # Images, config constants
-├── hooks/                 # Custom React hooks
-├── lib/                   # Utilities, animations
-├── prisma/                # Database schema
-└── styles/                # Global styles, theme
+├── app/
+│   ├── (auth)/             # login + onboarding (no shared shell)
+│   ├── (app)/              # authenticated area — guarded by layout + proxy.ts
+│   │   ├── dashboard/      # profile, matches, swaps, notifications
+│   │   ├── users/          # discovery grid + public profile dialog
+│   │   ├── swaps/[id]/     # swap detail, deliverables, proof
+│   │   ├── messages/       # E2E chat (conversation list + context panel)
+│   │   ├── notifications/
+│   │   └── profile/
+│   ├── api/                # route handlers (auth, swaps, messages, users, …)
+│   ├── generated/prisma/   # generated Prisma client (reflects the real DB)
+│   └── page.tsx            # landing page
+├── components/             # auth, dashboard, messaging, swap, layouts, sections, …
+├── hooks/                  # custom React hooks (useWalletAuth, …)
+├── lib/                    # prisma, jwt, auth, matching, crypto/e2e, cardano/, realtime, …
+├── prisma/                 # schema.prisma (in sync with the real DB)
+└── styles/                 # global styles, theme
 ```
+
+Route protection is handled by `proxy.ts` (Next.js 16's middleware
+file name) plus a server-side guard in `app/(app)/layout.tsx`.
 
 ---
 
 ## Database Schema
 
+Models: `User`, `Swap`, `Proof`, `Delivery`, `Message`, `Notification`, `WalletNonce`.
+
 ```
-User  → has teach_skill + learn_skill
-Swap  → connects two users, status lifecycle:
-         PENDING → ACTIVE → COMPLETED | DECLINED
-Proof → generated on swap completion,
-         stores tx hash + skills + timestamp
+User    → teachSkill + learnSkill (JSON-stringified arrays), walletAddress, publicKey
+Swap    → connects two users, lifecycle:
+           PENDING → ACTIVE → COMPLETED | DECLINED | CANCELLED
+           two-sided done/delivered flags + per-user last-read timestamps
+Proof   → created on completion; deterministic metadataHash,
+           on-chain status (PENDING → ANCHORING → ANCHORED | FAILED)
+Delivery → many per participant per swap (LINK/FILE/IMAGE/DOCUMENT/TEXT)
+Message  → per-swap chat; user text stored as E2E ciphertext, system events as plaintext
+WalletNonce → single-use, TTL'd CIP-8 login challenges (DB-backed)
 ```
 
 ---

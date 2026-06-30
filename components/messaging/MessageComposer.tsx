@@ -11,12 +11,16 @@ import {
 } from "@tabler/icons-react";
 import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { encryptMessage, type E2EKeyPair } from "@/lib/crypto/e2e";
 import type { MessageData } from "./MessageBubble";
 
 type Props = {
   swapId: string;
   currentUser: { id: string; name: string; avatarUrl?: string | null };
   onSent: (message: MessageData) => void;
+  /** When both are present, TEXT/LINK messages are end-to-end encrypted. */
+  myKeyPair?: E2EKeyPair | null;
+  partnerPublicKey?: string | null;
 };
 
 type AttachMode = null | "link";
@@ -27,6 +31,8 @@ export default function MessageComposer({
   swapId,
   currentUser,
   onSent,
+  myKeyPair,
+  partnerPublicKey,
 }: Props) {
   const [text, setText] = useState("");
   const [attachMode, setAttachMode] = useState<AttachMode>(null);
@@ -58,17 +64,42 @@ export default function MessageComposer({
     setSending(true);
     setError("");
     try {
+      const payload: Record<string, unknown> = {
+        type: opts.type,
+        fileData: opts.fileData,
+        fileName: opts.fileName,
+        fileSize: opts.fileSize,
+      };
+
+      // Encrypt text/link end-to-end when both keys are available; file
+      // captions stay plaintext (the binary itself is a Cloudinary URL).
+      const encryptable = opts.type === "TEXT" || opts.type === "LINK";
+      if (encryptable && myKeyPair && partnerPublicKey) {
+        const { ciphertext, nonce } = encryptMessage(
+          opts.content,
+          partnerPublicKey,
+          myKeyPair
+        );
+        payload.ciphertext = ciphertext;
+        payload.nonce = nonce;
+        payload.senderPublicKey = myKeyPair.publicKey;
+        payload.content = "";
+      } else {
+        payload.content = opts.content;
+      }
+
       const res = await fetch(`/api/messages/${swapId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(opts),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error ?? "Failed to send");
         return;
       }
-      onSent(data as MessageData);
+      // Show the plaintext we just typed locally (the server stored ciphertext).
+      onSent({ ...(data as MessageData), content: opts.content });
       setText("");
       setAttachMode(null);
       setLinkInput("");

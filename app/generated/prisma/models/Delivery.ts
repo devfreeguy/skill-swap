@@ -20,16 +20,31 @@ export type DeliveryModel = runtime.Types.Result.DefaultSelection<Prisma.$Delive
 
 export type AggregateDelivery = {
   _count: DeliveryCountAggregateOutputType | null
+  _avg: DeliveryAvgAggregateOutputType | null
+  _sum: DeliverySumAggregateOutputType | null
   _min: DeliveryMinAggregateOutputType | null
   _max: DeliveryMaxAggregateOutputType | null
+}
+
+export type DeliveryAvgAggregateOutputType = {
+  fileSize: number | null
+}
+
+export type DeliverySumAggregateOutputType = {
+  fileSize: number | null
 }
 
 export type DeliveryMinAggregateOutputType = {
   id: string | null
   swapId: string | null
   userId: string | null
+  type: $Enums.DeliverableType | null
+  title: string | null
   resourceLink: string | null
   notes: string | null
+  fileName: string | null
+  fileSize: number | null
+  mimeType: string | null
   submittedAt: Date | null
 }
 
@@ -37,8 +52,13 @@ export type DeliveryMaxAggregateOutputType = {
   id: string | null
   swapId: string | null
   userId: string | null
+  type: $Enums.DeliverableType | null
+  title: string | null
   resourceLink: string | null
   notes: string | null
+  fileName: string | null
+  fileSize: number | null
+  mimeType: string | null
   submittedAt: Date | null
 }
 
@@ -46,19 +66,37 @@ export type DeliveryCountAggregateOutputType = {
   id: number
   swapId: number
   userId: number
+  type: number
+  title: number
   resourceLink: number
   notes: number
+  fileName: number
+  fileSize: number
+  mimeType: number
   submittedAt: number
   _all: number
 }
 
 
+export type DeliveryAvgAggregateInputType = {
+  fileSize?: true
+}
+
+export type DeliverySumAggregateInputType = {
+  fileSize?: true
+}
+
 export type DeliveryMinAggregateInputType = {
   id?: true
   swapId?: true
   userId?: true
+  type?: true
+  title?: true
   resourceLink?: true
   notes?: true
+  fileName?: true
+  fileSize?: true
+  mimeType?: true
   submittedAt?: true
 }
 
@@ -66,8 +104,13 @@ export type DeliveryMaxAggregateInputType = {
   id?: true
   swapId?: true
   userId?: true
+  type?: true
+  title?: true
   resourceLink?: true
   notes?: true
+  fileName?: true
+  fileSize?: true
+  mimeType?: true
   submittedAt?: true
 }
 
@@ -75,8 +118,13 @@ export type DeliveryCountAggregateInputType = {
   id?: true
   swapId?: true
   userId?: true
+  type?: true
+  title?: true
   resourceLink?: true
   notes?: true
+  fileName?: true
+  fileSize?: true
+  mimeType?: true
   submittedAt?: true
   _all?: true
 }
@@ -119,6 +167,18 @@ export type DeliveryAggregateArgs<ExtArgs extends runtime.Types.Extensions.Inter
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: DeliveryAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: DeliverySumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: DeliveryMinAggregateInputType
@@ -149,6 +209,8 @@ export type DeliveryGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   _count?: DeliveryCountAggregateInputType | true
+  _avg?: DeliveryAvgAggregateInputType
+  _sum?: DeliverySumAggregateInputType
   _min?: DeliveryMinAggregateInputType
   _max?: DeliveryMaxAggregateInputType
 }
@@ -157,10 +219,17 @@ export type DeliveryGroupByOutputType = {
   id: string
   swapId: string
   userId: string
-  resourceLink: string
+  type: $Enums.DeliverableType
+  title: string | null
+  resourceLink: string | null
   notes: string | null
+  fileName: string | null
+  fileSize: number | null
+  mimeType: string | null
   submittedAt: Date
   _count: DeliveryCountAggregateOutputType | null
+  _avg: DeliveryAvgAggregateOutputType | null
+  _sum: DeliverySumAggregateOutputType | null
   _min: DeliveryMinAggregateOutputType | null
   _max: DeliveryMaxAggregateOutputType | null
 }
@@ -187,8 +256,13 @@ export type DeliveryWhereInput = {
   id?: Prisma.StringFilter<"Delivery"> | string
   swapId?: Prisma.StringFilter<"Delivery"> | string
   userId?: Prisma.StringFilter<"Delivery"> | string
-  resourceLink?: Prisma.StringFilter<"Delivery"> | string
+  type?: Prisma.EnumDeliverableTypeFilter<"Delivery"> | $Enums.DeliverableType
+  title?: Prisma.StringNullableFilter<"Delivery"> | string | null
+  resourceLink?: Prisma.StringNullableFilter<"Delivery"> | string | null
   notes?: Prisma.StringNullableFilter<"Delivery"> | string | null
+  fileName?: Prisma.StringNullableFilter<"Delivery"> | string | null
+  fileSize?: Prisma.IntNullableFilter<"Delivery"> | number | null
+  mimeType?: Prisma.StringNullableFilter<"Delivery"> | string | null
   submittedAt?: Prisma.DateTimeFilter<"Delivery"> | Date | string
   swap?: Prisma.XOR<Prisma.SwapScalarRelationFilter, Prisma.SwapWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -198,8 +272,13 @@ export type DeliveryOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   swapId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  resourceLink?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  title?: Prisma.SortOrderInput | Prisma.SortOrder
+  resourceLink?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  fileName?: Prisma.SortOrderInput | Prisma.SortOrder
+  fileSize?: Prisma.SortOrderInput | Prisma.SortOrder
+  mimeType?: Prisma.SortOrderInput | Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
   swap?: Prisma.SwapOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
@@ -207,29 +286,40 @@ export type DeliveryOrderByWithRelationInput = {
 
 export type DeliveryWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  swapId_userId?: Prisma.DeliverySwapIdUserIdCompoundUniqueInput
   AND?: Prisma.DeliveryWhereInput | Prisma.DeliveryWhereInput[]
   OR?: Prisma.DeliveryWhereInput[]
   NOT?: Prisma.DeliveryWhereInput | Prisma.DeliveryWhereInput[]
   swapId?: Prisma.StringFilter<"Delivery"> | string
   userId?: Prisma.StringFilter<"Delivery"> | string
-  resourceLink?: Prisma.StringFilter<"Delivery"> | string
+  type?: Prisma.EnumDeliverableTypeFilter<"Delivery"> | $Enums.DeliverableType
+  title?: Prisma.StringNullableFilter<"Delivery"> | string | null
+  resourceLink?: Prisma.StringNullableFilter<"Delivery"> | string | null
   notes?: Prisma.StringNullableFilter<"Delivery"> | string | null
+  fileName?: Prisma.StringNullableFilter<"Delivery"> | string | null
+  fileSize?: Prisma.IntNullableFilter<"Delivery"> | number | null
+  mimeType?: Prisma.StringNullableFilter<"Delivery"> | string | null
   submittedAt?: Prisma.DateTimeFilter<"Delivery"> | Date | string
   swap?: Prisma.XOR<Prisma.SwapScalarRelationFilter, Prisma.SwapWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "id" | "swapId_userId">
+}, "id">
 
 export type DeliveryOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   swapId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  resourceLink?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  title?: Prisma.SortOrderInput | Prisma.SortOrder
+  resourceLink?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  fileName?: Prisma.SortOrderInput | Prisma.SortOrder
+  fileSize?: Prisma.SortOrderInput | Prisma.SortOrder
+  mimeType?: Prisma.SortOrderInput | Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
   _count?: Prisma.DeliveryCountOrderByAggregateInput
+  _avg?: Prisma.DeliveryAvgOrderByAggregateInput
   _max?: Prisma.DeliveryMaxOrderByAggregateInput
   _min?: Prisma.DeliveryMinOrderByAggregateInput
+  _sum?: Prisma.DeliverySumOrderByAggregateInput
 }
 
 export type DeliveryScalarWhereWithAggregatesInput = {
@@ -239,15 +329,25 @@ export type DeliveryScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Delivery"> | string
   swapId?: Prisma.StringWithAggregatesFilter<"Delivery"> | string
   userId?: Prisma.StringWithAggregatesFilter<"Delivery"> | string
-  resourceLink?: Prisma.StringWithAggregatesFilter<"Delivery"> | string
+  type?: Prisma.EnumDeliverableTypeWithAggregatesFilter<"Delivery"> | $Enums.DeliverableType
+  title?: Prisma.StringNullableWithAggregatesFilter<"Delivery"> | string | null
+  resourceLink?: Prisma.StringNullableWithAggregatesFilter<"Delivery"> | string | null
   notes?: Prisma.StringNullableWithAggregatesFilter<"Delivery"> | string | null
+  fileName?: Prisma.StringNullableWithAggregatesFilter<"Delivery"> | string | null
+  fileSize?: Prisma.IntNullableWithAggregatesFilter<"Delivery"> | number | null
+  mimeType?: Prisma.StringNullableWithAggregatesFilter<"Delivery"> | string | null
   submittedAt?: Prisma.DateTimeWithAggregatesFilter<"Delivery"> | Date | string
 }
 
 export type DeliveryCreateInput = {
   id?: string
-  resourceLink: string
+  type?: $Enums.DeliverableType
+  title?: string | null
+  resourceLink?: string | null
   notes?: string | null
+  fileName?: string | null
+  fileSize?: number | null
+  mimeType?: string | null
   submittedAt?: Date | string
   swap: Prisma.SwapCreateNestedOneWithoutDeliveriesInput
   user: Prisma.UserCreateNestedOneWithoutDeliveriesInput
@@ -257,15 +357,25 @@ export type DeliveryUncheckedCreateInput = {
   id?: string
   swapId: string
   userId: string
-  resourceLink: string
+  type?: $Enums.DeliverableType
+  title?: string | null
+  resourceLink?: string | null
   notes?: string | null
+  fileName?: string | null
+  fileSize?: number | null
+  mimeType?: string | null
   submittedAt?: Date | string
 }
 
 export type DeliveryUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  resourceLink?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumDeliverableTypeFieldUpdateOperationsInput | $Enums.DeliverableType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resourceLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   swap?: Prisma.SwapUpdateOneRequiredWithoutDeliveriesNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutDeliveriesNestedInput
@@ -275,8 +385,13 @@ export type DeliveryUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   swapId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  resourceLink?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumDeliverableTypeFieldUpdateOperationsInput | $Enums.DeliverableType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resourceLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -284,15 +399,25 @@ export type DeliveryCreateManyInput = {
   id?: string
   swapId: string
   userId: string
-  resourceLink: string
+  type?: $Enums.DeliverableType
+  title?: string | null
+  resourceLink?: string | null
   notes?: string | null
+  fileName?: string | null
+  fileSize?: number | null
+  mimeType?: string | null
   submittedAt?: Date | string
 }
 
 export type DeliveryUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  resourceLink?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumDeliverableTypeFieldUpdateOperationsInput | $Enums.DeliverableType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resourceLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -300,8 +425,13 @@ export type DeliveryUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   swapId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  resourceLink?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumDeliverableTypeFieldUpdateOperationsInput | $Enums.DeliverableType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resourceLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -315,26 +445,35 @@ export type DeliveryOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type DeliverySwapIdUserIdCompoundUniqueInput = {
-  swapId: string
-  userId: string
-}
-
 export type DeliveryCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   swapId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  title?: Prisma.SortOrder
   resourceLink?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  fileName?: Prisma.SortOrder
+  fileSize?: Prisma.SortOrder
+  mimeType?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
+}
+
+export type DeliveryAvgOrderByAggregateInput = {
+  fileSize?: Prisma.SortOrder
 }
 
 export type DeliveryMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   swapId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  title?: Prisma.SortOrder
   resourceLink?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  fileName?: Prisma.SortOrder
+  fileSize?: Prisma.SortOrder
+  mimeType?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
 }
 
@@ -342,9 +481,18 @@ export type DeliveryMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   swapId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  title?: Prisma.SortOrder
   resourceLink?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  fileName?: Prisma.SortOrder
+  fileSize?: Prisma.SortOrder
+  mimeType?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
+}
+
+export type DeliverySumOrderByAggregateInput = {
+  fileSize?: Prisma.SortOrder
 }
 
 export type DeliveryCreateNestedManyWithoutUserInput = {
@@ -431,10 +579,27 @@ export type DeliveryUncheckedUpdateManyWithoutSwapNestedInput = {
   deleteMany?: Prisma.DeliveryScalarWhereInput | Prisma.DeliveryScalarWhereInput[]
 }
 
+export type EnumDeliverableTypeFieldUpdateOperationsInput = {
+  set?: $Enums.DeliverableType
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type DeliveryCreateWithoutUserInput = {
   id?: string
-  resourceLink: string
+  type?: $Enums.DeliverableType
+  title?: string | null
+  resourceLink?: string | null
   notes?: string | null
+  fileName?: string | null
+  fileSize?: number | null
+  mimeType?: string | null
   submittedAt?: Date | string
   swap: Prisma.SwapCreateNestedOneWithoutDeliveriesInput
 }
@@ -442,8 +607,13 @@ export type DeliveryCreateWithoutUserInput = {
 export type DeliveryUncheckedCreateWithoutUserInput = {
   id?: string
   swapId: string
-  resourceLink: string
+  type?: $Enums.DeliverableType
+  title?: string | null
+  resourceLink?: string | null
   notes?: string | null
+  fileName?: string | null
+  fileSize?: number | null
+  mimeType?: string | null
   submittedAt?: Date | string
 }
 
@@ -480,15 +650,25 @@ export type DeliveryScalarWhereInput = {
   id?: Prisma.StringFilter<"Delivery"> | string
   swapId?: Prisma.StringFilter<"Delivery"> | string
   userId?: Prisma.StringFilter<"Delivery"> | string
-  resourceLink?: Prisma.StringFilter<"Delivery"> | string
+  type?: Prisma.EnumDeliverableTypeFilter<"Delivery"> | $Enums.DeliverableType
+  title?: Prisma.StringNullableFilter<"Delivery"> | string | null
+  resourceLink?: Prisma.StringNullableFilter<"Delivery"> | string | null
   notes?: Prisma.StringNullableFilter<"Delivery"> | string | null
+  fileName?: Prisma.StringNullableFilter<"Delivery"> | string | null
+  fileSize?: Prisma.IntNullableFilter<"Delivery"> | number | null
+  mimeType?: Prisma.StringNullableFilter<"Delivery"> | string | null
   submittedAt?: Prisma.DateTimeFilter<"Delivery"> | Date | string
 }
 
 export type DeliveryCreateWithoutSwapInput = {
   id?: string
-  resourceLink: string
+  type?: $Enums.DeliverableType
+  title?: string | null
+  resourceLink?: string | null
   notes?: string | null
+  fileName?: string | null
+  fileSize?: number | null
+  mimeType?: string | null
   submittedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutDeliveriesInput
 }
@@ -496,8 +676,13 @@ export type DeliveryCreateWithoutSwapInput = {
 export type DeliveryUncheckedCreateWithoutSwapInput = {
   id?: string
   userId: string
-  resourceLink: string
+  type?: $Enums.DeliverableType
+  title?: string | null
+  resourceLink?: string | null
   notes?: string | null
+  fileName?: string | null
+  fileSize?: number | null
+  mimeType?: string | null
   submittedAt?: Date | string
 }
 
@@ -530,15 +715,25 @@ export type DeliveryUpdateManyWithWhereWithoutSwapInput = {
 export type DeliveryCreateManyUserInput = {
   id?: string
   swapId: string
-  resourceLink: string
+  type?: $Enums.DeliverableType
+  title?: string | null
+  resourceLink?: string | null
   notes?: string | null
+  fileName?: string | null
+  fileSize?: number | null
+  mimeType?: string | null
   submittedAt?: Date | string
 }
 
 export type DeliveryUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  resourceLink?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumDeliverableTypeFieldUpdateOperationsInput | $Enums.DeliverableType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resourceLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   swap?: Prisma.SwapUpdateOneRequiredWithoutDeliveriesNestedInput
 }
@@ -546,31 +741,51 @@ export type DeliveryUpdateWithoutUserInput = {
 export type DeliveryUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   swapId?: Prisma.StringFieldUpdateOperationsInput | string
-  resourceLink?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumDeliverableTypeFieldUpdateOperationsInput | $Enums.DeliverableType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resourceLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type DeliveryUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   swapId?: Prisma.StringFieldUpdateOperationsInput | string
-  resourceLink?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumDeliverableTypeFieldUpdateOperationsInput | $Enums.DeliverableType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resourceLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type DeliveryCreateManySwapInput = {
   id?: string
   userId: string
-  resourceLink: string
+  type?: $Enums.DeliverableType
+  title?: string | null
+  resourceLink?: string | null
   notes?: string | null
+  fileName?: string | null
+  fileSize?: number | null
+  mimeType?: string | null
   submittedAt?: Date | string
 }
 
 export type DeliveryUpdateWithoutSwapInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  resourceLink?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumDeliverableTypeFieldUpdateOperationsInput | $Enums.DeliverableType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resourceLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutDeliveriesNestedInput
 }
@@ -578,16 +793,26 @@ export type DeliveryUpdateWithoutSwapInput = {
 export type DeliveryUncheckedUpdateWithoutSwapInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  resourceLink?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumDeliverableTypeFieldUpdateOperationsInput | $Enums.DeliverableType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resourceLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type DeliveryUncheckedUpdateManyWithoutSwapInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  resourceLink?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumDeliverableTypeFieldUpdateOperationsInput | $Enums.DeliverableType
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resourceLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileSize?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  mimeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -597,8 +822,13 @@ export type DeliverySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   id?: boolean
   swapId?: boolean
   userId?: boolean
+  type?: boolean
+  title?: boolean
   resourceLink?: boolean
   notes?: boolean
+  fileName?: boolean
+  fileSize?: boolean
+  mimeType?: boolean
   submittedAt?: boolean
   swap?: boolean | Prisma.SwapDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -608,8 +838,13 @@ export type DeliverySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   swapId?: boolean
   userId?: boolean
+  type?: boolean
+  title?: boolean
   resourceLink?: boolean
   notes?: boolean
+  fileName?: boolean
+  fileSize?: boolean
+  mimeType?: boolean
   submittedAt?: boolean
   swap?: boolean | Prisma.SwapDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -619,8 +854,13 @@ export type DeliverySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   swapId?: boolean
   userId?: boolean
+  type?: boolean
+  title?: boolean
   resourceLink?: boolean
   notes?: boolean
+  fileName?: boolean
+  fileSize?: boolean
+  mimeType?: boolean
   submittedAt?: boolean
   swap?: boolean | Prisma.SwapDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -630,12 +870,17 @@ export type DeliverySelectScalar = {
   id?: boolean
   swapId?: boolean
   userId?: boolean
+  type?: boolean
+  title?: boolean
   resourceLink?: boolean
   notes?: boolean
+  fileName?: boolean
+  fileSize?: boolean
+  mimeType?: boolean
   submittedAt?: boolean
 }
 
-export type DeliveryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "swapId" | "userId" | "resourceLink" | "notes" | "submittedAt", ExtArgs["result"]["delivery"]>
+export type DeliveryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "swapId" | "userId" | "type" | "title" | "resourceLink" | "notes" | "fileName" | "fileSize" | "mimeType" | "submittedAt", ExtArgs["result"]["delivery"]>
 export type DeliveryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   swap?: boolean | Prisma.SwapDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -659,8 +904,13 @@ export type $DeliveryPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     id: string
     swapId: string
     userId: string
-    resourceLink: string
+    type: $Enums.DeliverableType
+    title: string | null
+    resourceLink: string | null
     notes: string | null
+    fileName: string | null
+    fileSize: number | null
+    mimeType: string | null
     submittedAt: Date
   }, ExtArgs["result"]["delivery"]>
   composites: {}
@@ -1090,8 +1340,13 @@ export interface DeliveryFieldRefs {
   readonly id: Prisma.FieldRef<"Delivery", 'String'>
   readonly swapId: Prisma.FieldRef<"Delivery", 'String'>
   readonly userId: Prisma.FieldRef<"Delivery", 'String'>
+  readonly type: Prisma.FieldRef<"Delivery", 'DeliverableType'>
+  readonly title: Prisma.FieldRef<"Delivery", 'String'>
   readonly resourceLink: Prisma.FieldRef<"Delivery", 'String'>
   readonly notes: Prisma.FieldRef<"Delivery", 'String'>
+  readonly fileName: Prisma.FieldRef<"Delivery", 'String'>
+  readonly fileSize: Prisma.FieldRef<"Delivery", 'Int'>
+  readonly mimeType: Prisma.FieldRef<"Delivery", 'String'>
   readonly submittedAt: Prisma.FieldRef<"Delivery", 'DateTime'>
 }
     

@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Nonce must have been issued by /api/auth/wallet/nonce and is single-use.
-  if (!consumeNonce(nonce)) {
+  if (!(await consumeNonce(nonce))) {
     return NextResponse.json(
       { error: "Invalid or expired nonce" },
       { status: 401 }

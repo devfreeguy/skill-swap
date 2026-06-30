@@ -19,6 +19,20 @@ export async function uploadAvatar(
   return result.secure_url;
 }
 
+export async function uploadDeliverable(
+  file: string,
+  swapId: string,
+  userId: string,
+  resourceType: "image" | "raw"
+): Promise<{ url: string }> {
+  const result = await cloudinary.uploader.upload(file, {
+    folder: "skillswap/deliverables",
+    public_id: `${swapId}-${userId}-${Date.now()}`,
+    resource_type: resourceType,
+  });
+  return { url: result.secure_url };
+}
+
 export async function uploadMessageFile(
   file: string,
   messageId: string,

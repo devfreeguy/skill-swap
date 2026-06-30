@@ -64,7 +64,7 @@ export default function CTASection() {
             </p>
 
             <div className="flex items-center gap-4 flex-wrap justify-center">
-              <Link href="/register">
+              <Link href="/login">
                 <Button
                   size="lg"
                   className="rounded-full bg-white text-[#01060C] font-semibold px-8"

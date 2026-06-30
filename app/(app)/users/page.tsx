@@ -6,16 +6,12 @@ import FeaturedMatchCard, {
   type FeaturedMatchData,
 } from "@/components/cards/FeaturedMatchCard";
 import { parseSkills } from "@/lib/skills";
+import { matchPercent } from "@/lib/utils";
 import type { MatchType } from "@/lib/matching";
+import FilterPill from "@/components/users/FilterPill";
+import TrendIcon from "@/components/users/TrendIcon";
 import { Button, Card } from "@heroui/react";
-import {
-  IconChevronDown,
-  IconCheck,
-  IconTrendingUp,
-  IconTrendingDown,
-  IconMinus,
-  IconStar,
-} from "@tabler/icons-react";
+import { IconStar, IconTrendingUp } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -38,45 +34,6 @@ const TRENDING_SKILLS = [
   { name: "Cardano Dev", trend: "up" as const },
   { name: "Public Speaking", trend: "down" as const },
 ];
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function matchPercent(score: number): number {
-  return Math.min(50 + score * 15, 99);
-}
-
-function TrendIcon({ trend }: { trend: "up" | "down" | "flat" }) {
-  if (trend === "up")
-    return <IconTrendingUp size={16} className="text-accent" />;
-  if (trend === "down")
-    return <IconTrendingDown size={16} className="text-danger" />;
-  return <IconMinus size={16} className="text-muted" />;
-}
-
-function FilterPill({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active?: boolean;
-  onClick?: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${
-        active
-          ? "border-accent bg-accent/10 text-accent font-medium"
-          : "border-border text-muted hover:text-foreground hover:border-foreground/30"
-      }`}
-    >
-      {active && <IconCheck size={13} />}
-      {label}
-      {!active && <IconChevronDown size={13} />}
-    </button>
-  );
-}
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
@@ -115,7 +72,7 @@ export default function DiscoverPage() {
     .slice(0, 2)
     .map((m) => ({ ...m, matchPct: matchPercent(m.score) }));
 
-  // Network grid — all users, filtered by search
+  // Network grid - all users, filtered by search
   const q = search.toLowerCase().trim();
   const filtered = users.filter((u) => {
     if (!q) return true;
@@ -151,10 +108,6 @@ export default function DiscoverPage() {
 
         {/* Filters */}
         <div className="flex flex-wrap gap-2">
-          {/* TODO: Category / Experience / Availability have no DB fields yet — UI only */}
-          <FilterPill label="Category" />
-          <FilterPill label="Experience Level" />
-          <FilterPill label="Availability" />
           <FilterPill
             label="Match Type: Perfect"
             active={onlyPerfect}

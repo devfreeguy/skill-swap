@@ -3,9 +3,9 @@ import { verifyToken } from "@/lib/jwt";
 
 const protectedPaths = [
   "/dashboard",
-  "/discover",
   "/swaps",
   "/users",
+  "/messages",
   "/profile",
   "/notifications",
 ];
@@ -38,9 +38,9 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/dashboard/:path*",
-    "/discover/:path*",
     "/swaps/:path*",
     "/users/:path*",
+    "/messages/:path*",
     "/profile/:path*",
     "/notifications/:path*",
   ],

@@ -4,6 +4,8 @@ import LemniscateLoader from "@/components/layouts/Loader";
 import SkillSelector from "@/components/elements/SkillSelector";
 import WalletConnectButton from "@/components/elements/WalletConnectButton";
 import { parseSkills } from "@/lib/skills";
+import { truncateAddress } from "@/lib/utils";
+import StatItem from "@/components/profile/StatItem";
 import {
   Avatar,
   Button,
@@ -42,11 +44,6 @@ type ProfileData = {
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function truncateAddress(addr: string): string {
-  if (addr.length <= 14) return addr;
-  return `${addr.slice(0, 8)}...${addr.slice(-6)}`;
-}
 
 function formatMemberSince(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("en-US", {
@@ -338,7 +335,7 @@ export default function ProfilePage() {
         {/* ── Sections 4 + 5: Account + Stats ─────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-          {/* Section 4 — Account */}
+          {/* Section 4 - Account */}
           <Card className="bg-surface border border-border rounded-2xl p-6">
             <h2 className="text-base font-semibold text-foreground mb-4">
               Account
@@ -393,7 +390,7 @@ export default function ProfilePage() {
             </div>
           </Card>
 
-          {/* Section 5 — Exchange Statistics */}
+          {/* Section 5 - Exchange Statistics */}
           <Card className="bg-surface border border-border rounded-2xl p-6">
             <h2 className="text-base font-semibold text-foreground mb-4">
               Exchange Statistics
@@ -430,22 +427,3 @@ export default function ProfilePage() {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function StatItem({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string | number;
-}) {
-  return (
-    <div className="flex flex-col gap-2 p-3 rounded-xl bg-background border border-border">
-      <div className="flex items-center gap-1.5">
-        {icon}
-        <span className="text-xs font-medium text-muted">{label}</span>
-      </div>
-      <p className="text-xl font-bold text-foreground leading-none">{value}</p>
-    </div>
-  );
-}

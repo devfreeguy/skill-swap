@@ -1,5 +1,10 @@
-import AuthPage from "@/components/auth/AuthPage";
+import LoginPanel from "@/components/auth/LoginPanel";
 
-export default function LoginPage() {
-  return <AuthPage defaultTab="login" />;
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
+  return <LoginPanel error={error} />;
 }

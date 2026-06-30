@@ -389,7 +389,8 @@ export const ModelName = {
   Proof: 'Proof',
   Delivery: 'Delivery',
   Message: 'Message',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  WalletNonce: 'WalletNonce'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -405,7 +406,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "swap" | "proof" | "delivery" | "message" | "notification"
+    modelProps: "user" | "swap" | "proof" | "delivery" | "message" | "notification" | "walletNonce"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -853,6 +854,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    WalletNonce: {
+      payload: Prisma.$WalletNoncePayload<ExtArgs>
+      fields: Prisma.WalletNonceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.WalletNonceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletNoncePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.WalletNonceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletNoncePayload>
+        }
+        findFirst: {
+          args: Prisma.WalletNonceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletNoncePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.WalletNonceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletNoncePayload>
+        }
+        findMany: {
+          args: Prisma.WalletNonceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletNoncePayload>[]
+        }
+        create: {
+          args: Prisma.WalletNonceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletNoncePayload>
+        }
+        createMany: {
+          args: Prisma.WalletNonceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.WalletNonceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletNoncePayload>[]
+        }
+        delete: {
+          args: Prisma.WalletNonceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletNoncePayload>
+        }
+        update: {
+          args: Prisma.WalletNonceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletNoncePayload>
+        }
+        deleteMany: {
+          args: Prisma.WalletNonceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.WalletNonceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.WalletNonceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletNoncePayload>[]
+        }
+        upsert: {
+          args: Prisma.WalletNonceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WalletNoncePayload>
+        }
+        aggregate: {
+          args: Prisma.WalletNonceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateWalletNonce>
+        }
+        groupBy: {
+          args: Prisma.WalletNonceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WalletNonceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.WalletNonceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WalletNonceCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -898,9 +973,12 @@ export const UserScalarFieldEnum = {
   email: 'email',
   password: 'password',
   avatarUrl: 'avatarUrl',
+  bio: 'bio',
   teachSkill: 'teachSkill',
   learnSkill: 'learnSkill',
+  twitterId: 'twitterId',
   walletAddress: 'walletAddress',
+  publicKey: 'publicKey',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -913,11 +991,15 @@ export const SwapScalarFieldEnum = {
   initiatorId: 'initiatorId',
   receiverId: 'receiverId',
   status: 'status',
+  initiatorSkill: 'initiatorSkill',
+  receiverSkill: 'receiverSkill',
   adaTxHash: 'adaTxHash',
   initiatorDone: 'initiatorDone',
   receiverDone: 'receiverDone',
   initiatorDelivered: 'initiatorDelivered',
   receiverDelivered: 'receiverDelivered',
+  initiatorLastReadAt: 'initiatorLastReadAt',
+  receiverLastReadAt: 'receiverLastReadAt',
   completedAt: 'completedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -935,6 +1017,10 @@ export const ProofScalarFieldEnum = {
   adaTxHash: 'adaTxHash',
   metadataHash: 'metadataHash',
   summary: 'summary',
+  chainTxHash: 'chainTxHash',
+  chainStatus: 'chainStatus',
+  network: 'network',
+  anchoredAt: 'anchoredAt',
   createdAt: 'createdAt'
 } as const
 
@@ -945,8 +1031,13 @@ export const DeliveryScalarFieldEnum = {
   id: 'id',
   swapId: 'swapId',
   userId: 'userId',
+  type: 'type',
+  title: 'title',
   resourceLink: 'resourceLink',
   notes: 'notes',
+  fileName: 'fileName',
+  fileSize: 'fileSize',
+  mimeType: 'mimeType',
   submittedAt: 'submittedAt'
 } as const
 
@@ -960,6 +1051,9 @@ export const MessageScalarFieldEnum = {
   content: 'content',
   type: 'type',
   metadata: 'metadata',
+  ciphertext: 'ciphertext',
+  nonce: 'nonce',
+  senderPublicKey: 'senderPublicKey',
   fileUrl: 'fileUrl',
   fileName: 'fileName',
   fileSize: 'fileSize',
@@ -980,6 +1074,15 @@ export const NotificationScalarFieldEnum = {
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
+export const WalletNonceScalarFieldEnum = {
+  nonce: 'nonce',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type WalletNonceScalarFieldEnum = (typeof WalletNonceScalarFieldEnum)[keyof typeof WalletNonceScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1062,16 +1165,16 @@ export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
- * Reference to a field of type 'MessageType'
+ * Reference to a field of type 'DeliverableType'
  */
-export type EnumMessageTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageType'>
+export type EnumDeliverableTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeliverableType'>
     
 
 
 /**
- * Reference to a field of type 'MessageType[]'
+ * Reference to a field of type 'DeliverableType[]'
  */
-export type ListEnumMessageTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageType[]'>
+export type ListEnumDeliverableTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeliverableType[]'>
     
 
 
@@ -1086,6 +1189,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'MessageType'
+ */
+export type EnumMessageTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageType'>
+    
+
+
+/**
+ * Reference to a field of type 'MessageType[]'
+ */
+export type ListEnumMessageTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageType[]'>
     
 
 
@@ -1232,6 +1349,7 @@ export type GlobalOmitConfig = {
   delivery?: Prisma.DeliveryOmit
   message?: Prisma.MessageOmit
   notification?: Prisma.NotificationOmit
+  walletNonce?: Prisma.WalletNonceOmit
 }
 
 /* Types for Logging */

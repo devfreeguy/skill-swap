@@ -1,7 +1,7 @@
 import { Avatar, Button, Card, Chip } from "@heroui/react";
 import { IconArrowRight, IconBolt } from "@tabler/icons-react";
-import Link from "next/link";
 import { parseSkills } from "@/lib/skills";
+import UserProfileDialog from "@/components/users/UserProfileDialog";
 
 export type FeaturedMatchData = {
   id: string;
@@ -42,9 +42,6 @@ export default function FeaturedMatchCard({ match }: Props) {
       <div className="flex-1 flex flex-col gap-3 min-w-0">
         <div>
           <p className="font-bold text-foreground text-lg leading-tight">{match.name}</p>
-          {teach.length > 0 && (
-            <p className="text-sm text-muted">{teach.slice(0, 2).join(", ")}</p>
-          )}
         </div>
 
         <div className="flex flex-wrap gap-4 text-xs">
@@ -73,12 +70,17 @@ export default function FeaturedMatchCard({ match }: Props) {
 
       {/* Action */}
       <div className="flex items-end sm:items-center shrink-0">
-        <Link href={`/users/${match.id}`}>
-          <Button className="font-semibold bg-accent text-accent-foreground hover:bg-accent/90 flex items-center gap-2">
-            Request Exchange
-            <IconArrowRight size={16} />
-          </Button>
-        </Link>
+        <UserProfileDialog userId={match.id}>
+          {(open) => (
+            <Button
+              onPress={open}
+              className="font-semibold bg-accent text-accent-foreground hover:bg-accent/90 flex items-center gap-2"
+            >
+              Request Exchange
+              <IconArrowRight size={16} />
+            </Button>
+          )}
+        </UserProfileDialog>
       </div>
     </Card>
   );

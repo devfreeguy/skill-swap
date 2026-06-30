@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (!consumeNonce(nonce)) {
+  if (!(await consumeNonce(nonce))) {
     return NextResponse.json(
       { error: "Invalid or expired nonce" },
       { status: 401 }

@@ -16,7 +16,7 @@ export default function StepCard({
   return (
     <div className="relative w-full">
 
-      {/* Corner notch SVG — top right only */}
+      {/* Corner notch SVG - top right only */}
       <svg
         width="80"
         height="80"
@@ -40,7 +40,7 @@ export default function StepCard({
         style={{ backgroundColor: "var(--surface)" }}
       />
 
-      {/* Floating icon box — top-right, above notch */}
+      {/* Floating icon box - top-right, above notch */}
       <div className="absolute top-2 right-2 z-20 w-14 h-14 rounded-2xl bg-accent text-accent-foreground flex items-center justify-center">
         <Icon size={24} />
       </div>

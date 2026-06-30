@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import { requireAuth } from "@/lib/api";
 import { uploadAvatar } from "@/lib/cloudinary";
 import { signToken } from "@/lib/jwt";
 import { setAuthCookie } from "@/lib/cookies";
 
 export async function GET(request: NextRequest) {
-  const currentUser = await getCurrentUser(request);
-  if (!currentUser) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = await requireAuth(request);
+  if (auth.response) return auth.response;
+  const currentUser = auth.user;
 
   const [user, completedSwaps, proofsEarned] = await Promise.all([
     prisma.user.findUnique({
@@ -19,6 +18,7 @@ export async function GET(request: NextRequest) {
         name: true,
         email: true,
         avatarUrl: true,
+        bio: true,
         teachSkill: true,
         learnSkill: true,
         walletAddress: true,
@@ -45,13 +45,12 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  const currentUser = await getCurrentUser(request);
-  if (!currentUser) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = await requireAuth(request);
+  if (auth.response) return auth.response;
+  const currentUser = auth.user;
 
   const body = await request.json();
-  const { name, email, teachSkill, learnSkill, teachSkills, learnSkills, avatarFile } = body;
+  const { name, email, bio, teachSkill, learnSkill, teachSkills, learnSkills, avatarFile } = body;
 
   let avatarUrl = currentUser.avatarUrl;
   if (avatarFile) {
@@ -69,6 +68,7 @@ export async function PATCH(request: NextRequest) {
     data: {
       ...(name !== undefined && { name }),
       ...(email !== undefined && { email: email || null }),
+      ...(bio !== undefined && { bio: bio || null }),
       ...(finalTeachSkill !== undefined && { teachSkill: finalTeachSkill }),
       ...(finalLearnSkill !== undefined && { learnSkill: finalLearnSkill }),
       ...(avatarUrl !== undefined && { avatarUrl }),
@@ -80,6 +80,7 @@ export async function PATCH(request: NextRequest) {
     name: updated.name,
     email: updated.email,
     avatarUrl: updated.avatarUrl,
+    bio: updated.bio,
     teachSkill: updated.teachSkill,
     learnSkill: updated.learnSkill,
     walletAddress: updated.walletAddress,

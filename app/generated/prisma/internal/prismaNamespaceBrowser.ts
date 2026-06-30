@@ -56,7 +56,8 @@ export const ModelName = {
   Proof: 'Proof',
   Delivery: 'Delivery',
   Message: 'Message',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  WalletNonce: 'WalletNonce'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -81,9 +82,12 @@ export const UserScalarFieldEnum = {
   email: 'email',
   password: 'password',
   avatarUrl: 'avatarUrl',
+  bio: 'bio',
   teachSkill: 'teachSkill',
   learnSkill: 'learnSkill',
+  twitterId: 'twitterId',
   walletAddress: 'walletAddress',
+  publicKey: 'publicKey',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -96,11 +100,15 @@ export const SwapScalarFieldEnum = {
   initiatorId: 'initiatorId',
   receiverId: 'receiverId',
   status: 'status',
+  initiatorSkill: 'initiatorSkill',
+  receiverSkill: 'receiverSkill',
   adaTxHash: 'adaTxHash',
   initiatorDone: 'initiatorDone',
   receiverDone: 'receiverDone',
   initiatorDelivered: 'initiatorDelivered',
   receiverDelivered: 'receiverDelivered',
+  initiatorLastReadAt: 'initiatorLastReadAt',
+  receiverLastReadAt: 'receiverLastReadAt',
   completedAt: 'completedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -118,6 +126,10 @@ export const ProofScalarFieldEnum = {
   adaTxHash: 'adaTxHash',
   metadataHash: 'metadataHash',
   summary: 'summary',
+  chainTxHash: 'chainTxHash',
+  chainStatus: 'chainStatus',
+  network: 'network',
+  anchoredAt: 'anchoredAt',
   createdAt: 'createdAt'
 } as const
 
@@ -128,8 +140,13 @@ export const DeliveryScalarFieldEnum = {
   id: 'id',
   swapId: 'swapId',
   userId: 'userId',
+  type: 'type',
+  title: 'title',
   resourceLink: 'resourceLink',
   notes: 'notes',
+  fileName: 'fileName',
+  fileSize: 'fileSize',
+  mimeType: 'mimeType',
   submittedAt: 'submittedAt'
 } as const
 
@@ -143,6 +160,9 @@ export const MessageScalarFieldEnum = {
   content: 'content',
   type: 'type',
   metadata: 'metadata',
+  ciphertext: 'ciphertext',
+  nonce: 'nonce',
+  senderPublicKey: 'senderPublicKey',
   fileUrl: 'fileUrl',
   fileName: 'fileName',
   fileSize: 'fileSize',
@@ -163,6 +183,15 @@ export const NotificationScalarFieldEnum = {
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
+export const WalletNonceScalarFieldEnum = {
+  nonce: 'nonce',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type WalletNonceScalarFieldEnum = (typeof WalletNonceScalarFieldEnum)[keyof typeof WalletNonceScalarFieldEnum]
 
 
 export const SortOrder = {

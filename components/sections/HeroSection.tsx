@@ -23,7 +23,7 @@ export default function HeroSection() {
 
   return (
     <section className="relative min-h-dvh bg-background overflow-hidden">
-      {/* Text + Buttons — top overlay */}
+      {/* Text + Buttons - top overlay */}
       <motion.div
         className="absolute h-full top-0 left-0 right-0 z-10 flex flex-col items-center text-center pt-36 md:pt-44 md:pb-12 px-4 gap-6"
         variants={stagger}
@@ -55,7 +55,7 @@ export default function HeroSection() {
           variants={fadeUp}
           transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
         >
-          <Link href="/register">
+          <Link href="/login">
             <Button
               size="lg"
               className="rounded-full w-48 bg-accent text-accent-foreground font-semibold shadow"
@@ -88,12 +88,12 @@ export default function HeroSection() {
         >
           <Image
             src={heroBGSrc}
-            alt="SkillSwap — Teach and Learn"
+            alt="SkillSwap - Teach and Learn"
             fill
             priority
             className="object-cover object-bottom"
           />
-          {/* Gradient shade overlay — fades the image bottom into the background */}
+          {/* Gradient shade overlay - fades the image bottom into the background */}
         </div>
         <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(to_top,var(--background),transparent_20%)]" />
       </motion.div>

@@ -11,6 +11,7 @@ import {
   IS_MAINNET,
 } from "@/lib/cardano";
 import LemniscateLoader from "@/components/layouts/Loader";
+import { truncateAddress } from "@/lib/utils";
 
 type WalletInfo = {
   name: string;
@@ -40,25 +41,26 @@ function getAvailableWallets(): WalletInfo[] {
     }));
 }
 
-function truncateAddress(addr: string): string {
-  if (addr.length <= 14) return addr;
-  return `${addr.slice(0, 8)}...${addr.slice(-6)}`;
-}
-
 interface WalletConnectButtonProps {
   /**
-   * Kept for call-site compatibility. The wallet flow now signs in if an
-   * account exists and creates one otherwise, regardless of mode.
+   * "login"/"register" run the sign-in-or-create flow. "link" binds the wallet
+   * to the already-authenticated account (used by onboarding + the wallet gate)
+   * and calls `onLinked` on success.
    */
-  mode?: "login" | "register";
+  mode?: "login" | "register" | "link";
+  onLinked?: () => void;
 }
 
-export default function WalletConnectButton(_props: WalletConnectButtonProps) {
+export default function WalletConnectButton({
+  mode = "login",
+  onLinked,
+}: WalletConnectButtonProps) {
   const { isConnected, disconnect } = useCardano({
     limitNetwork: CARDANO_LIMIT_NETWORK,
   });
   const {
     connectAndAuth,
+    connectAndLink,
     stakeAddress,
     enabledWallet,
     isLoading,
@@ -66,6 +68,14 @@ export default function WalletConnectButton(_props: WalletConnectButtonProps) {
     loadingHint,
     error,
   } = useWalletAuth();
+
+  function runWalletFlow(walletId: string) {
+    if (mode === "link") {
+      connectAndLink(walletId, onLinked);
+    } else {
+      connectAndAuth(walletId);
+    }
+  }
   const [isOpen, setIsOpen] = useState(false);
   // Guards the auto-auth effect so it runs once per connection (not on every
   // re-render). Reset when the wallet disconnects so a reconnect retries.
@@ -76,7 +86,7 @@ export default function WalletConnectButton(_props: WalletConnectButtonProps) {
   function handleWalletSelect(walletId: string) {
     setIsOpen(false);
     autoTriggered.current = true;
-    connectAndAuth(walletId);
+    runWalletFlow(walletId);
   }
 
   // As soon as a wallet is connected (freshly or already-connected on load),
@@ -88,7 +98,7 @@ export default function WalletConnectButton(_props: WalletConnectButtonProps) {
     }
     if (autoTriggered.current || !enabledWallet) return;
     autoTriggered.current = true;
-    connectAndAuth(enabledWallet);
+    runWalletFlow(enabledWallet);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, enabledWallet]);
 

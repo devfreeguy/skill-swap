@@ -13,7 +13,7 @@ import DiscoverySection from "@/components/sections/DiscoverySection";
 import CTASection from "@/components/sections/CTASection";
 
 export const metadata: Metadata = {
-  title: "SkillSwap — Exchange Skills. Build Reputation.",
+  title: "SkillSwap - Exchange Skills. Build Reputation.",
   description:
     "A peer-to-peer skill exchange network where every completed exchange creates a verifiable contribution record and builds your portable reputation on Cardano.",
 };

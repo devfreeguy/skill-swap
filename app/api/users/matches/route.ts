@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import { requireAuth } from "@/lib/api";
 import { scoreMatch } from "@/lib/matching";
 
 export async function GET(request: NextRequest) {
-  const currentUser = await getCurrentUser(request);
-  if (!currentUser) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = await requireAuth(request);
+  if (auth.response) return auth.response;
+  const currentUser = auth.user;
 
   const candidates = await prisma.user.findMany({
     where: {

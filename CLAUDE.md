@@ -20,53 +20,54 @@ Package manager is **pnpm**. Use `pnpm` not `npm`.
 
 **Read this before touching anything database-related.**
 
-### `prisma/schema.prisma` ≠ actual database
+### `prisma/schema.prisma` is now in sync with the real DB
 
-`schema.prisma` is an aspirational redesign that **has never been pushed to the database**. The generated client in `app/generated/prisma/` reflects the real DB. These two are **incompatible** — running `npx prisma db push` from the current `schema.prisma` would destroy live data.
+`schema.prisma` and the generated client in `app/generated/prisma/` now match the live database. (This was **not** true historically — the schema used to be an aspirational redesign that diverged from the DB. That divergence has been reconciled.) The current models are exactly `User`, `Swap`, `Proof`, `Delivery`, `Message`, `Notification`, `WalletNonce` — no `Skill`/`UserSkill`/`Endorsement`/reputation tables exist.
 
-Key divergences to be aware of:
+Still, prefer **targeted, additive migrations** over a blanket `npx prisma db push` against the live DB: push can try to reconcile any subtle drift and drop columns. When adding a table, add the model, run `npx prisma generate`, then create just that table with raw SQL (this is exactly how `WalletNonce` was added). Reserve `db push` for fresh/empty databases.
 
-- **`User` in the real DB** has `teachSkill: String?` and `learnSkill: String?` as plain scalar strings. The schema.prisma `User` has `userSkills UserSkill[]` and reputation counter fields (`reputationScore`, `completedSwaps`, etc.) — none of those exist in the actual DB.
-- **`Swap` in the real DB** has four boolean fields not in `schema.prisma`: `initiatorDone`, `receiverDone`, `initiatorDelivered`, `receiverDelivered`. The swap completion logic in `app/api/swaps/[id]/route.ts` uses these flags.
-- **`Proof` in the real DB** has `teachSkill String`, `learnSkill String`, `adaTxHash String`, `summary String?` — not the `title`/`description`/`outcomes`/`durationMinutes` from `schema.prisma`.
-- `Skill`, `UserSkill`, `SwapSkill`, `Endorsement`, `Verification`, `BlockchainRecord` **do not exist** in the actual DB.
-
-To safely evolve the schema: reverse-engineer the actual DB state first, then plan a migration.
+Shape worth remembering:
+- **`User`** — `teachSkill: String?` / `learnSkill: String?` are plain scalar strings (see "Skills are stored as JSON-stringified arrays" below), plus `walletAddress`, `twitterId`, `publicKey`.
+- **`Swap`** — booleans `initiatorDone`, `receiverDone`, `initiatorDelivered`, `receiverDelivered`; `initiatorLastReadAt` / `receiverLastReadAt` (drive unread counts); `initiatorSkill` / `receiverSkill` (skills chosen for this swap).
+- **`Proof`** — `teachSkill`, `learnSkill`, `metadataHash`, on-chain anchor fields (`chainTxHash`, `chainStatus`, `network`, `anchoredAt`).
 
 ### Skills are stored as JSON-stringified arrays
 
-The onboarding page sends `{ teachSkills: string[], learnSkills: string[] }` (arrays), which `app/api/users/profile/route.ts` serializes via `JSON.stringify()` into the single `teachSkill`/`learnSkill` string columns. When reading `user.teachSkill`, it may be a raw string like `"Python"` (legacy) or a JSON array string like `'["Python","React"]'`. The match algorithm in `app/api/users/matches/route.ts` does **exact string equality** and is therefore broken for any multi-skill user.
+The onboarding page sends `{ teachSkills: string[], learnSkills: string[] }` (arrays), which `app/api/users/profile/route.ts` serializes via `JSON.stringify()` into the single `teachSkill`/`learnSkill` string columns. When reading `user.teachSkill`, it may be a raw string like `"Python"` (legacy) or a JSON array string like `'["Python","React"]'`. **Always** normalize with `parseSkills()` (`lib/skills.ts`) before comparing — never compare the raw column. Matching (`lib/matching.ts` `scoreMatch`, used by `app/api/users/matches/route.ts`) already does this correctly and is multi-skill aware.
 
-### `/dashboard` does not exist
+### Route protection: `proxy.ts` + the `(app)` layout
 
-Four places in the codebase redirect to `/dashboard` after auth, but `app/dashboard/` has never been created. This is the highest-priority missing page.
+Next.js 16 uses `proxy.ts` as the middleware file (not `middleware.ts`). It protects `/dashboard`, `/swaps`, `/users`, `/messages`, `/profile`, `/notifications`: checks the JWT cookie, redirects unauthenticated users to `/login`, and redirects non-onboarded users to `/onboarding`. **Keep this list in sync with the pages under `app/(app)/`** — it previously listed a dead `/discover` and omitted `/messages`.
 
-### Wallet signature verification is a stub
+Belt-and-suspenders: `app/(app)/layout.tsx` is a second, server-side guard — it calls `getShellUser()` and redirects to `/login` if there's no session, covering every page in the group regardless of the proxy.
 
-`app/api/auth/wallet/route.ts` and `app/api/auth/register/wallet/route.ts` both receive a `signature` parameter but **never cryptographically verify it**. The wallet auth is effectively based on nonce possession, not wallet ownership. Do not build more on top of this without fixing it first.
+### Wallet auth & the nonce store
 
-### Route protection uses `proxy.ts`, not `middleware.ts`
-
-Next.js 16 uses `proxy.ts` as the middleware file (not `middleware.ts`). The file already exists at `proxy.ts` and protects `/dashboard`, `/swaps`, `/users`, `/profile`, `/discover`, `/notifications`. It checks the JWT cookie and redirects unauthenticated users to `/login`. It also redirects non-onboarded users to `/onboarding`.
+Wallet login uses **real CIP-8 signature verification** (`@cardano-foundation/cardano-verify-datasignature`) in `app/api/auth/wallet/route.ts` and `app/api/auth/register/wallet/route.ts` — it cryptographically proves wallet ownership of the signed nonce. The challenge nonces are **DB-backed** (`WalletNonce` table via `lib/wallet-nonce-store.ts`): single-use (atomic delete), 5-min TTL, shared across instances. `storeNonce`/`consumeNonce` are **async** — always `await` them.
 
 ## Architecture
 
-**Next.js 16.2.4** (App Router) + **React 19** + **TypeScript**. Despite the README saying v15, the actual version is 16. Consult `node_modules/next/dist/docs/` for any unfamiliar APIs.
+**Next.js 16.2.4** (App Router) + **React 19** + **TypeScript**. Consult `node_modules/next/dist/docs/` for any unfamiliar APIs.
 
 ### Route layout
 
 ```
 app/
-  (auth)/            # login + register pages — no shared layout wrapper
+  (auth)/            # login + onboarding — no shared app shell
+  (app)/             # authenticated area — AppShell + WalletGate (layout.tsx guards session)
+    dashboard/       # authenticated home: profile, matches, swaps, notifications
+    users/           # [page.tsx] discovery grid; [id]/page.tsx public profile dialog + swap request
+    swaps/[id]/      # swap detail + deliverables form + proof / on-chain anchor
+    messages/        # E2E chat: conversation list + thread + exchange context panel
+    notifications/   # notifications list
+    profile/         # own profile
   api/
-    auth/            # login, register, logout, me, wallet/, wallet/nonce
-    swaps/           # GET+POST list; [id]/ GET+PATCH; [id]/deliver/ POST+GET
-    users/           # profile (GET+PATCH), matches, [id]/ GET, route.ts GET (discovery)
-    notifications/   # list + mark-read
-  dashboard/         # authenticated home: profile, matches, swaps, notifications
-  users/             # [page.tsx] discovery grid; [id]/page.tsx public profile + swap request
-  swaps/             # [page.tsx] swaps list; [id]/page.tsx swap detail + delivery form + proof
-  onboarding/        # skill setup page (teachSkill + learnSkill)
+    auth/            # logout, me, twitter/, twitter/callback, wallet/, wallet/nonce, register/wallet
+    swaps/           # GET+POST list; [id]/ GET+PATCH; [id]/deliver POST+GET+DELETE; [id]/anchor POST+GET
+    users/           # profile (GET+PATCH), matches, perfect-match, public-key, wallet, [id]/ GET, route.ts (discovery)
+    messages/        # conversations, unread-count, [swapId]/ GET+POST, [swapId]/read, [swapId]/files
+    notifications/   # list + [id] + mark-read
+    pusher/auth, ably/token   # realtime private-channel auth
   layout.tsx         # root layout — fonts, ThemeProvider
   providers.tsx      # client wrapper: next-themes ThemeProvider
 ```
@@ -79,9 +80,11 @@ app/
 - `lib/cookies.ts` — `setAuthCookie()` / `getAuthToken()`
 - `lib/auth.ts` — `getCurrentUser(req)` reads cookie → verifies JWT → fetches User from DB
 
-Two auth methods:
-1. **Email/password** — bcrypt (rounds=12), `lib/auth.ts` `hashPassword` / `comparePassword`
-2. **Cardano wallet** — nonce challenge/sign flow via `lib/wallet-nonce-store.ts` (in-memory); `app/api/auth/wallet/nonce/` issues nonce, `app/api/auth/wallet/` verifies signature
+Two auth methods (no email/password — that was removed):
+1. **Twitter/X OAuth2** — `app/api/auth/twitter/` initiates, `twitter/callback/` exchanges the code (`lib/twitter.ts`).
+2. **Cardano wallet** — CIP-8 nonce challenge/sign flow. `app/api/auth/wallet/nonce/` issues a nonce, `app/api/auth/wallet/` verifies the signature, `app/api/auth/register/wallet/` registers a new wallet account. Nonces are DB-backed and single-use (`lib/wallet-nonce-store.ts`, `WalletNonce` table).
+
+A connected wallet is **mandatory** app-wide: `components/layouts/WalletGate.tsx` shows a non-dismissible modal for any signed-in account without a `walletAddress`.
 
 JWT payload shape: `{ id, email, name, onboarded }`. `onboarded` is true when user has both `teachSkill` and `learnSkill` set.
 
@@ -94,28 +97,35 @@ import prisma from "@/lib/prisma";
 import type { User } from "@/app/generated/prisma/client";
 ```
 
-Schema models: `User`, `Swap`, `Proof`, `Message`, `Delivery`, `Notification`.
+Schema models: `User`, `Swap`, `Proof`, `Message`, `Delivery`, `Notification`, `WalletNonce`.
 
-**Swap lifecycle (actual code behaviour):** `PENDING → ACTIVE → COMPLETED | DECLINED`
-- `schema.prisma` defines additional statuses (`AWAITING_DELIVERY`, `VERIFICATION`, `CANCELLED`) but the API code does not use them yet
-- Initiator pays ADA tx hash upfront (verified via Blockfrost API on creation, skipped if key absent)
-- Both parties mark done independently via `initiatorDone`/`receiverDone` boolean fields; `COMPLETED` + `Proof` auto-created server-side when both are true
-- `Message` and `Delivery` tables exist in the real DB but have **no API endpoints** — they are unreachable
+**Swap lifecycle (actual code behaviour):** `PENDING → ACTIVE → COMPLETED | DECLINED | CANCELLED`
+- Creating a swap is guarded (`app/api/swaps/route.ts`): no second `PENDING`/`ACTIVE` swap with the same person, and no repeat of an already-`COMPLETED` identical skill pair. Concurrent swaps with *different* people are allowed.
+- Both parties add deliverables (`[id]/deliver`) and independently confirm via the `complete` action; a side can only confirm after delivering ≥1 item. `COMPLETED` + `Proof` are auto-created server-side once both have delivered and confirmed.
+- The `Proof` is anchored on-chain as a separate, retryable step (`[id]/anchor`): the client signs a metadata tx, the server submits it through a provider fallback chain (`PENDING → ANCHORING → ANCHORED | FAILED`).
+- `Message` and `Delivery` are fully wired (messaging UI + deliverables UI both exist).
 
-**What is not yet built:** messaging UI, delivery display improvements, public reputation pages.
+**What is not yet built:** public reputation pages.
 
 ### Key lib utilities
 
 | File | Purpose |
 |------|---------|
-| `lib/utils.ts` | `cn()` — clsx + tailwind-merge |
+| `lib/utils.ts` | `cn()` (clsx + tailwind-merge) plus `relativeTime`, `truncateAddress`, `firstSkill`, `matchPercent` |
+| `lib/api.ts` | `requireAuth(request)` / `requireParticipantSwap(swapId, userId)` — route guards used by every API handler |
 | `lib/animations.ts` | Framer Motion variant presets |
 | `lib/theme.ts` | `useIsDarkMode()` hook (SSR-safe) |
-| `lib/mailer.ts` | Nodemailer for transactional email |
-| `lib/cloudinary.ts` | Avatar image uploads |
-| `lib/wallet-nonce-store.ts` | In-memory nonce store (resets on server restart) |
+| `lib/cloudinary.ts` | Cloudinary uploads (avatars, deliverables, message files) |
+| `lib/wallet-nonce-store.ts` | DB-backed single-use CIP-8 nonce store (async `storeNonce`/`consumeNonce`) |
 | `lib/skills.ts` | `parseSkills(raw)` — normalizes null/string/"[...]" → `string[]` |
 | `lib/matching.ts` | `scoreMatch(me, candidate)` → `{ score, type, teachOverlap, learnOverlap }` |
+| `lib/crypto/e2e.ts` | tweetnacl E2E messaging — wallet-derived key pair, encrypt/decrypt |
+| `lib/cardano.ts` | Network resolution (`CARDANO_NETWORK`, `IS_MAINNET`, `CARDANO_LIMIT_NETWORK`). **Type-only** import of `NetworkType` — never import the wallet runtime here (it touches `window` and breaks SSR) |
+| `lib/cardano/providers.ts` | On-chain submit/confirm with Blockfrost → Koios → Maestro fallback |
+| `lib/socket.ts` | Server-side realtime emit (`emitToUser` / `emitToSwap`) |
+| `lib/realtime.ts` | Client subscribe; Pusher primary, Ably fallback |
+| `lib/realtime-channels.ts` | Shared channel-name helpers (`userChannel`, `swapChannel`) |
+| `lib/get-shell-user.ts` | Reads the session + DB for `{ id, name, avatarUrl }` (JWT carries no avatar) |
 
 ### Styling
 
@@ -125,10 +135,16 @@ Schema models: `User`, `Swap`, `Proof`, `Message`, `Delivery`, `Notification`.
 
 ```
 components/
-  auth/       # AuthPage — shared animated 2-column auth layout
-  elements/   # Logo, WalletConnectButton, PasswordField, ThemeToggle, StepCard
-  layouts/    # PublicHeader, PublicFooter, SectionWrapper, Loader
-  sections/   # Landing page: Hero, Features, HowItWorks, Stats, CTA
+  auth/        # LoginPanel — animated auth layout
+  elements/    # Logo, WalletConnectButton, ThemeToggle, StepCard, SkillSelector, ExchangePair, FirstRunGuide
+  layouts/     # AppShell, AppSidebar, nav.ts, WalletGate, PublicFooter, Loader
+  dashboard/   # StatCard, MatchCard, DiscoverMoreCard
+  messaging/   # ConversationItem, MessageBubble, MessageComposer, ExchangeContextPanel, SystemEvent
+  swap/        # ParticipantCard, DeliverableItem
+  users/       # FilterPill, TrendIcon, UserProfileDialog
+  notifications/ # NotificationCard, NotificationList
+  profile/     # StatItem
+  sections/    # Landing page: Hero, Features, HowItWorks, Cardano, Discovery, PerfectMatch, CTA
 ```
 
 ### Environment variables
@@ -137,9 +153,25 @@ components/
 DATABASE_URL=               # NeonDB connection string
 JWT_SECRET=                 # for jose JWT signing
 NEXTAUTH_URL=               # app base URL (used for cookie domain)
-BLOCKFROST_API_KEY=         # Cardano tx verification (optional — skipped if absent)
-NEXT_PUBLIC_BLOCKFROST_NETWORK=  # "mainnet" | "preprod" | "preview"
-CLOUDINARY_*=               # image upload credentials
+
+TWITTER_CLIENT_ID=          # X/Twitter OAuth2
+TWITTER_CLIENT_SECRET=
+
+NEXT_PUBLIC_CARDANO_NETWORK= # "mainnet" | "preprod" | "preview" (default preprod)
+BLOCKFROST_API_KEY=         # on-chain submit/verify (optional — falls back to Koios/Maestro)
+MAESTRO_API_KEY=            # optional provider fallback
+
+PUSHER_APP_ID=              # realtime (primary)
+PUSHER_KEY=
+PUSHER_SECRET=
+PUSHER_CLUSTER=
+NEXT_PUBLIC_PUSHER_KEY=
+NEXT_PUBLIC_PUSHER_CLUSTER=
+ABLY_API_KEY=               # realtime (fallback)
+
+CLOUDINARY_CLOUD_NAME=      # image/file uploads
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
 ```
 
 ---

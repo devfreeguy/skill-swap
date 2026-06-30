@@ -15,16 +15,32 @@ import MessageComposer from "@/components/messaging/MessageComposer";
 import SystemEvent from "@/components/messaging/SystemEvent";
 import { cn, formatDaySeparator, isSameDay } from "@/lib/utils";
 import { parseSkills } from "@/lib/skills";
+import { CARDANO_LIMIT_NETWORK } from "@/lib/cardano";
+import { useCardano } from "@cardano-foundation/cardano-connect-with-wallet";
+import {
+  decryptMessage,
+  getMyKeyPair,
+  type E2EKeyPair,
+} from "@/lib/crypto/e2e";
+import { subscribe, swapChannel } from "@/lib/realtime";
 import { Avatar, Drawer } from "@heroui/react";
 import {
   IconArrowLeft,
-  IconArrowsExchange,
   IconDotsVertical,
+  IconLock,
   IconMessageCircle,
   IconSearch,
 } from "@tabler/icons-react";
+import ExchangePair from "@/components/elements/ExchangePair";
 import Link from "next/link";
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -64,9 +80,12 @@ export default function MessagesPage() {
   const [mobileView, setMobileView] = useState<"list" | "chat">("list");
   const [contextDrawerOpen, setContextDrawerOpen] = useState(false);
 
+  const { enabledWallet } = useCardano({ limitNetwork: CARDANO_LIMIT_NETWORK });
+  const [myKeyPair, setMyKeyPair] = useState<E2EKeyPair | null>(null);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Initial load — run once on mount only; router is stable and must NOT be a dep
+  // Initial load - run once on mount only; router is stable and must NOT be a dep
   useEffect(() => {
     let cancelled = false;
 
@@ -85,7 +104,9 @@ export default function MessagesPage() {
         setLoading(false);
 
         // Deep-link: open a specific conversation when arriving via ?swap=<id>
-        const swapParam = new URLSearchParams(window.location.search).get("swap");
+        const swapParam = new URLSearchParams(window.location.search).get(
+          "swap",
+        );
         if (swapParam) {
           selectConversation(swapParam);
         }
@@ -105,28 +126,91 @@ export default function MessagesPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const selectConversation = useCallback(async (swapId: string) => {
-    setSelectedSwapId(swapId);
-    setMobileView("chat");
-    setChatLoading(true);
-    setMessages([]);
-    setSwapData(null);
-    setRecentFiles([]);
+  const selectConversation = useCallback(
+    async (swapId: string) => {
+      setSelectedSwapId(swapId);
+      setMobileView("chat");
+      setChatLoading(true);
+      setMessages([]);
+      setSwapData(null);
+      setRecentFiles([]);
+      // Clear the unread indicator on this conversation immediately.
+      setConversations((prev) =>
+        prev.map((c) => (c.swapId === swapId ? { ...c, unread: false } : c)),
+      );
 
-    const [chatRes, filesRes] = await Promise.all([
-      fetch(`/api/messages/${swapId}`).then((r) => r.json()),
-      fetch(`/api/messages/${swapId}/files`).then((r) => r.json()),
-    ]);
+      const [chatRes, filesRes] = await Promise.all([
+        fetch(`/api/messages/${swapId}`).then((r) => r.json()),
+        fetch(`/api/messages/${swapId}/files`).then((r) => r.json()),
+      ]);
 
-    setSwapData(chatRes.swap ?? null);
-    setMessages(Array.isArray(chatRes.messages) ? chatRes.messages : []);
-    setRecentFiles(Array.isArray(filesRes) ? filesRes : []);
-    setChatLoading(false);
-  }, []);
+      setSwapData(chatRes.swap ?? null);
+      setMessages(Array.isArray(chatRes.messages) ? chatRes.messages : []);
+      setRecentFiles(Array.isArray(filesRes) ? filesRes : []);
+      setChatLoading(false);
+
+      // Mark this conversation read, then refresh the global unread badge.
+      fetch(`/api/messages/${swapId}/read`, { method: "POST" })
+        .then(() => window.dispatchEvent(new Event("messages:read")))
+        .catch(() => {});
+
+      // Derive E2E keys lazily on first chat open (one wallet signature, cached).
+      if (!myKeyPair && enabledWallet) {
+        getMyKeyPair(enabledWallet)
+          .then(setMyKeyPair)
+          .catch(() => {});
+      }
+    },
+    [myKeyPair, enabledWallet],
+  );
+
+  // Partner's public key for this conversation (the participant who isn't me).
+  const partnerPublicKey =
+    swapData && me
+      ? swapData.initiatorId === me.id
+        ? (swapData.receiver.publicKey ?? null)
+        : (swapData.initiator.publicKey ?? null)
+      : null;
+
+  // Decrypt at render so it always reflects the latest keys/partner key.
+  const decryptedMessages = useMemo(
+    () =>
+      messages.map((m) => {
+        if (m.ciphertext && m.nonce && myKeyPair && partnerPublicKey) {
+          const text = decryptMessage(
+            m.ciphertext,
+            m.nonce,
+            partnerPublicKey,
+            myKeyPair,
+          );
+          return { ...m, content: text ?? "🔒 Unable to decrypt" };
+        }
+        return m;
+      }),
+    [messages, myKeyPair, partnerPublicKey],
+  );
 
   const handleMessageSent = useCallback((msg: MessageData) => {
     setMessages((prev) => [...prev, msg]);
   }, []);
+
+  // Live delivery: join the open conversation's room and append incoming
+  // messages instantly (decryption happens in the render memo above).
+  useEffect(() => {
+    if (!selectedSwapId) return;
+    return subscribe(swapChannel(selectedSwapId), "message:new", (payload) => {
+      const msg = payload as MessageData & { swapId: string };
+      if (msg.swapId !== selectedSwapId) return;
+      if (me && msg.senderId === me.id) return; // own message already shown
+      setMessages((prev) =>
+        prev.some((m) => m.id === msg.id) ? prev : [...prev, msg],
+      );
+      // We're viewing this conversation → mark read and refresh the badge.
+      fetch(`/api/messages/${selectedSwapId}/read`, { method: "POST" })
+        .then(() => window.dispatchEvent(new Event("messages:read")))
+        .catch(() => {});
+    });
+  }, [selectedSwapId, me?.id]);
 
   if (loading) {
     return <LemniscateLoader loading text="Loading…" overlayOpacity={1} />;
@@ -134,38 +218,38 @@ export default function MessagesPage() {
   if (!me) return null;
 
   const filteredConversations = conversations.filter((c) =>
-    c.other.name.toLowerCase().includes(search.toLowerCase())
+    c.other.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   const selectedConv = conversations.find((c) => c.swapId === selectedSwapId);
 
-  // Skills line for header
+  // Skills line for header - prefer the skills chosen for this swap.
+  const headerIsInit = swapData ? swapData.initiatorId === me.id : false;
   const headerMyTeach = swapData
-    ? parseSkills(
-        swapData.initiatorId === me.id
+    ? ((headerIsInit ? swapData.initiatorSkill : swapData.receiverSkill) ??
+      parseSkills(
+        headerIsInit
           ? swapData.initiator.teachSkill
-          : swapData.receiver.teachSkill
-      )[0]
+          : swapData.receiver.teachSkill,
+      )[0])
     : null;
   const headerTheirTeach = swapData
-    ? parseSkills(
-        swapData.initiatorId === me.id
+    ? ((headerIsInit ? swapData.receiverSkill : swapData.initiatorSkill) ??
+      parseSkills(
+        headerIsInit
           ? swapData.receiver.teachSkill
-          : swapData.initiator.teachSkill
-      )[0]
+          : swapData.initiator.teachSkill,
+      )[0])
     : null;
-  const headerSkillsLine =
-    headerMyTeach && headerTheirTeach
-      ? `${headerMyTeach} ↔ ${headerTheirTeach}`
-      : null;
+  const hasHeaderSkills = !!(headerMyTeach && headerTheirTeach);
 
   return (
     <div className="flex flex-1 min-h-0 overflow-hidden">
       {/* ── Panel 1: Conversation List ──────────────────────────────────── */}
       <div
         className={cn(
-          "flex flex-col w-full lg:w-72 shrink-0 border-r border-border bg-background",
-          mobileView === "chat" ? "hidden lg:flex" : "flex"
+          "flex flex-col w-full lg:w-80 xl:w-88 shrink-0 border-r border-border bg-background",
+          mobileView === "chat" ? "hidden lg:flex" : "flex",
         )}
       >
         {/* List header */}
@@ -187,7 +271,7 @@ export default function MessagesPage() {
         </div>
 
         {/* Conversations */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 min-h-0 overflow-y-auto">
           {filteredConversations.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full px-6 py-12 gap-3 text-center">
               <IconMessageCircle size={40} className="text-muted/30" />
@@ -219,8 +303,8 @@ export default function MessagesPage() {
       {/* ── Panel 2: Active Conversation ────────────────────────────────── */}
       <div
         className={cn(
-          "flex flex-col flex-1 min-w-0",
-          mobileView === "list" ? "hidden lg:flex" : "flex"
+          "flex flex-col flex-1 min-w-0 min-h-0 overflow-hidden",
+          mobileView === "list" ? "hidden lg:flex" : "flex",
         )}
       >
         {!selectedSwapId ? (
@@ -272,13 +356,12 @@ export default function MessagesPage() {
                       <p className="text-sm font-semibold text-foreground truncate">
                         {selectedConv.other.name}
                       </p>
-                      {headerSkillsLine && (
-                        <div className="flex items-center gap-1 text-xs text-muted">
-                          <IconArrowsExchange
-                            size={10}
-                            className="shrink-0 text-accent/60"
+                      {hasHeaderSkills && (
+                        <div className="text-xs text-muted">
+                          <ExchangePair
+                            a={headerMyTeach ?? ""}
+                            b={headerTheirTeach ?? ""}
                           />
-                          <span className="truncate">{headerSkillsLine}</span>
                         </div>
                       )}
                     </div>
@@ -295,7 +378,7 @@ export default function MessagesPage() {
                     {/* Context drawer toggle (tablet + mobile) */}
                     <button
                       onClick={() => setContextDrawerOpen(true)}
-                      className="lg:hidden p-2 rounded-lg text-muted hover:text-foreground hover:bg-surface transition-colors"
+                      className="xl:hidden p-2 rounded-lg text-muted hover:text-foreground hover:bg-surface transition-colors"
                       aria-label="Exchange context"
                     >
                       <IconDotsVertical size={18} />
@@ -305,24 +388,29 @@ export default function MessagesPage() {
               )}
             </div>
 
+            {/* End-to-end encryption indicator */}
+            <div className="flex items-center justify-center gap-1.5 py-1.5 text-[11px] text-muted border-b border-border shrink-0">
+              <IconLock size={11} />
+              End-to-end encrypted
+            </div>
+
             {/* Messages area */}
-            <div className="flex-1 overflow-y-auto px-4 py-6 flex flex-col gap-3">
-              {messages.length === 0 ? (
+            <div className="flex-1 min-h-0 overflow-y-auto px-4 py-6 flex flex-col gap-3">
+              {decryptedMessages.length === 0 ? (
                 <div className="flex-1 flex items-center justify-center">
                   <p className="text-sm text-muted">
                     No messages yet. Say hello!
                   </p>
                 </div>
               ) : (
-                messages.map((msg, i) => {
+                decryptedMessages.map((msg, i) => {
                   const isOwn = msg.senderId === me.id;
                   const isSystemEvent = SYSTEM_EVENT_TYPES.has(msg.type);
-                  const prevMsg = messages[i - 1];
+                  const prevMsg = decryptedMessages[i - 1];
                   const showDaySeparator =
                     !prevMsg || !isSameDay(prevMsg.createdAt, msg.createdAt);
                   const showAvatar =
-                    !isOwn &&
-                    (!prevMsg || prevMsg.senderId !== msg.senderId);
+                    !isOwn && (!prevMsg || prevMsg.senderId !== msg.senderId);
 
                   return (
                     <Fragment key={msg.id}>
@@ -337,15 +425,12 @@ export default function MessagesPage() {
                       )}
 
                       {isSystemEvent ? (
-                        <SystemEvent
-                          type={msg.type}
-                          swapId={selectedSwapId!}
-                        />
+                        <SystemEvent type={msg.type} swapId={selectedSwapId!} />
                       ) : (
                         <div
                           className={cn(
                             "flex",
-                            isOwn ? "justify-end" : "justify-start"
+                            isOwn ? "justify-end" : "justify-start",
                           )}
                         >
                           <MessageBubble
@@ -362,18 +447,19 @@ export default function MessagesPage() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Composer — only for ACTIVE swaps */}
+            {/* Composer - only for ACTIVE swaps */}
             {swapData?.status === "ACTIVE" ? (
               <MessageComposer
                 swapId={selectedSwapId!}
                 currentUser={me}
                 onSent={handleMessageSent}
+                myKeyPair={myKeyPair}
+                partnerPublicKey={partnerPublicKey}
               />
             ) : swapData ? (
               <div className="px-4 py-3 border-t border-border bg-surface text-center text-xs text-muted">
-                This swap is{" "}
-                {swapData.status.toLowerCase()}. Messaging is only available on
-                active swaps.
+                This swap is {swapData.status.toLowerCase()}. Messaging is only
+                available on active swaps.
               </div>
             ) : null}
           </>
@@ -382,7 +468,7 @@ export default function MessagesPage() {
 
       {/* ── Panel 3: Exchange Context (desktop only) ─────────────────────── */}
       {selectedSwapId && swapData && (
-        <aside className="hidden lg:flex flex-col w-72 shrink-0 border-l border-border px-5 py-5 overflow-y-auto">
+        <aside className="hidden xl:flex flex-col w-80 xl:w-88 shrink-0 border-l border-border px-5 py-5 overflow-y-auto">
           <ExchangeContextPanel
             swap={swapData}
             currentUserId={me.id}

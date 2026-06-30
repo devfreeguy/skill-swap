@@ -29,11 +29,15 @@ export type SwapMinAggregateOutputType = {
   initiatorId: string | null
   receiverId: string | null
   status: $Enums.SwapStatus | null
+  initiatorSkill: string | null
+  receiverSkill: string | null
   adaTxHash: string | null
   initiatorDone: boolean | null
   receiverDone: boolean | null
   initiatorDelivered: boolean | null
   receiverDelivered: boolean | null
+  initiatorLastReadAt: Date | null
+  receiverLastReadAt: Date | null
   completedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -44,11 +48,15 @@ export type SwapMaxAggregateOutputType = {
   initiatorId: string | null
   receiverId: string | null
   status: $Enums.SwapStatus | null
+  initiatorSkill: string | null
+  receiverSkill: string | null
   adaTxHash: string | null
   initiatorDone: boolean | null
   receiverDone: boolean | null
   initiatorDelivered: boolean | null
   receiverDelivered: boolean | null
+  initiatorLastReadAt: Date | null
+  receiverLastReadAt: Date | null
   completedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -59,11 +67,15 @@ export type SwapCountAggregateOutputType = {
   initiatorId: number
   receiverId: number
   status: number
+  initiatorSkill: number
+  receiverSkill: number
   adaTxHash: number
   initiatorDone: number
   receiverDone: number
   initiatorDelivered: number
   receiverDelivered: number
+  initiatorLastReadAt: number
+  receiverLastReadAt: number
   completedAt: number
   createdAt: number
   updatedAt: number
@@ -76,11 +88,15 @@ export type SwapMinAggregateInputType = {
   initiatorId?: true
   receiverId?: true
   status?: true
+  initiatorSkill?: true
+  receiverSkill?: true
   adaTxHash?: true
   initiatorDone?: true
   receiverDone?: true
   initiatorDelivered?: true
   receiverDelivered?: true
+  initiatorLastReadAt?: true
+  receiverLastReadAt?: true
   completedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -91,11 +107,15 @@ export type SwapMaxAggregateInputType = {
   initiatorId?: true
   receiverId?: true
   status?: true
+  initiatorSkill?: true
+  receiverSkill?: true
   adaTxHash?: true
   initiatorDone?: true
   receiverDone?: true
   initiatorDelivered?: true
   receiverDelivered?: true
+  initiatorLastReadAt?: true
+  receiverLastReadAt?: true
   completedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -106,11 +126,15 @@ export type SwapCountAggregateInputType = {
   initiatorId?: true
   receiverId?: true
   status?: true
+  initiatorSkill?: true
+  receiverSkill?: true
   adaTxHash?: true
   initiatorDone?: true
   receiverDone?: true
   initiatorDelivered?: true
   receiverDelivered?: true
+  initiatorLastReadAt?: true
+  receiverLastReadAt?: true
   completedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -194,11 +218,15 @@ export type SwapGroupByOutputType = {
   initiatorId: string
   receiverId: string
   status: $Enums.SwapStatus
+  initiatorSkill: string | null
+  receiverSkill: string | null
   adaTxHash: string | null
   initiatorDone: boolean
   receiverDone: boolean
   initiatorDelivered: boolean
   receiverDelivered: boolean
+  initiatorLastReadAt: Date | null
+  receiverLastReadAt: Date | null
   completedAt: Date | null
   createdAt: Date
   updatedAt: Date
@@ -230,11 +258,15 @@ export type SwapWhereInput = {
   initiatorId?: Prisma.StringFilter<"Swap"> | string
   receiverId?: Prisma.StringFilter<"Swap"> | string
   status?: Prisma.EnumSwapStatusFilter<"Swap"> | $Enums.SwapStatus
+  initiatorSkill?: Prisma.StringNullableFilter<"Swap"> | string | null
+  receiverSkill?: Prisma.StringNullableFilter<"Swap"> | string | null
   adaTxHash?: Prisma.StringNullableFilter<"Swap"> | string | null
   initiatorDone?: Prisma.BoolFilter<"Swap"> | boolean
   receiverDone?: Prisma.BoolFilter<"Swap"> | boolean
   initiatorDelivered?: Prisma.BoolFilter<"Swap"> | boolean
   receiverDelivered?: Prisma.BoolFilter<"Swap"> | boolean
+  initiatorLastReadAt?: Prisma.DateTimeNullableFilter<"Swap"> | Date | string | null
+  receiverLastReadAt?: Prisma.DateTimeNullableFilter<"Swap"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"Swap"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Swap"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Swap"> | Date | string
@@ -251,11 +283,15 @@ export type SwapOrderByWithRelationInput = {
   initiatorId?: Prisma.SortOrder
   receiverId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  initiatorSkill?: Prisma.SortOrderInput | Prisma.SortOrder
+  receiverSkill?: Prisma.SortOrderInput | Prisma.SortOrder
   adaTxHash?: Prisma.SortOrderInput | Prisma.SortOrder
   initiatorDone?: Prisma.SortOrder
   receiverDone?: Prisma.SortOrder
   initiatorDelivered?: Prisma.SortOrder
   receiverDelivered?: Prisma.SortOrder
+  initiatorLastReadAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  receiverLastReadAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -275,11 +311,15 @@ export type SwapWhereUniqueInput = Prisma.AtLeast<{
   initiatorId?: Prisma.StringFilter<"Swap"> | string
   receiverId?: Prisma.StringFilter<"Swap"> | string
   status?: Prisma.EnumSwapStatusFilter<"Swap"> | $Enums.SwapStatus
+  initiatorSkill?: Prisma.StringNullableFilter<"Swap"> | string | null
+  receiverSkill?: Prisma.StringNullableFilter<"Swap"> | string | null
   adaTxHash?: Prisma.StringNullableFilter<"Swap"> | string | null
   initiatorDone?: Prisma.BoolFilter<"Swap"> | boolean
   receiverDone?: Prisma.BoolFilter<"Swap"> | boolean
   initiatorDelivered?: Prisma.BoolFilter<"Swap"> | boolean
   receiverDelivered?: Prisma.BoolFilter<"Swap"> | boolean
+  initiatorLastReadAt?: Prisma.DateTimeNullableFilter<"Swap"> | Date | string | null
+  receiverLastReadAt?: Prisma.DateTimeNullableFilter<"Swap"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"Swap"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Swap"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Swap"> | Date | string
@@ -296,11 +336,15 @@ export type SwapOrderByWithAggregationInput = {
   initiatorId?: Prisma.SortOrder
   receiverId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  initiatorSkill?: Prisma.SortOrderInput | Prisma.SortOrder
+  receiverSkill?: Prisma.SortOrderInput | Prisma.SortOrder
   adaTxHash?: Prisma.SortOrderInput | Prisma.SortOrder
   initiatorDone?: Prisma.SortOrder
   receiverDone?: Prisma.SortOrder
   initiatorDelivered?: Prisma.SortOrder
   receiverDelivered?: Prisma.SortOrder
+  initiatorLastReadAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  receiverLastReadAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -317,11 +361,15 @@ export type SwapScalarWhereWithAggregatesInput = {
   initiatorId?: Prisma.StringWithAggregatesFilter<"Swap"> | string
   receiverId?: Prisma.StringWithAggregatesFilter<"Swap"> | string
   status?: Prisma.EnumSwapStatusWithAggregatesFilter<"Swap"> | $Enums.SwapStatus
+  initiatorSkill?: Prisma.StringNullableWithAggregatesFilter<"Swap"> | string | null
+  receiverSkill?: Prisma.StringNullableWithAggregatesFilter<"Swap"> | string | null
   adaTxHash?: Prisma.StringNullableWithAggregatesFilter<"Swap"> | string | null
   initiatorDone?: Prisma.BoolWithAggregatesFilter<"Swap"> | boolean
   receiverDone?: Prisma.BoolWithAggregatesFilter<"Swap"> | boolean
   initiatorDelivered?: Prisma.BoolWithAggregatesFilter<"Swap"> | boolean
   receiverDelivered?: Prisma.BoolWithAggregatesFilter<"Swap"> | boolean
+  initiatorLastReadAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Swap"> | Date | string | null
+  receiverLastReadAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Swap"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Swap"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Swap"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Swap"> | Date | string
@@ -330,11 +378,15 @@ export type SwapScalarWhereWithAggregatesInput = {
 export type SwapCreateInput = {
   id?: string
   status?: $Enums.SwapStatus
+  initiatorSkill?: string | null
+  receiverSkill?: string | null
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: Date | string | null
+  receiverLastReadAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -351,11 +403,15 @@ export type SwapUncheckedCreateInput = {
   initiatorId: string
   receiverId: string
   status?: $Enums.SwapStatus
+  initiatorSkill?: string | null
+  receiverSkill?: string | null
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: Date | string | null
+  receiverLastReadAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -368,11 +424,15 @@ export type SwapUncheckedCreateInput = {
 export type SwapUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  initiatorLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receiverLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -389,11 +449,15 @@ export type SwapUncheckedUpdateInput = {
   initiatorId?: Prisma.StringFieldUpdateOperationsInput | string
   receiverId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  initiatorLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receiverLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -408,11 +472,15 @@ export type SwapCreateManyInput = {
   initiatorId: string
   receiverId: string
   status?: $Enums.SwapStatus
+  initiatorSkill?: string | null
+  receiverSkill?: string | null
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: Date | string | null
+  receiverLastReadAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -421,11 +489,15 @@ export type SwapCreateManyInput = {
 export type SwapUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  initiatorLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receiverLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -436,11 +508,15 @@ export type SwapUncheckedUpdateManyInput = {
   initiatorId?: Prisma.StringFieldUpdateOperationsInput | string
   receiverId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  initiatorLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receiverLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -461,11 +537,15 @@ export type SwapCountOrderByAggregateInput = {
   initiatorId?: Prisma.SortOrder
   receiverId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  initiatorSkill?: Prisma.SortOrder
+  receiverSkill?: Prisma.SortOrder
   adaTxHash?: Prisma.SortOrder
   initiatorDone?: Prisma.SortOrder
   receiverDone?: Prisma.SortOrder
   initiatorDelivered?: Prisma.SortOrder
   receiverDelivered?: Prisma.SortOrder
+  initiatorLastReadAt?: Prisma.SortOrder
+  receiverLastReadAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -476,11 +556,15 @@ export type SwapMaxOrderByAggregateInput = {
   initiatorId?: Prisma.SortOrder
   receiverId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  initiatorSkill?: Prisma.SortOrder
+  receiverSkill?: Prisma.SortOrder
   adaTxHash?: Prisma.SortOrder
   initiatorDone?: Prisma.SortOrder
   receiverDone?: Prisma.SortOrder
   initiatorDelivered?: Prisma.SortOrder
   receiverDelivered?: Prisma.SortOrder
+  initiatorLastReadAt?: Prisma.SortOrder
+  receiverLastReadAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -491,11 +575,15 @@ export type SwapMinOrderByAggregateInput = {
   initiatorId?: Prisma.SortOrder
   receiverId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  initiatorSkill?: Prisma.SortOrder
+  receiverSkill?: Prisma.SortOrder
   adaTxHash?: Prisma.SortOrder
   initiatorDone?: Prisma.SortOrder
   receiverDone?: Prisma.SortOrder
   initiatorDelivered?: Prisma.SortOrder
   receiverDelivered?: Prisma.SortOrder
+  initiatorLastReadAt?: Prisma.SortOrder
+  receiverLastReadAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -668,11 +756,15 @@ export type SwapUpdateOneWithoutNotificationsNestedInput = {
 export type SwapCreateWithoutInitiatorInput = {
   id?: string
   status?: $Enums.SwapStatus
+  initiatorSkill?: string | null
+  receiverSkill?: string | null
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: Date | string | null
+  receiverLastReadAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -687,11 +779,15 @@ export type SwapUncheckedCreateWithoutInitiatorInput = {
   id?: string
   receiverId: string
   status?: $Enums.SwapStatus
+  initiatorSkill?: string | null
+  receiverSkill?: string | null
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: Date | string | null
+  receiverLastReadAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -714,11 +810,15 @@ export type SwapCreateManyInitiatorInputEnvelope = {
 export type SwapCreateWithoutReceiverInput = {
   id?: string
   status?: $Enums.SwapStatus
+  initiatorSkill?: string | null
+  receiverSkill?: string | null
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: Date | string | null
+  receiverLastReadAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -733,11 +833,15 @@ export type SwapUncheckedCreateWithoutReceiverInput = {
   id?: string
   initiatorId: string
   status?: $Enums.SwapStatus
+  initiatorSkill?: string | null
+  receiverSkill?: string | null
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: Date | string | null
+  receiverLastReadAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -781,11 +885,15 @@ export type SwapScalarWhereInput = {
   initiatorId?: Prisma.StringFilter<"Swap"> | string
   receiverId?: Prisma.StringFilter<"Swap"> | string
   status?: Prisma.EnumSwapStatusFilter<"Swap"> | $Enums.SwapStatus
+  initiatorSkill?: Prisma.StringNullableFilter<"Swap"> | string | null
+  receiverSkill?: Prisma.StringNullableFilter<"Swap"> | string | null
   adaTxHash?: Prisma.StringNullableFilter<"Swap"> | string | null
   initiatorDone?: Prisma.BoolFilter<"Swap"> | boolean
   receiverDone?: Prisma.BoolFilter<"Swap"> | boolean
   initiatorDelivered?: Prisma.BoolFilter<"Swap"> | boolean
   receiverDelivered?: Prisma.BoolFilter<"Swap"> | boolean
+  initiatorLastReadAt?: Prisma.DateTimeNullableFilter<"Swap"> | Date | string | null
+  receiverLastReadAt?: Prisma.DateTimeNullableFilter<"Swap"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"Swap"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Swap"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Swap"> | Date | string
@@ -810,11 +918,15 @@ export type SwapUpdateManyWithWhereWithoutReceiverInput = {
 export type SwapCreateWithoutProofInput = {
   id?: string
   status?: $Enums.SwapStatus
+  initiatorSkill?: string | null
+  receiverSkill?: string | null
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: Date | string | null
+  receiverLastReadAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -830,11 +942,15 @@ export type SwapUncheckedCreateWithoutProofInput = {
   initiatorId: string
   receiverId: string
   status?: $Enums.SwapStatus
+  initiatorSkill?: string | null
+  receiverSkill?: string | null
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: Date | string | null
+  receiverLastReadAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -862,11 +978,15 @@ export type SwapUpdateToOneWithWhereWithoutProofInput = {
 export type SwapUpdateWithoutProofInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  initiatorLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receiverLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -882,11 +1002,15 @@ export type SwapUncheckedUpdateWithoutProofInput = {
   initiatorId?: Prisma.StringFieldUpdateOperationsInput | string
   receiverId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  initiatorLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receiverLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -898,11 +1022,15 @@ export type SwapUncheckedUpdateWithoutProofInput = {
 export type SwapCreateWithoutDeliveriesInput = {
   id?: string
   status?: $Enums.SwapStatus
+  initiatorSkill?: string | null
+  receiverSkill?: string | null
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: Date | string | null
+  receiverLastReadAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -918,11 +1046,15 @@ export type SwapUncheckedCreateWithoutDeliveriesInput = {
   initiatorId: string
   receiverId: string
   status?: $Enums.SwapStatus
+  initiatorSkill?: string | null
+  receiverSkill?: string | null
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: Date | string | null
+  receiverLastReadAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -950,11 +1082,15 @@ export type SwapUpdateToOneWithWhereWithoutDeliveriesInput = {
 export type SwapUpdateWithoutDeliveriesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  initiatorLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receiverLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -970,11 +1106,15 @@ export type SwapUncheckedUpdateWithoutDeliveriesInput = {
   initiatorId?: Prisma.StringFieldUpdateOperationsInput | string
   receiverId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  initiatorLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receiverLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -986,11 +1126,15 @@ export type SwapUncheckedUpdateWithoutDeliveriesInput = {
 export type SwapCreateWithoutMessagesInput = {
   id?: string
   status?: $Enums.SwapStatus
+  initiatorSkill?: string | null
+  receiverSkill?: string | null
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: Date | string | null
+  receiverLastReadAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1006,11 +1150,15 @@ export type SwapUncheckedCreateWithoutMessagesInput = {
   initiatorId: string
   receiverId: string
   status?: $Enums.SwapStatus
+  initiatorSkill?: string | null
+  receiverSkill?: string | null
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: Date | string | null
+  receiverLastReadAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1038,11 +1186,15 @@ export type SwapUpdateToOneWithWhereWithoutMessagesInput = {
 export type SwapUpdateWithoutMessagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  initiatorLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receiverLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1058,11 +1210,15 @@ export type SwapUncheckedUpdateWithoutMessagesInput = {
   initiatorId?: Prisma.StringFieldUpdateOperationsInput | string
   receiverId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  initiatorLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receiverLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1074,11 +1230,15 @@ export type SwapUncheckedUpdateWithoutMessagesInput = {
 export type SwapCreateWithoutNotificationsInput = {
   id?: string
   status?: $Enums.SwapStatus
+  initiatorSkill?: string | null
+  receiverSkill?: string | null
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: Date | string | null
+  receiverLastReadAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1094,11 +1254,15 @@ export type SwapUncheckedCreateWithoutNotificationsInput = {
   initiatorId: string
   receiverId: string
   status?: $Enums.SwapStatus
+  initiatorSkill?: string | null
+  receiverSkill?: string | null
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: Date | string | null
+  receiverLastReadAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1126,11 +1290,15 @@ export type SwapUpdateToOneWithWhereWithoutNotificationsInput = {
 export type SwapUpdateWithoutNotificationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  initiatorLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receiverLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1146,11 +1314,15 @@ export type SwapUncheckedUpdateWithoutNotificationsInput = {
   initiatorId?: Prisma.StringFieldUpdateOperationsInput | string
   receiverId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  initiatorLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receiverLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1163,11 +1335,15 @@ export type SwapCreateManyInitiatorInput = {
   id?: string
   receiverId: string
   status?: $Enums.SwapStatus
+  initiatorSkill?: string | null
+  receiverSkill?: string | null
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: Date | string | null
+  receiverLastReadAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1177,11 +1353,15 @@ export type SwapCreateManyReceiverInput = {
   id?: string
   initiatorId: string
   status?: $Enums.SwapStatus
+  initiatorSkill?: string | null
+  receiverSkill?: string | null
   adaTxHash?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: Date | string | null
+  receiverLastReadAt?: Date | string | null
   completedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1190,11 +1370,15 @@ export type SwapCreateManyReceiverInput = {
 export type SwapUpdateWithoutInitiatorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  initiatorLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receiverLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1209,11 +1393,15 @@ export type SwapUncheckedUpdateWithoutInitiatorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   receiverId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  initiatorLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receiverLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1227,11 +1415,15 @@ export type SwapUncheckedUpdateManyWithoutInitiatorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   receiverId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  initiatorLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receiverLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1240,11 +1432,15 @@ export type SwapUncheckedUpdateManyWithoutInitiatorInput = {
 export type SwapUpdateWithoutReceiverInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  initiatorLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receiverLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1259,11 +1455,15 @@ export type SwapUncheckedUpdateWithoutReceiverInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   initiatorId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  initiatorLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receiverLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1277,11 +1477,15 @@ export type SwapUncheckedUpdateManyWithoutReceiverInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   initiatorId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSwapStatusFieldUpdateOperationsInput | $Enums.SwapStatus
+  initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  initiatorLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receiverLastReadAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1341,11 +1545,15 @@ export type SwapSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   initiatorId?: boolean
   receiverId?: boolean
   status?: boolean
+  initiatorSkill?: boolean
+  receiverSkill?: boolean
   adaTxHash?: boolean
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: boolean
+  receiverLastReadAt?: boolean
   completedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1363,11 +1571,15 @@ export type SwapSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   initiatorId?: boolean
   receiverId?: boolean
   status?: boolean
+  initiatorSkill?: boolean
+  receiverSkill?: boolean
   adaTxHash?: boolean
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: boolean
+  receiverLastReadAt?: boolean
   completedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1380,11 +1592,15 @@ export type SwapSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   initiatorId?: boolean
   receiverId?: boolean
   status?: boolean
+  initiatorSkill?: boolean
+  receiverSkill?: boolean
   adaTxHash?: boolean
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: boolean
+  receiverLastReadAt?: boolean
   completedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1397,17 +1613,21 @@ export type SwapSelectScalar = {
   initiatorId?: boolean
   receiverId?: boolean
   status?: boolean
+  initiatorSkill?: boolean
+  receiverSkill?: boolean
   adaTxHash?: boolean
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
   receiverDelivered?: boolean
+  initiatorLastReadAt?: boolean
+  receiverLastReadAt?: boolean
   completedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type SwapOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "initiatorId" | "receiverId" | "status" | "adaTxHash" | "initiatorDone" | "receiverDone" | "initiatorDelivered" | "receiverDelivered" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["swap"]>
+export type SwapOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "initiatorId" | "receiverId" | "status" | "initiatorSkill" | "receiverSkill" | "adaTxHash" | "initiatorDone" | "receiverDone" | "initiatorDelivered" | "receiverDelivered" | "initiatorLastReadAt" | "receiverLastReadAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["swap"]>
 export type SwapInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   initiator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   receiver?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1441,11 +1661,15 @@ export type $SwapPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     initiatorId: string
     receiverId: string
     status: $Enums.SwapStatus
+    initiatorSkill: string | null
+    receiverSkill: string | null
     adaTxHash: string | null
     initiatorDone: boolean
     receiverDone: boolean
     initiatorDelivered: boolean
     receiverDelivered: boolean
+    initiatorLastReadAt: Date | null
+    receiverLastReadAt: Date | null
     completedAt: Date | null
     createdAt: Date
     updatedAt: Date
@@ -1882,11 +2106,15 @@ export interface SwapFieldRefs {
   readonly initiatorId: Prisma.FieldRef<"Swap", 'String'>
   readonly receiverId: Prisma.FieldRef<"Swap", 'String'>
   readonly status: Prisma.FieldRef<"Swap", 'SwapStatus'>
+  readonly initiatorSkill: Prisma.FieldRef<"Swap", 'String'>
+  readonly receiverSkill: Prisma.FieldRef<"Swap", 'String'>
   readonly adaTxHash: Prisma.FieldRef<"Swap", 'String'>
   readonly initiatorDone: Prisma.FieldRef<"Swap", 'Boolean'>
   readonly receiverDone: Prisma.FieldRef<"Swap", 'Boolean'>
   readonly initiatorDelivered: Prisma.FieldRef<"Swap", 'Boolean'>
   readonly receiverDelivered: Prisma.FieldRef<"Swap", 'Boolean'>
+  readonly initiatorLastReadAt: Prisma.FieldRef<"Swap", 'DateTime'>
+  readonly receiverLastReadAt: Prisma.FieldRef<"Swap", 'DateTime'>
   readonly completedAt: Prisma.FieldRef<"Swap", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Swap", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Swap", 'DateTime'>

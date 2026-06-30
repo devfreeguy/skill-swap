@@ -1,25 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import { requireAuth } from "@/lib/api";
 import { uploadMessageFile } from "@/lib/cloudinary";
+import { emitToUser, emitToSwap } from "@/lib/socket";
 import { MessageType } from "@/app/generated/prisma/client";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ swapId: string }> }
 ) {
-  const currentUser = await getCurrentUser(request);
-  if (!currentUser) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = await requireAuth(request);
+  if (auth.response) return auth.response;
+  const currentUser = auth.user;
 
   const { swapId } = await params;
 
   const swap = await prisma.swap.findUnique({
     where: { id: swapId },
     include: {
-      initiator: { select: { id: true, name: true, avatarUrl: true } },
-      receiver: { select: { id: true, name: true, avatarUrl: true } },
+      initiator: {
+        select: { id: true, name: true, avatarUrl: true, publicKey: true },
+      },
+      receiver: {
+        select: { id: true, name: true, avatarUrl: true, publicKey: true },
+      },
     },
   });
 
@@ -48,10 +52,9 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ swapId: string }> }
 ) {
-  const currentUser = await getCurrentUser(request);
-  if (!currentUser) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = await requireAuth(request);
+  if (auth.response) return auth.response;
+  const currentUser = auth.user;
 
   const { swapId } = await params;
 
@@ -80,15 +83,22 @@ export async function POST(
     fileData,
     fileName,
     fileSize,
+    ciphertext,
+    nonce,
+    senderPublicKey,
   } = body as {
-    content: string;
+    content?: string;
     type?: string;
     fileData?: string;
     fileName?: string;
     fileSize?: number;
+    ciphertext?: string;
+    nonce?: string;
+    senderPublicKey?: string;
   };
 
-  if (!content) {
+  // Either plaintext content (files/legacy) or an encrypted payload is required.
+  if (!content && !ciphertext) {
     return NextResponse.json({ error: "content is required" }, { status: 400 });
   }
 
@@ -125,8 +135,11 @@ export async function POST(
     data: {
       swapId,
       senderId: currentUser.id,
-      content,
+      content: content ?? "",
       type: type as MessageType,
+      ...(ciphertext && { ciphertext }),
+      ...(nonce && { nonce }),
+      ...(senderPublicKey && { senderPublicKey }),
       ...(fileUrl && { fileUrl }),
       ...(fileName && { fileName }),
       ...(fileSize !== undefined && { fileSize }),
@@ -134,6 +147,17 @@ export async function POST(
     include: {
       sender: { select: { id: true, name: true, avatarUrl: true } },
     },
+  });
+
+  // Real-time fan-out: deliver to the open conversation, and notify the
+  // recipient's personal channel for the inbox badge + toast.
+  const recipientId =
+    swap.initiatorId === currentUser.id ? swap.receiverId : swap.initiatorId;
+  emitToSwap(swapId, "message:new", message);
+  emitToUser(recipientId, "message:notify", {
+    swapId,
+    messageId: message.id,
+    senderName: currentUser.name,
   });
 
   return NextResponse.json(message, { status: 201 });

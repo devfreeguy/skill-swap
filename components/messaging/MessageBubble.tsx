@@ -14,6 +14,9 @@ export type MessageData = {
   content: string;
   type: string;
   metadata?: string | null;
+  ciphertext?: string | null;
+  nonce?: string | null;
+  senderPublicKey?: string | null;
   fileUrl?: string | null;
   fileName?: string | null;
   fileSize?: number | null;

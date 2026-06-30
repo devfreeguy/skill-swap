@@ -2,7 +2,7 @@
 
 import { useCardano } from "@cardano-foundation/cardano-connect-with-wallet";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CARDANO_LIMIT_NETWORK, CARDANO_NETWORK_LABEL } from "@/lib/cardano";
 
 /**
@@ -67,7 +67,7 @@ function normalizeWalletError(err: unknown): string {
     return "No Cardano wallet detected. Install Nami, Eternl, or Lace and try again.";
   }
 
-  // Fallback — surface the real message if we have one, otherwise generic.
+  // Fallback - surface the real message if we have one, otherwise generic.
   return msg
     ? `Wallet error: ${msg}`
     : "Something went wrong connecting your wallet. Please try again.";
@@ -84,6 +84,24 @@ export function useWalletAuth() {
   const [loadingHint, setLoadingHint] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  // `stakeAddress` populates a render AFTER connect() resolves, so a flow that
+  // started pre-connection closes over a stale `undefined`. Mirror it into a
+  // ref and read that at sign time so a fresh connect uses the real address.
+  const stakeAddressRef = useRef<string | undefined>(stakeAddress ?? undefined);
+  useEffect(() => {
+    stakeAddressRef.current = stakeAddress ?? undefined;
+  }, [stakeAddress]);
+
+  // Backstop sign timeout, held in a ref so it can be cleared if the component
+  // unmounts mid-sign (avoids a setState on an unmounted component).
+  const signTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (signTimeoutRef.current) clearTimeout(signTimeoutRef.current);
+    },
+    []
+  );
+
   function setPhase(text: string, hint = "") {
     setLoadingText(text);
     setLoadingHint(hint);
@@ -95,11 +113,19 @@ export function useWalletAuth() {
   }
 
   /**
-   * Connect a wallet, prove ownership with a signed nonce, then sign in if an
-   * account already exists for the wallet — otherwise create one. Works the
-   * same regardless of which page (login or register) triggered it.
+   * Shared flow: connect a wallet, fetch a nonce, and prove ownership by
+   * signing it. On success calls `onSigned` with the credentials; the caller
+   * decides what to do with them (sign in, register, or link to an account).
    */
-  async function connectAndAuth(walletName: string) {
+  async function runSignedFlow(
+    walletName: string,
+    onSigned: (creds: {
+      signature: string;
+      key: string;
+      nonce: string;
+      stakeAddress: string | undefined;
+    }) => Promise<void>
+  ) {
     try {
       setIsLoading(true);
       setError(null);
@@ -125,9 +151,9 @@ export function useWalletAuth() {
       // The hook's signMessage is fire-and-forget (it does NOT await the wallet
       // signing), so resolve everything from its callbacks. A timeout backstops
       // the case where the wallet never responds (e.g. locked) so the loader
-      // can't spin forever — but normal signing won't false-trigger it.
+      // can't spin forever - but normal signing won't false-trigger it.
       let settled = false;
-      const signTimeout = setTimeout(() => {
+      signTimeoutRef.current = setTimeout(() => {
         if (settled) return;
         settled = true;
         setError(
@@ -141,65 +167,21 @@ export function useWalletAuth() {
         async (signature, key) => {
           if (settled) return;
           settled = true;
-          clearTimeout(signTimeout);
+          if (signTimeoutRef.current) clearTimeout(signTimeoutRef.current);
           try {
             setPhase("Verifying…", "Confirming your wallet signature…");
-
-            // 1) Try to sign in with an existing account.
-            const loginRes = await fetch("/api/auth/wallet", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                walletAddress: stakeAddress,
-                signature,
-                key,
-                nonce,
-              }),
+            await onSigned({
+              signature: signature ?? "",
+              key: key ?? "",
+              nonce,
+              // Use the ref, not the closed-over value, so a fresh connect
+              // resolves to the real stake address rather than a stale undefined.
+              stakeAddress: stakeAddressRef.current ?? stakeAddress ?? undefined,
             });
-            const loginData = await loginRes.json();
-
-            if (loginRes.ok) {
-              router.push(
-                loginData.teachSkill && loginData.learnSkill
-                  ? "/dashboard"
-                  : "/onboarding"
-              );
-              return;
-            }
-
-            // 2) No account linked to this wallet → create one with the same
-            //    signature + nonce (the login route returns 404 before it
-            //    consumes the nonce, so it's still valid here).
-            if (loginRes.status === 404) {
-              setPhase(
-                "Creating your account…",
-                "Setting up your SkillSwap profile…"
-              );
-              const defaultName = `Cardano User ${(stakeAddress ?? "").slice(-6)}`;
-              const regRes = await fetch("/api/auth/register/wallet", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  name: defaultName,
-                  walletAddress: stakeAddress,
-                  signature,
-                  key,
-                  nonce,
-                }),
-              });
-              const regData = await regRes.json();
-              if (regRes.ok) {
-                router.push("/onboarding");
-                return;
-              }
-              setError(regData.error ?? "Couldn't create your account. Please try again.");
-              return;
-            }
-
-            // Other failures (e.g. 401 signature verification failed)
-            setError(loginData.error ?? "Wallet sign-in failed. Please try again.");
           } catch {
-            setError("Couldn't reach the server. Check your connection and try again.");
+            setError(
+              "Couldn't reach the server. Check your connection and try again."
+            );
           } finally {
             stopLoading();
           }
@@ -207,7 +189,7 @@ export function useWalletAuth() {
         (err) => {
           if (settled) return;
           settled = true;
-          clearTimeout(signTimeout);
+          if (signTimeoutRef.current) clearTimeout(signTimeoutRef.current);
           setError(normalizeWalletError(err));
           stopLoading();
         }
@@ -218,8 +200,91 @@ export function useWalletAuth() {
     }
   }
 
+  /**
+   * Connect a wallet, prove ownership with a signed nonce, then sign in if an
+   * account already exists for the wallet - otherwise create one. Works the
+   * same regardless of which page (login or register) triggered it.
+   */
+  async function connectAndAuth(walletName: string) {
+    await runSignedFlow(
+      walletName,
+      async ({ signature, key, nonce, stakeAddress }) => {
+        // 1) Try to sign in with an existing account.
+        const loginRes = await fetch("/api/auth/wallet", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ walletAddress: stakeAddress, signature, key, nonce }),
+        });
+        const loginData = await loginRes.json();
+
+        if (loginRes.ok) {
+          router.push(
+            loginData.teachSkill && loginData.learnSkill
+              ? "/dashboard"
+              : "/onboarding"
+          );
+          return;
+        }
+
+        // 2) No account linked to this wallet → create one with the same
+        //    signature + nonce (the login route returns 404 before it consumes
+        //    the nonce, so it's still valid here).
+        if (loginRes.status === 404) {
+          setPhase("Creating your account…", "Setting up your SkillSwap profile…");
+          const defaultName = `Cardano User ${(stakeAddress ?? "").slice(-6)}`;
+          const regRes = await fetch("/api/auth/register/wallet", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: defaultName,
+              walletAddress: stakeAddress,
+              signature,
+              key,
+              nonce,
+            }),
+          });
+          const regData = await regRes.json();
+          if (regRes.ok) {
+            router.push("/onboarding");
+            return;
+          }
+          setError(regData.error ?? "Couldn't create your account. Please try again.");
+          return;
+        }
+
+        // Other failures (e.g. 401 signature verification failed)
+        setError(loginData.error ?? "Wallet sign-in failed. Please try again.");
+      }
+    );
+  }
+
+  /**
+   * Connect a wallet and link it to the *currently authenticated* account.
+   * Used by the mandatory wallet gate and onboarding. Calls `onSuccess` once
+   * the wallet is bound so the caller can refresh/close the gate.
+   */
+  async function connectAndLink(walletName: string, onSuccess?: () => void) {
+    await runSignedFlow(
+      walletName,
+      async ({ signature, key, nonce, stakeAddress }) => {
+        const res = await fetch("/api/users/wallet", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ walletAddress: stakeAddress, signature, key, nonce }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          onSuccess?.();
+          return;
+        }
+        setError(data.error ?? "Couldn't link your wallet. Please try again.");
+      }
+    );
+  }
+
   return {
     connectAndAuth,
+    connectAndLink,
     isConnected,
     stakeAddress,
     enabledWallet,

@@ -108,7 +108,7 @@ export default function PerfectMatchSection() {
           initial="hidden"
           viewport={{ once: true, amount: 0.4 }}
         >
-          <Link href="/register">
+          <Link href="/login">
             <Button
               size="lg"
               className="rounded-full bg-accent text-accent-foreground font-semibold px-10"

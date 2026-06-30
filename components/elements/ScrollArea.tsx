@@ -31,7 +31,7 @@ export interface ScrollAreaProps {
   visibility?: ScrollbarVisibility;
   /** Track + thumb thickness in px. @default 6 */
   scrollbarSize?: number;
-  /** Outer wrapper — controls dimensions and overflow clipping */
+  /** Outer wrapper - controls dimensions and overflow clipping */
   className?: string;
   /** Inner scrollable viewport */
   viewportClassName?: string;

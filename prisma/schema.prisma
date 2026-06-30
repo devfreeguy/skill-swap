@@ -17,11 +17,17 @@ model User {
   email     String? @unique
   password  String?
   avatarUrl String?
+  bio       String?
 
   teachSkill String?
   learnSkill String?
 
+  twitterId     String? @unique
   walletAddress String? @unique
+
+  // Public key for end-to-end encrypted messaging (derived from a wallet
+  // signature on the client). Private key never leaves the user's device.
+  publicKey String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -46,12 +52,22 @@ model Swap {
 
   status SwapStatus @default(PENDING)
 
+  // The specific skills exchanged in this swap, chosen at request time:
+  // initiatorSkill = what the initiator teaches the receiver
+  // receiverSkill  = what the receiver teaches the initiator
+  initiatorSkill String?
+  receiverSkill  String?
+
   adaTxHash String?
 
   initiatorDone      Boolean @default(false)
   receiverDone       Boolean @default(false)
   initiatorDelivered Boolean @default(false)
   receiverDelivered  Boolean @default(false)
+
+  // Last time each participant opened this conversation — drives unread counts.
+  initiatorLastReadAt DateTime?
+  receiverLastReadAt  DateTime?
 
   completedAt DateTime?
 
@@ -72,6 +88,7 @@ enum SwapStatus {
   ACTIVE
   COMPLETED
   DECLINED
+  CANCELLED
 }
 
 //
@@ -91,6 +108,13 @@ model Proof {
   metadataHash String?
   summary      String?
 
+  // On-chain anchoring of the proof (user wallet signs a metadata tx).
+  // chainStatus: PENDING | ANCHORING | ANCHORED | FAILED
+  chainTxHash String?
+  chainStatus String?
+  network     String?
+  anchoredAt  DateTime?
+
   createdAt DateTime @default(now())
 
   swap Swap @relation(fields: [swapId], references: [id])
@@ -101,21 +125,39 @@ model Proof {
 // DELIVERY
 //
 
+enum DeliverableType {
+  LINK
+  FILE
+  IMAGE
+  DOCUMENT
+  TEXT
+}
+
 model Delivery {
   id String @id @default(cuid())
 
   swapId String
   userId String
 
-  resourceLink String
-  notes        String?
+  // A swap can hold many deliverables per participant, of varying types —
+  // these are the concrete outcomes of the exchange, not a single link.
+  type  DeliverableType @default(LINK)
+  title String?
+
+  resourceLink String? // url for LINK/FILE/IMAGE/DOCUMENT
+  notes        String? // free text for TEXT, or a description for others
+
+  fileName String?
+  fileSize Int?
+  mimeType String?
 
   submittedAt DateTime @default(now())
 
   swap Swap @relation(fields: [swapId], references: [id])
   user User @relation(fields: [userId], references: [id])
 
-  @@unique([swapId, userId])
+  @@index([swapId])
+  @@index([swapId, userId])
 }
 
 //
@@ -144,6 +186,13 @@ model Message {
   content  String
   type     MessageType @default(TEXT)
   metadata String?
+
+  // End-to-end encrypted payload. For user chat messages `content` is left
+  // empty and the real text lives here as ciphertext (server can't read it).
+  // System events (e.g. "Swap accepted") still use plaintext `content`.
+  ciphertext      String?
+  nonce           String?
+  senderPublicKey String?
 
   fileUrl  String?
   fileName String?
@@ -178,4 +227,20 @@ enum NotificationType {
   SWAP_COMPLETED
   PERFECT_MATCH
   PROOF_CREATED
+}
+
+//
+// WALLET AUTH
+//
+
+// Single-use challenge nonces for CIP-8 wallet login/registration. Persisted
+// (not in-memory) so the challenge survives restarts and is shared across all
+// serverless instances. Consumed by an atomic delete; expired rows are GC'd
+// opportunistically on issue.
+model WalletNonce {
+  nonce     String   @id
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
 }

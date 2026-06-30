@@ -1,5 +1,6 @@
 import { getShellUser } from "@/lib/get-shell-user";
 import AppShell from "@/components/layouts/AppShell";
+import WalletGate from "@/components/layouts/WalletGate";
 import { redirect } from "next/navigation";
 
 export default async function AppLayout({
@@ -9,5 +10,10 @@ export default async function AppLayout({
 }) {
   const user = await getShellUser();
   if (!user) redirect("/login");
-  return <AppShell user={user}>{children}</AppShell>;
+  return (
+    <AppShell user={user}>
+      <WalletGate />
+      {children}
+    </AppShell>
+  );
 }

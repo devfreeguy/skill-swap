@@ -58,7 +58,7 @@ export default function FeaturesSection() {
       </motion.div>
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_340px] gap-4">
-        {/* Feature cards — below image on mobile, left on desktop */}
+        {/* Feature cards - below image on mobile, left on desktop */}
         <motion.div
           className="order-last md:order-first grid lg:grid-cols-2 gap-4"
           variants={stagger}
@@ -85,7 +85,7 @@ export default function FeaturesSection() {
           ))}
         </motion.div>
 
-        {/* Image — first on mobile, right on desktop */}
+        {/* Image - first on mobile, right on desktop */}
         <motion.div
           className="order-first md:order-last relative rounded-2xl overflow-hidden border border-border aspect-9/16 md:aspect-auto md:min-h-full w-full"
           variants={fadeLeft}

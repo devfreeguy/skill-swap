@@ -1,6 +1,6 @@
 import { Avatar, Button, Card, Chip } from "@heroui/react";
-import Link from "next/link";
 import { parseSkills } from "@/lib/skills";
+import UserProfileDialog from "@/components/users/UserProfileDialog";
 
 export type UserCardData = {
   id: string;
@@ -32,9 +32,6 @@ export default function UserCard({ user }: Props) {
         </Avatar>
         <div className="min-w-0">
           <p className="font-semibold text-foreground truncate">{user.name}</p>
-          {teach.length > 0 && (
-            <p className="text-xs text-muted truncate">{teach.slice(0, 2).join(", ")}</p>
-          )}
         </div>
       </div>
 
@@ -42,48 +39,74 @@ export default function UserCard({ user }: Props) {
       <div className="flex flex-col gap-2 text-xs flex-1">
         {teach.length > 0 && (
           <div>
-            <p className="uppercase tracking-wider text-muted font-semibold mb-1.5">Teaches</p>
-            <div className="flex flex-wrap gap-1">
-              {teach.slice(0, 3).map((s) => (
-                <Chip key={s} size="sm" color="default">{s}</Chip>
-              ))}
-              {teach.length > 3 && (
-                <Chip size="sm" color="default">+{teach.length - 3}</Chip>
-              )}
+            <p className="uppercase tracking-wider text-muted font-semibold mb-1.5">
+              Teaches
+            </p>
+            <div className="flex flex-col gap-1">
+              <div className="flex flex-wrap items-center gap-1.5">
+                {teach.slice(0, 3).map((s) => (
+                  <Chip key={s} size="sm" color="default">
+                    {s}
+                  </Chip>
+                ))}
+                {teach.length > 3 && (
+                  <Chip size="sm" color="default">
+                    +{teach.length - 3}
+                  </Chip>
+                )}
+              </div>
             </div>
           </div>
         )}
         {learn.length > 0 && (
           <div>
-            <p className="uppercase tracking-wider text-muted font-semibold mb-1.5">Wants to Learn</p>
-            <div className="flex flex-wrap gap-1">
-              {learn.slice(0, 3).map((s) => (
-                <Chip key={s} size="sm" className="border border-accent/40 text-accent bg-transparent">{s}</Chip>
-              ))}
-              {learn.length > 3 && (
-                <Chip size="sm" color="default">+{learn.length - 3}</Chip>
-              )}
+            <p className="uppercase tracking-wider text-muted font-semibold mb-1.5">
+              Wants to Learn
+            </p>
+            <div className="flex flex-col gap-1">
+              <div className="flex flex-wrap items-center gap-1.5">
+                {learn.slice(0, 3).map((s) => (
+                  <Chip
+                    key={s}
+                    size="sm"
+                    className="border border-accent/40 text-accent bg-transparent"
+                  >
+                    {s}
+                  </Chip>
+                ))}
+                {learn.length > 3 && (
+                  <Chip size="sm" color="default">
+                    +{learn.length - 3}
+                  </Chip>
+                )}
+              </div>
             </div>
           </div>
         )}
       </div>
 
       {/* Actions */}
-      <div className="flex gap-2">
-        <Link href={`/users/${user.id}`} className="flex-1">
-          <Button variant="secondary" size="sm" className="w-full">
-            View Profile
-          </Button>
-        </Link>
-        <Link href={`/users/${user.id}`} className="flex-1">
-          <Button
-            size="sm"
-            className="w-full font-semibold bg-accent text-accent-foreground hover:bg-accent/90"
-          >
-            Request Swap
-          </Button>
-        </Link>
-      </div>
+      <UserProfileDialog userId={user.id}>
+        {(open) => (
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              className="flex-1"
+              onPress={open}
+            >
+              View Profile
+            </Button>
+            <Button
+              size="sm"
+              className="flex-1 font-semibold bg-accent text-accent-foreground hover:bg-accent/90"
+              onPress={open}
+            >
+              Request Swap
+            </Button>
+          </div>
+        )}
+      </UserProfileDialog>
     </Card>
   );
 }

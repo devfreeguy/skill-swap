@@ -87,7 +87,7 @@ function UserCard({ user }: { user: (typeof users)[0] }) {
 
       {/* Actions */}
       <div className="flex gap-2 mt-auto">
-        <Link href="/register" className="flex-1">
+        <Link href="/login" className="flex-1">
           <Button
             size="sm"
             className="w-full gap-1.5 text-xs bg-accent text-accent-foreground"
@@ -97,7 +97,7 @@ function UserCard({ user }: { user: (typeof users)[0] }) {
           </Button>
         </Link>
 
-        <Link href="/register">
+        <Link href="/login">
           <Button
             variant="tertiary"
             size="sm"

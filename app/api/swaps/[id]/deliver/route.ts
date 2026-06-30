@@ -1,29 +1,53 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import { requireAuth } from "@/lib/api";
+import { uploadDeliverable } from "@/lib/cloudinary";
+import { emitToSwap } from "@/lib/socket";
+import type { DeliverableType } from "@/app/generated/prisma/client";
 
+const VALID_TYPES: DeliverableType[] = [
+  "LINK",
+  "FILE",
+  "IMAGE",
+  "DOCUMENT",
+  "TEXT",
+];
+
+/**
+ * Add a deliverable to a swap. A participant can add MANY deliverables of
+ * varying types - these are the concrete outcomes of the exchange. Adding a
+ * deliverable never completes the swap; completion is a separate, explicit
+ * two-sided confirmation (PATCH /api/swaps/[id] { action: "complete" }).
+ */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const currentUser = await getCurrentUser(request);
-  if (!currentUser) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = await requireAuth(request);
+  if (auth.response) return auth.response;
+  const currentUser = auth.user;
 
   const { id } = await params;
   const body = await request.json();
-  const { resourceLink, notes } = body as {
-    resourceLink: string;
+  const {
+    type = "LINK",
+    title,
+    resourceLink,
+    notes,
+    file,
+    fileName,
+    fileSize,
+    mimeType,
+  } = body as {
+    type?: DeliverableType;
+    title?: string;
+    resourceLink?: string;
     notes?: string;
+    file?: string; // base64 data URL for uploads
+    fileName?: string;
+    fileSize?: number;
+    mimeType?: string;
   };
-
-  if (!resourceLink) {
-    return NextResponse.json(
-      { error: "resourceLink is required" },
-      { status: 400 }
-    );
-  }
 
   const swap = await prisma.swap.findUnique({ where: { id } });
   if (!swap) {
@@ -32,7 +56,7 @@ export async function POST(
 
   if (swap.status !== "ACTIVE") {
     return NextResponse.json(
-      { error: "Swap must be active to submit delivery" },
+      { error: "Swap must be active to add deliverables" },
       { status: 400 }
     );
   }
@@ -43,10 +67,67 @@ export async function POST(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const delivery = await prisma.delivery.upsert({
-    where: { swapId_userId: { swapId: id, userId: currentUser.id } },
-    create: { swapId: id, userId: currentUser.id, resourceLink, notes },
-    update: { resourceLink, notes },
+  const dtype: DeliverableType = VALID_TYPES.includes(type as DeliverableType)
+    ? (type as DeliverableType)
+    : "LINK";
+  const isFileType =
+    dtype === "IMAGE" || dtype === "FILE" || dtype === "DOCUMENT";
+
+  // Each deliverable needs content: TEXT carries notes, LINK a URL, and file
+  // types either an uploaded file or a pre-existing URL.
+  if (dtype === "TEXT") {
+    if (!notes || !notes.trim()) {
+      return NextResponse.json(
+        { error: "Add some text for this deliverable." },
+        { status: 400 }
+      );
+    }
+  } else if (dtype === "LINK") {
+    if (!resourceLink || !resourceLink.trim()) {
+      return NextResponse.json(
+        { error: "A link is required for this deliverable." },
+        { status: 400 }
+      );
+    }
+  } else if (isFileType && !file && !resourceLink?.trim()) {
+    return NextResponse.json(
+      { error: "A file is required for this deliverable." },
+      { status: 400 }
+    );
+  }
+
+  // Upload file-type deliverables to Cloudinary; the secure URL becomes the link.
+  let finalResourceLink = resourceLink?.trim() || null;
+  if (isFileType && file) {
+    try {
+      const resourceType = dtype === "IMAGE" ? "image" : "raw";
+      const { url } = await uploadDeliverable(
+        file,
+        id,
+        currentUser.id,
+        resourceType
+      );
+      finalResourceLink = url;
+    } catch {
+      return NextResponse.json(
+        { error: "File upload failed. Please try again." },
+        { status: 502 }
+      );
+    }
+  }
+
+  const delivery = await prisma.delivery.create({
+    data: {
+      swapId: id,
+      userId: currentUser.id,
+      type: dtype,
+      title: title?.trim() || null,
+      resourceLink: finalResourceLink,
+      notes: notes?.trim() || null,
+      fileName: fileName || null,
+      fileSize: fileSize ?? null,
+      mimeType: mimeType || null,
+    },
   });
 
   await prisma.message.create({
@@ -58,86 +139,60 @@ export async function POST(
     },
   });
 
-  const deliveryCount = await prisma.delivery.count({
-    where: {
-      swapId: id,
-      userId: { in: [swap.initiatorId, swap.receiverId] },
-    },
-  });
+  emitToSwap(id, "swap:update");
 
-  if (deliveryCount >= 2) {
-    try {
-      const allDeliveries = await prisma.delivery.findMany({
-        where: { swapId: id },
-      });
-      const summary = allDeliveries
-        .map((d) => d.resourceLink)
-        .filter(Boolean)
-        .join(" | ");
-
-      const [initiator, receiver] = await Promise.all([
-        prisma.user.findUnique({ where: { id: swap.initiatorId } }),
-        prisma.user.findUnique({ where: { id: swap.receiverId } }),
-      ]);
-
-      await prisma.$transaction([
-        prisma.swap.update({
-          where: { id },
-          data: { status: "COMPLETED" },
-        }),
-        prisma.proof.create({
-          data: {
-            swapId: id,
-            userId: swap.initiatorId,
-            teachSkill: initiator?.teachSkill ?? "",
-            learnSkill: initiator?.learnSkill ?? "",
-            adaTxHash: swap.adaTxHash,
-            summary,
-          },
-        }),
-        prisma.notification.createMany({
-          data: [
-            {
-              userId: swap.initiatorId,
-              type: "SWAP_COMPLETED",
-              message: `Your swap with ${receiver?.name} is complete! Both deliveries received.`,
-              swapId: id,
-            },
-            {
-              userId: swap.receiverId,
-              type: "SWAP_COMPLETED",
-              message: `Your swap with ${initiator?.name} is complete! Both deliveries received.`,
-              swapId: id,
-            },
-          ],
-        }),
-        prisma.message.create({
-          data: {
-            swapId: id,
-            senderId: swap.initiatorId,
-            content: "Swap completed",
-            type: "PROOF_CREATED",
-          },
-        }),
-      ]);
-
-      return NextResponse.json({ delivery, completed: true });
-    } catch {
-      return NextResponse.json({ delivery, completed: true });
-    }
-  }
-
-  return NextResponse.json({ delivery, completed: false, awaitingOther: true });
+  return NextResponse.json(delivery, { status: 201 });
 }
 
+/** Remove one of your own deliverables (only while the swap is active). */
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const auth = await requireAuth(request);
+  if (auth.response) return auth.response;
+  const currentUser = auth.user;
+
+  const { id } = await params;
+  const deliveryId = request.nextUrl.searchParams.get("deliveryId");
+  if (!deliveryId) {
+    return NextResponse.json(
+      { error: "deliveryId is required" },
+      { status: 400 }
+    );
+  }
+
+  const [swap, delivery] = await Promise.all([
+    prisma.swap.findUnique({ where: { id } }),
+    prisma.delivery.findUnique({ where: { id: deliveryId } }),
+  ]);
+
+  if (!delivery || delivery.swapId !== id) {
+    return NextResponse.json({ error: "Deliverable not found" }, { status: 404 });
+  }
+  if (delivery.userId !== currentUser.id) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  if (swap?.status !== "ACTIVE") {
+    return NextResponse.json(
+      { error: "Can only remove deliverables while the swap is active" },
+      { status: 400 }
+    );
+  }
+
+  await prisma.delivery.delete({ where: { id: deliveryId } });
+  emitToSwap(id, "swap:update");
+  return NextResponse.json({ success: true });
+}
+
+/** List the current user's deliverables for this swap. */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const currentUser = await getCurrentUser(request);
-  if (!currentUser) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = await requireAuth(request);
+  if (auth.response) return auth.response;
+  const currentUser = auth.user;
 
   const { id } = await params;
 
@@ -152,9 +207,10 @@ export async function GET(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const delivery = await prisma.delivery.findUnique({
-    where: { swapId_userId: { swapId: id, userId: currentUser.id } },
+  const deliveries = await prisma.delivery.findMany({
+    where: { swapId: id, userId: currentUser.id },
+    orderBy: { submittedAt: "asc" },
   });
 
-  return NextResponse.json(delivery);
+  return NextResponse.json(deliveries);
 }

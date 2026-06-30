@@ -13,10 +13,22 @@ export const SwapStatus = {
   PENDING: 'PENDING',
   ACTIVE: 'ACTIVE',
   COMPLETED: 'COMPLETED',
-  DECLINED: 'DECLINED'
+  DECLINED: 'DECLINED',
+  CANCELLED: 'CANCELLED'
 } as const
 
 export type SwapStatus = (typeof SwapStatus)[keyof typeof SwapStatus]
+
+
+export const DeliverableType = {
+  LINK: 'LINK',
+  FILE: 'FILE',
+  IMAGE: 'IMAGE',
+  DOCUMENT: 'DOCUMENT',
+  TEXT: 'TEXT'
+} as const
+
+export type DeliverableType = (typeof DeliverableType)[keyof typeof DeliverableType]
 
 
 export const MessageType = {

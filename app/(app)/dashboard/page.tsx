@@ -2,8 +2,14 @@
 
 import LemniscateLoader from "@/components/layouts/Loader";
 import { parseSkills } from "@/lib/skills";
+import { firstSkill, relativeTime } from "@/lib/utils";
 import type { MatchType } from "@/lib/matching";
-import { Avatar, Button, Card, Chip, Separator } from "@heroui/react";
+import FirstRunGuide from "@/components/elements/FirstRunGuide";
+import ExchangePair from "@/components/elements/ExchangePair";
+import StatCard from "@/components/dashboard/StatCard";
+import MatchCard from "@/components/dashboard/MatchCard";
+import DiscoverMoreCard from "@/components/dashboard/DiscoverMoreCard";
+import { Avatar, Button, Card, Modal } from "@heroui/react";
 import { IconArrowRight, IconBolt, IconCheck } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -45,33 +51,22 @@ type Swap = {
   status: string;
   createdAt: string;
   adaTxHash?: string | null;
+  initiatorSkill?: string | null;
+  receiverSkill?: string | null;
   initiatorId: string;
   initiator: SwapUser;
   receiver: SwapUser;
 };
 
-type Notification = {
+type PerfectMatch = {
   id: string;
-  read: boolean;
+  name: string;
+  avatarUrl?: string | null;
+  teachSkill?: string | null;
+  learnSkill?: string | null;
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function relativeTime(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  if (diff < 60_000) return "just now";
-  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
-  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`;
-  return `${Math.floor(diff / 86_400_000)}d ago`;
-}
-
-function matchPercent(score: number): number {
-  return Math.min(50 + score * 15, 99);
-}
-
-function firstSkill(raw?: string | null): string {
-  return parseSkills(raw)[0] ?? "—";
-}
 
 function formatMonth(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("en-US", {
@@ -104,118 +99,6 @@ const ACTION_LABEL: Record<string, string> = {
   CANCELLED: "Details",
 };
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function StatCard({
-  label,
-  value,
-  icon,
-  valueClass,
-}: {
-  label: string;
-  value: string | number;
-  icon: React.ReactNode;
-  valueClass?: string;
-}) {
-  return (
-    <Card className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-3 min-w-0">
-      <div className="flex items-start justify-between gap-2">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted leading-tight">
-          {label}
-        </p>
-        <span className="text-muted shrink-0">{icon}</span>
-      </div>
-      <p className={`text-3xl font-bold ${valueClass ?? "text-foreground"}`}>
-        {value}
-      </p>
-    </Card>
-  );
-}
-
-function MatchCard({ match }: { match: MatchUser }) {
-  const pct = matchPercent(match.score);
-  const teachSkills = parseSkills(match.teachSkill);
-  const learnSkills = parseSkills(match.learnSkill);
-  return (
-    <Card className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-4 hover:border-accent/40 transition-colors">
-      <div className="flex justify-end">
-        <span className="inline-flex items-center gap-1 text-xs font-semibold bg-surface border border-accent/40 text-accent rounded-full px-2.5 py-1">
-          <IconBolt size={12} />
-          {pct}% Match
-        </span>
-      </div>
-      <div className="flex items-center gap-3 -mt-2">
-        <Avatar size="md">
-          {match.avatarUrl && (
-            <Avatar.Image src={match.avatarUrl} alt={match.name} />
-          )}
-          <Avatar.Fallback className="font-semibold">
-            {match.name.slice(0, 2).toUpperCase()}
-          </Avatar.Fallback>
-        </Avatar>
-        <div>
-          <p className="font-semibold text-foreground">{match.name}</p>
-          {teachSkills.length > 0 && (
-            <p className="text-xs text-muted">{teachSkills.join(", ")}</p>
-          )}
-        </div>
-      </div>
-      <Separator />
-      <div className="flex flex-col gap-2 text-xs">
-        {teachSkills.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="uppercase tracking-wider text-muted font-semibold w-14 shrink-0">
-              Teaches
-            </span>
-            {teachSkills.slice(0, 2).map((s) => (
-              <Chip key={s} size="sm" color="default" className="text-xs">
-                {s}
-              </Chip>
-            ))}
-          </div>
-        )}
-        {learnSkills.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="uppercase tracking-wider text-muted font-semibold w-14 shrink-0">
-              Wants
-            </span>
-            <span className="text-accent font-medium">
-              {learnSkills.slice(0, 2).join(", ")}
-            </span>
-          </div>
-        )}
-      </div>
-      <div className="flex gap-2 mt-auto">
-        <Link href={`/users/${match.id}`} className="flex-1">
-          <Button variant="secondary" size="sm" className="w-full">
-            View Profile
-          </Button>
-        </Link>
-        <Link href={`/users/${match.id}`} className="flex-1">
-          <Button
-            size="sm"
-            className="w-full font-semibold bg-accent text-accent-foreground hover:bg-accent/90"
-          >
-            Request
-          </Button>
-        </Link>
-      </div>
-    </Card>
-  );
-}
-
-function DiscoverMoreCard() {
-  return (
-    <Card className="bg-surface border border-border rounded-2xl p-5 flex flex-col items-center justify-center gap-3 min-h-55 hover:border-accent/40 transition-colors">
-      <p className="text-muted text-sm font-medium">Discover More</p>
-      <Link href="/users">
-        <Button variant="secondary" size="sm">
-          Browse All
-        </Button>
-      </Link>
-    </Card>
-  );
-}
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
@@ -225,6 +108,8 @@ export default function DashboardPage() {
   const [matches, setMatches] = useState<MatchUser[]>([]);
   const [swaps, setSwaps] = useState<Swap[]>([]);
   const [loading, setLoading] = useState(true);
+  const [perfectMatch, setPerfectMatch] = useState<PerfectMatch | null>(null);
+  const [matchModalOpen, setMatchModalOpen] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -239,8 +124,29 @@ export default function DashboardPage() {
         }
         setUser(me);
         setMatches(Array.isArray(matchData) ? matchData : []);
-        setSwaps(Array.isArray(swapData) ? swapData : []);
+        const swapList: Swap[] = Array.isArray(swapData) ? swapData : [];
+        setSwaps(swapList);
         setLoading(false);
+
+        // Silent perfect-match prompt - once per session, and only when the
+        // user isn't already mid-exchange.
+        const hasActiveSwaps = swapList.some(
+          (s) => s.status === "ACTIVE" || s.status === "PENDING",
+        );
+        const alreadyShown =
+          sessionStorage.getItem("perfectMatchShown") === "1";
+        if (!hasActiveSwaps && !alreadyShown) {
+          fetch("/api/users/perfect-match")
+            .then((r) => r.json())
+            .then((pm: PerfectMatch | null) => {
+              if (pm && pm.id) {
+                setPerfectMatch(pm);
+                setMatchModalOpen(true);
+                sessionStorage.setItem("perfectMatchShown", "1");
+              }
+            })
+            .catch(() => {});
+        }
       })
       .catch(() => router.replace("/login"));
   }, [router]);
@@ -254,22 +160,22 @@ export default function DashboardPage() {
   const completedCount = swaps.filter((s) => s.status === "COMPLETED").length;
 
   const topMatches = matches.slice(0, 2);
-  const activeSwaps = swaps
-    .filter(
-      (s) =>
-        s.status !== "COMPLETED" &&
-        s.status !== "DECLINED" &&
-        s.status !== "CANCELLED",
-    )
-    .slice(0, 5);
-  const recentHistory = swaps
-    .filter((s) => s.status === "COMPLETED")
-    .slice(0, 4);
+  // The dashboard is now the single home for swaps (no separate /swaps page),
+  // so show them all rather than a capped preview.
+  const activeSwaps = swaps.filter(
+    (s) =>
+      s.status !== "COMPLETED" &&
+      s.status !== "DECLINED" &&
+      s.status !== "CANCELLED",
+  );
+  const recentHistory = swaps.filter((s) => s.status === "COMPLETED");
 
   return (
     <main className="flex-1 px-6 py-6 flex flex-col gap-8">
+      <FirstRunGuide />
+
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard
           label="Completed Exchanges"
           value={completedCount}
@@ -309,10 +215,10 @@ export default function DashboardPage() {
             </svg>
           }
         />
-        {/* TODO: reputation not in real DB — placeholder */}
+        {/* TODO: reputation not in real DB - placeholder */}
         <StatCard
           label="Reputation Score"
-          value="—"
+          value="-"
           valueClass="text-accent"
           icon={
             <svg
@@ -358,12 +264,6 @@ export default function DashboardPage() {
             <h2 className="text-lg font-semibold text-foreground">
               Active Swaps
             </h2>
-            <Link
-              href="/swaps"
-              className="text-sm text-muted hover:text-foreground transition-colors"
-            >
-              View all
-            </Link>
           </div>
           <Card className="bg-surface border border-border rounded-2xl overflow-hidden">
             {activeSwaps.length === 0 ? (
@@ -374,96 +274,166 @@ export default function DashboardPage() {
                 </Link>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border">
-                      {[
-                        "Partner",
-                        "Skills Exchanged",
-                        "Status",
-                        "Last Activity",
-                        "Action",
-                      ].map((h) => (
-                        <th
-                          key={h}
-                          className="text-left text-xs uppercase tracking-wider text-muted font-semibold px-4 py-3"
-                        >
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {activeSwaps.map((s, i) => {
-                      const isInit = s.initiatorId === user.id;
-                      const other = isInit ? s.receiver : s.initiator;
-                      const mySkill = firstSkill(
+              <>
+                {/* Table - tablet/desktop. Columns never wrap; the container
+                    scrolls horizontally if content overflows. */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border">
+                        {[
+                          "Partner",
+                          "Skills Exchanged",
+                          "Status",
+                          "Last Activity",
+                          "Action",
+                        ].map((h) => (
+                          <th
+                            key={h}
+                            className="text-left text-xs uppercase tracking-wider text-muted font-semibold px-4 py-3 whitespace-nowrap"
+                          >
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {activeSwaps.map((s, i) => {
+                        const isInit = s.initiatorId === user.id;
+                        const other = isInit ? s.receiver : s.initiator;
+                        const mySkill =
+                          (isInit ? s.initiatorSkill : s.receiverSkill) ??
+                          firstSkill(
+                            isInit
+                              ? s.initiator.teachSkill
+                              : s.receiver.teachSkill,
+                          );
+                        const theirSkill =
+                          (isInit ? s.receiverSkill : s.initiatorSkill) ??
+                          firstSkill(
+                            isInit
+                              ? s.receiver.teachSkill
+                              : s.initiator.teachSkill,
+                          );
+                        return (
+                          <tr
+                            key={s.id}
+                            className={`${i < activeSwaps.length - 1 ? "border-b border-border" : ""} hover:bg-background/50 transition-colors`}
+                          >
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <div className="flex items-center gap-2">
+                                <Avatar size="sm">
+                                  {other.avatarUrl && (
+                                    <Avatar.Image
+                                      src={other.avatarUrl}
+                                      alt={other.name}
+                                    />
+                                  )}
+                                  <Avatar.Fallback className="text-xs font-semibold">
+                                    {other.name.slice(0, 2).toUpperCase()}
+                                  </Avatar.Fallback>
+                                </Avatar>
+                                <span className="font-medium text-foreground">
+                                  {other.name}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-muted whitespace-nowrap">
+                              <ExchangePair a={mySkill} b={theirSkill} />
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <span className="inline-flex items-center gap-1.5">
+                                <span
+                                  className={`size-2 rounded-full ${STATUS_DOT[s.status] ?? "bg-muted"}`}
+                                />
+                                <span
+                                  className={
+                                    s.status === "ACTIVE"
+                                      ? "text-accent text-xs font-medium"
+                                      : s.status === "PENDING"
+                                        ? "text-warning text-xs font-medium"
+                                        : "text-muted text-xs"
+                                  }
+                                >
+                                  {STATUS_LABEL[s.status] ?? s.status}
+                                </span>
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-muted whitespace-nowrap">
+                              {relativeTime(s.createdAt)}
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              <Link href={`/swaps/${s.id}`}>
+                                <span className="text-accent text-sm font-medium hover:underline">
+                                  {ACTION_LABEL[s.status] ?? "Open"}
+                                </span>
+                              </Link>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Card list - mobile (responsive alternative to the table) */}
+                <div className="md:hidden flex flex-col divide-y divide-border">
+                  {activeSwaps.map((s) => {
+                    const isInit = s.initiatorId === user.id;
+                    const other = isInit ? s.receiver : s.initiator;
+                    const mySkill =
+                      (isInit ? s.initiatorSkill : s.receiverSkill) ??
+                      firstSkill(
                         isInit ? s.initiator.teachSkill : s.receiver.teachSkill,
                       );
-                      const theirSkill = firstSkill(
+                    const theirSkill =
+                      (isInit ? s.receiverSkill : s.initiatorSkill) ??
+                      firstSkill(
                         isInit ? s.receiver.teachSkill : s.initiator.teachSkill,
                       );
-                      return (
-                        <tr
-                          key={s.id}
-                          className={`${i < activeSwaps.length - 1 ? "border-b border-border" : ""} hover:bg-background/50 transition-colors`}
-                        >
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-2">
-                              <Avatar size="sm">
-                                {other.avatarUrl && (
-                                  <Avatar.Image
-                                    src={other.avatarUrl}
-                                    alt={other.name}
-                                  />
-                                )}
-                                <Avatar.Fallback className="text-xs font-semibold">
-                                  {other.name.slice(0, 2).toUpperCase()}
-                                </Avatar.Fallback>
-                              </Avatar>
-                              <span className="font-medium text-foreground">
-                                {other.name}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-muted">
-                            {mySkill} ↔ {theirSkill}
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className="inline-flex items-center gap-1.5">
-                              <span
-                                className={`size-2 rounded-full ${STATUS_DOT[s.status] ?? "bg-muted"}`}
-                              />
-                              <span
-                                className={
-                                  s.status === "ACTIVE"
-                                    ? "text-accent text-xs font-medium"
-                                    : s.status === "PENDING"
-                                      ? "text-warning text-xs font-medium"
-                                      : "text-muted text-xs"
-                                }
-                              >
-                                {STATUS_LABEL[s.status] ?? s.status}
-                              </span>
+                    return (
+                      <Link
+                        key={s.id}
+                        href={`/swaps/${s.id}`}
+                        className="flex items-center gap-3 p-4 hover:bg-background/50 transition-colors"
+                      >
+                        <Avatar size="sm">
+                          {other.avatarUrl && (
+                            <Avatar.Image
+                              src={other.avatarUrl}
+                              alt={other.name}
+                            />
+                          )}
+                          <Avatar.Fallback className="text-xs font-semibold">
+                            {other.name.slice(0, 2).toUpperCase()}
+                          </Avatar.Fallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-foreground truncate">
+                            {other.name}
+                          </p>
+                          <p className="text-xs text-muted truncate">
+                            <ExchangePair a={mySkill} b={theirSkill} />
+                          </p>
+                        </div>
+                        <div className="flex flex-col items-end gap-1 shrink-0">
+                          <span className="inline-flex items-center gap-1.5">
+                            <span
+                              className={`size-2 rounded-full ${STATUS_DOT[s.status] ?? "bg-muted"}`}
+                            />
+                            <span className="text-xs text-muted">
+                              {STATUS_LABEL[s.status] ?? s.status}
                             </span>
-                          </td>
-                          <td className="px-4 py-3 text-muted">
+                          </span>
+                          <span className="text-xs text-muted">
                             {relativeTime(s.createdAt)}
-                          </td>
-                          <td className="px-4 py-3">
-                            <Link href={`/swaps/${s.id}`}>
-                              <span className="text-accent text-sm font-medium hover:underline">
-                                {ACTION_LABEL[s.status] ?? "Open"}
-                              </span>
-                            </Link>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                          </span>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </>
             )}
           </Card>
         </section>
@@ -517,6 +487,74 @@ export default function DashboardPage() {
           )}
         </section>
       </div>
+
+      {/* Perfect-match prompt */}
+      {perfectMatch && (
+        <Modal.Backdrop
+          isOpen={matchModalOpen}
+          onOpenChange={setMatchModalOpen}
+          variant="blur"
+        >
+          <Modal.Container>
+            <Modal.Dialog className="sm:max-w-105">
+              <Modal.CloseTrigger />
+              <Modal.Header>
+                <Modal.Icon className="bg-accent/10 text-accent">
+                  <IconBolt className="size-5" />
+                </Modal.Icon>
+                <Modal.Heading>Perfect Match Found! ⚡</Modal.Heading>
+              </Modal.Header>
+              <Modal.Body>
+                <p className="text-sm text-muted">
+                  We found someone who teaches what you want to learn and wants
+                  to learn what you teach.
+                </p>
+                <div className="mt-4 flex items-center gap-3 rounded-xl border border-border bg-surface p-4">
+                  <Avatar size="md">
+                    {perfectMatch.avatarUrl && (
+                      <Avatar.Image
+                        src={perfectMatch.avatarUrl}
+                        alt={perfectMatch.name}
+                      />
+                    )}
+                    <Avatar.Fallback className="font-semibold">
+                      {perfectMatch.name.slice(0, 2).toUpperCase()}
+                    </Avatar.Fallback>
+                  </Avatar>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-foreground">
+                      {perfectMatch.name}
+                    </p>
+                    <p className="text-xs text-muted">
+                      Teaches{" "}
+                      <span className="text-foreground font-medium">
+                        {firstSkill(perfectMatch.teachSkill)}
+                      </span>
+                    </p>
+                    <p className="text-xs text-muted">
+                      Wants{" "}
+                      <span className="text-accent font-medium">
+                        {firstSkill(perfectMatch.learnSkill)}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button slot="close" variant="secondary">
+                  Maybe Later
+                </Button>
+                <Button
+                  onPress={() => router.push(`/users/${perfectMatch.id}`)}
+                  className="bg-accent text-accent-foreground font-semibold"
+                >
+                  View Profile
+                </Button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      )}
     </main>
   );
 }

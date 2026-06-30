@@ -3,6 +3,16 @@
 @import "../styles/mint-green.css";
 @import "../styles/utilities.css";
 
+/*
+ * Global density: Tailwind's text and spacing scales are rem-based, so lowering
+ * the root font size proportionally tightens type sizes AND padding/margins/gaps
+ * across the entire app for a denser visual hierarchy. Tune this single value
+ * (e.g. 14px for tighter, 16px for default).
+ */
+html {
+  font-size: 15px;
+}
+
 * {
   font-family: var(--font-sans);
 }

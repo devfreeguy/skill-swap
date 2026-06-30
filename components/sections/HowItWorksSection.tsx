@@ -26,7 +26,7 @@ const steps = [
     icon: IconTargetArrow,
     title: "Find a Match",
     description:
-      "The system surfaces only bidirectional matches — users who teach what you want and want what you teach. No one-sided connections.",
+      "The system surfaces only bidirectional matches - users who teach what you want and want what you teach. No one-sided connections.",
   },
   {
     step: "03",

@@ -14,8 +14,7 @@ const links = [
   { label: "How it Works", href: "#how-it-works" },
   { label: "Contribution Ledger", href: "#ledger" },
   { label: "Community", href: "#discovery" },
-  { label: "Register", href: "/register" },
-  { label: "Login", href: "/login" },
+  { label: "Get Started", href: "/login" },
 ];
 
 const socials = [

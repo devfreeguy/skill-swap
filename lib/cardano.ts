@@ -1,4 +1,6 @@
-import { NetworkType } from "@cardano-foundation/cardano-connect-with-wallet-core";
+// Type-only import: erased at compile time so this module never pulls the
+// wallet-core runtime (which touches `window` at eval) into the server bundle.
+import type { NetworkType } from "@cardano-foundation/cardano-connect-with-wallet-core";
 
 export type CardanoNetwork = "preprod" | "preview" | "mainnet";
 
@@ -24,9 +26,11 @@ export const IS_MAINNET = CARDANO_NETWORK === "mainnet";
  * id, so preprod and preview both map to NetworkType.TESTNET. The preprod/preview
  * distinction is display-only.
  */
-export const CARDANO_LIMIT_NETWORK: NetworkType = IS_MAINNET
-  ? NetworkType.MAINNET
-  : NetworkType.TESTNET;
+// NetworkType is a string enum ("mainnet" | "testnet"); using the literal
+// values keeps this free of the runtime import while staying type-correct.
+export const CARDANO_LIMIT_NETWORK: NetworkType = (
+  IS_MAINNET ? "mainnet" : "testnet"
+) as NetworkType;
 
 const NETWORK_LABELS: Record<CardanoNetwork, string> = {
   mainnet: "Mainnet",

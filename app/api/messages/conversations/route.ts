@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import { requireAuth } from "@/lib/api";
 import { scoreMatch } from "@/lib/matching";
 
 export async function GET(request: NextRequest) {
-  const currentUser = await getCurrentUser(request);
-  if (!currentUser) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = await requireAuth(request);
+  if (auth.response) return auth.response;
+  const currentUser = auth.user;
 
   const swaps = await prisma.swap.findMany({
     where: {
@@ -48,6 +47,8 @@ export async function GET(request: NextRequest) {
     orderBy: { updatedAt: "desc" },
   });
 
+  const CHAT_TYPES = ["TEXT", "LINK", "IMAGE", "DOCUMENT"];
+
   const conversations = swaps.map((swap) => {
     const me =
       swap.initiatorId === currentUser.id ? swap.initiator : swap.receiver;
@@ -56,6 +57,19 @@ export async function GET(request: NextRequest) {
     const lastMessage = swap.messages[0] ?? null;
     const { type: matchType } = scoreMatch(me, other);
 
+    // Unread when the latest chat message is from the other party and newer
+    // than the last time I opened this conversation.
+    const myLastReadAt =
+      swap.initiatorId === currentUser.id
+        ? swap.initiatorLastReadAt
+        : swap.receiverLastReadAt;
+    const unread =
+      !!lastMessage &&
+      lastMessage.senderId !== currentUser.id &&
+      CHAT_TYPES.includes(lastMessage.type) &&
+      (!myLastReadAt ||
+        new Date(lastMessage.createdAt) > new Date(myLastReadAt));
+
     return {
       swapId: swap.id,
       status: swap.status,
@@ -63,6 +77,7 @@ export async function GET(request: NextRequest) {
       myTeachSkill: me.teachSkill ?? null,
       lastMessage,
       matchType,
+      unread,
       updatedAt: swap.updatedAt,
     };
   });

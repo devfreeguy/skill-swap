@@ -33,6 +33,10 @@ export type ProofMinAggregateOutputType = {
   adaTxHash: string | null
   metadataHash: string | null
   summary: string | null
+  chainTxHash: string | null
+  chainStatus: string | null
+  network: string | null
+  anchoredAt: Date | null
   createdAt: Date | null
 }
 
@@ -45,6 +49,10 @@ export type ProofMaxAggregateOutputType = {
   adaTxHash: string | null
   metadataHash: string | null
   summary: string | null
+  chainTxHash: string | null
+  chainStatus: string | null
+  network: string | null
+  anchoredAt: Date | null
   createdAt: Date | null
 }
 
@@ -57,6 +65,10 @@ export type ProofCountAggregateOutputType = {
   adaTxHash: number
   metadataHash: number
   summary: number
+  chainTxHash: number
+  chainStatus: number
+  network: number
+  anchoredAt: number
   createdAt: number
   _all: number
 }
@@ -71,6 +83,10 @@ export type ProofMinAggregateInputType = {
   adaTxHash?: true
   metadataHash?: true
   summary?: true
+  chainTxHash?: true
+  chainStatus?: true
+  network?: true
+  anchoredAt?: true
   createdAt?: true
 }
 
@@ -83,6 +99,10 @@ export type ProofMaxAggregateInputType = {
   adaTxHash?: true
   metadataHash?: true
   summary?: true
+  chainTxHash?: true
+  chainStatus?: true
+  network?: true
+  anchoredAt?: true
   createdAt?: true
 }
 
@@ -95,6 +115,10 @@ export type ProofCountAggregateInputType = {
   adaTxHash?: true
   metadataHash?: true
   summary?: true
+  chainTxHash?: true
+  chainStatus?: true
+  network?: true
+  anchoredAt?: true
   createdAt?: true
   _all?: true
 }
@@ -180,6 +204,10 @@ export type ProofGroupByOutputType = {
   adaTxHash: string | null
   metadataHash: string | null
   summary: string | null
+  chainTxHash: string | null
+  chainStatus: string | null
+  network: string | null
+  anchoredAt: Date | null
   createdAt: Date
   _count: ProofCountAggregateOutputType | null
   _min: ProofMinAggregateOutputType | null
@@ -213,6 +241,10 @@ export type ProofWhereInput = {
   adaTxHash?: Prisma.StringNullableFilter<"Proof"> | string | null
   metadataHash?: Prisma.StringNullableFilter<"Proof"> | string | null
   summary?: Prisma.StringNullableFilter<"Proof"> | string | null
+  chainTxHash?: Prisma.StringNullableFilter<"Proof"> | string | null
+  chainStatus?: Prisma.StringNullableFilter<"Proof"> | string | null
+  network?: Prisma.StringNullableFilter<"Proof"> | string | null
+  anchoredAt?: Prisma.DateTimeNullableFilter<"Proof"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Proof"> | Date | string
   swap?: Prisma.XOR<Prisma.SwapScalarRelationFilter, Prisma.SwapWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -227,6 +259,10 @@ export type ProofOrderByWithRelationInput = {
   adaTxHash?: Prisma.SortOrderInput | Prisma.SortOrder
   metadataHash?: Prisma.SortOrderInput | Prisma.SortOrder
   summary?: Prisma.SortOrderInput | Prisma.SortOrder
+  chainTxHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  chainStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  network?: Prisma.SortOrderInput | Prisma.SortOrder
+  anchoredAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   swap?: Prisma.SwapOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
@@ -244,6 +280,10 @@ export type ProofWhereUniqueInput = Prisma.AtLeast<{
   adaTxHash?: Prisma.StringNullableFilter<"Proof"> | string | null
   metadataHash?: Prisma.StringNullableFilter<"Proof"> | string | null
   summary?: Prisma.StringNullableFilter<"Proof"> | string | null
+  chainTxHash?: Prisma.StringNullableFilter<"Proof"> | string | null
+  chainStatus?: Prisma.StringNullableFilter<"Proof"> | string | null
+  network?: Prisma.StringNullableFilter<"Proof"> | string | null
+  anchoredAt?: Prisma.DateTimeNullableFilter<"Proof"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Proof"> | Date | string
   swap?: Prisma.XOR<Prisma.SwapScalarRelationFilter, Prisma.SwapWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -258,6 +298,10 @@ export type ProofOrderByWithAggregationInput = {
   adaTxHash?: Prisma.SortOrderInput | Prisma.SortOrder
   metadataHash?: Prisma.SortOrderInput | Prisma.SortOrder
   summary?: Prisma.SortOrderInput | Prisma.SortOrder
+  chainTxHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  chainStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  network?: Prisma.SortOrderInput | Prisma.SortOrder
+  anchoredAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.ProofCountOrderByAggregateInput
   _max?: Prisma.ProofMaxOrderByAggregateInput
@@ -276,6 +320,10 @@ export type ProofScalarWhereWithAggregatesInput = {
   adaTxHash?: Prisma.StringNullableWithAggregatesFilter<"Proof"> | string | null
   metadataHash?: Prisma.StringNullableWithAggregatesFilter<"Proof"> | string | null
   summary?: Prisma.StringNullableWithAggregatesFilter<"Proof"> | string | null
+  chainTxHash?: Prisma.StringNullableWithAggregatesFilter<"Proof"> | string | null
+  chainStatus?: Prisma.StringNullableWithAggregatesFilter<"Proof"> | string | null
+  network?: Prisma.StringNullableWithAggregatesFilter<"Proof"> | string | null
+  anchoredAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Proof"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Proof"> | Date | string
 }
 
@@ -286,6 +334,10 @@ export type ProofCreateInput = {
   adaTxHash?: string | null
   metadataHash?: string | null
   summary?: string | null
+  chainTxHash?: string | null
+  chainStatus?: string | null
+  network?: string | null
+  anchoredAt?: Date | string | null
   createdAt?: Date | string
   swap: Prisma.SwapCreateNestedOneWithoutProofInput
   user: Prisma.UserCreateNestedOneWithoutProofsInput
@@ -300,6 +352,10 @@ export type ProofUncheckedCreateInput = {
   adaTxHash?: string | null
   metadataHash?: string | null
   summary?: string | null
+  chainTxHash?: string | null
+  chainStatus?: string | null
+  network?: string | null
+  anchoredAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -310,6 +366,10 @@ export type ProofUpdateInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chainTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chainStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  network?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anchoredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   swap?: Prisma.SwapUpdateOneRequiredWithoutProofNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutProofsNestedInput
@@ -324,6 +384,10 @@ export type ProofUncheckedUpdateInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chainTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chainStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  network?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anchoredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -336,6 +400,10 @@ export type ProofCreateManyInput = {
   adaTxHash?: string | null
   metadataHash?: string | null
   summary?: string | null
+  chainTxHash?: string | null
+  chainStatus?: string | null
+  network?: string | null
+  anchoredAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -346,6 +414,10 @@ export type ProofUpdateManyMutationInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chainTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chainStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  network?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anchoredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -358,6 +430,10 @@ export type ProofUncheckedUpdateManyInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chainTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chainStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  network?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anchoredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -385,6 +461,10 @@ export type ProofCountOrderByAggregateInput = {
   adaTxHash?: Prisma.SortOrder
   metadataHash?: Prisma.SortOrder
   summary?: Prisma.SortOrder
+  chainTxHash?: Prisma.SortOrder
+  chainStatus?: Prisma.SortOrder
+  network?: Prisma.SortOrder
+  anchoredAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -397,6 +477,10 @@ export type ProofMaxOrderByAggregateInput = {
   adaTxHash?: Prisma.SortOrder
   metadataHash?: Prisma.SortOrder
   summary?: Prisma.SortOrder
+  chainTxHash?: Prisma.SortOrder
+  chainStatus?: Prisma.SortOrder
+  network?: Prisma.SortOrder
+  anchoredAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -409,6 +493,10 @@ export type ProofMinOrderByAggregateInput = {
   adaTxHash?: Prisma.SortOrder
   metadataHash?: Prisma.SortOrder
   summary?: Prisma.SortOrder
+  chainTxHash?: Prisma.SortOrder
+  chainStatus?: Prisma.SortOrder
+  network?: Prisma.SortOrder
+  anchoredAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -493,6 +581,10 @@ export type ProofCreateWithoutUserInput = {
   adaTxHash?: string | null
   metadataHash?: string | null
   summary?: string | null
+  chainTxHash?: string | null
+  chainStatus?: string | null
+  network?: string | null
+  anchoredAt?: Date | string | null
   createdAt?: Date | string
   swap: Prisma.SwapCreateNestedOneWithoutProofInput
 }
@@ -505,6 +597,10 @@ export type ProofUncheckedCreateWithoutUserInput = {
   adaTxHash?: string | null
   metadataHash?: string | null
   summary?: string | null
+  chainTxHash?: string | null
+  chainStatus?: string | null
+  network?: string | null
+  anchoredAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -546,6 +642,10 @@ export type ProofScalarWhereInput = {
   adaTxHash?: Prisma.StringNullableFilter<"Proof"> | string | null
   metadataHash?: Prisma.StringNullableFilter<"Proof"> | string | null
   summary?: Prisma.StringNullableFilter<"Proof"> | string | null
+  chainTxHash?: Prisma.StringNullableFilter<"Proof"> | string | null
+  chainStatus?: Prisma.StringNullableFilter<"Proof"> | string | null
+  network?: Prisma.StringNullableFilter<"Proof"> | string | null
+  anchoredAt?: Prisma.DateTimeNullableFilter<"Proof"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Proof"> | Date | string
 }
 
@@ -556,6 +656,10 @@ export type ProofCreateWithoutSwapInput = {
   adaTxHash?: string | null
   metadataHash?: string | null
   summary?: string | null
+  chainTxHash?: string | null
+  chainStatus?: string | null
+  network?: string | null
+  anchoredAt?: Date | string | null
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProofsInput
 }
@@ -568,6 +672,10 @@ export type ProofUncheckedCreateWithoutSwapInput = {
   adaTxHash?: string | null
   metadataHash?: string | null
   summary?: string | null
+  chainTxHash?: string | null
+  chainStatus?: string | null
+  network?: string | null
+  anchoredAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -594,6 +702,10 @@ export type ProofUpdateWithoutSwapInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chainTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chainStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  network?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anchoredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProofsNestedInput
 }
@@ -606,6 +718,10 @@ export type ProofUncheckedUpdateWithoutSwapInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chainTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chainStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  network?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anchoredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -617,6 +733,10 @@ export type ProofCreateManyUserInput = {
   adaTxHash?: string | null
   metadataHash?: string | null
   summary?: string | null
+  chainTxHash?: string | null
+  chainStatus?: string | null
+  network?: string | null
+  anchoredAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -627,6 +747,10 @@ export type ProofUpdateWithoutUserInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chainTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chainStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  network?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anchoredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   swap?: Prisma.SwapUpdateOneRequiredWithoutProofNestedInput
 }
@@ -639,6 +763,10 @@ export type ProofUncheckedUpdateWithoutUserInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chainTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chainStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  network?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anchoredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -650,6 +778,10 @@ export type ProofUncheckedUpdateManyWithoutUserInput = {
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chainTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  chainStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  network?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anchoredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -664,6 +796,10 @@ export type ProofSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   adaTxHash?: boolean
   metadataHash?: boolean
   summary?: boolean
+  chainTxHash?: boolean
+  chainStatus?: boolean
+  network?: boolean
+  anchoredAt?: boolean
   createdAt?: boolean
   swap?: boolean | Prisma.SwapDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -678,6 +814,10 @@ export type ProofSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   adaTxHash?: boolean
   metadataHash?: boolean
   summary?: boolean
+  chainTxHash?: boolean
+  chainStatus?: boolean
+  network?: boolean
+  anchoredAt?: boolean
   createdAt?: boolean
   swap?: boolean | Prisma.SwapDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -692,6 +832,10 @@ export type ProofSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   adaTxHash?: boolean
   metadataHash?: boolean
   summary?: boolean
+  chainTxHash?: boolean
+  chainStatus?: boolean
+  network?: boolean
+  anchoredAt?: boolean
   createdAt?: boolean
   swap?: boolean | Prisma.SwapDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -706,10 +850,14 @@ export type ProofSelectScalar = {
   adaTxHash?: boolean
   metadataHash?: boolean
   summary?: boolean
+  chainTxHash?: boolean
+  chainStatus?: boolean
+  network?: boolean
+  anchoredAt?: boolean
   createdAt?: boolean
 }
 
-export type ProofOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "swapId" | "userId" | "teachSkill" | "learnSkill" | "adaTxHash" | "metadataHash" | "summary" | "createdAt", ExtArgs["result"]["proof"]>
+export type ProofOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "swapId" | "userId" | "teachSkill" | "learnSkill" | "adaTxHash" | "metadataHash" | "summary" | "chainTxHash" | "chainStatus" | "network" | "anchoredAt" | "createdAt", ExtArgs["result"]["proof"]>
 export type ProofInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   swap?: boolean | Prisma.SwapDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -738,6 +886,10 @@ export type $ProofPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     adaTxHash: string | null
     metadataHash: string | null
     summary: string | null
+    chainTxHash: string | null
+    chainStatus: string | null
+    network: string | null
+    anchoredAt: Date | null
     createdAt: Date
   }, ExtArgs["result"]["proof"]>
   composites: {}
@@ -1172,6 +1324,10 @@ export interface ProofFieldRefs {
   readonly adaTxHash: Prisma.FieldRef<"Proof", 'String'>
   readonly metadataHash: Prisma.FieldRef<"Proof", 'String'>
   readonly summary: Prisma.FieldRef<"Proof", 'String'>
+  readonly chainTxHash: Prisma.FieldRef<"Proof", 'String'>
+  readonly chainStatus: Prisma.FieldRef<"Proof", 'String'>
+  readonly network: Prisma.FieldRef<"Proof", 'String'>
+  readonly anchoredAt: Prisma.FieldRef<"Proof", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Proof", 'DateTime'>
 }
     

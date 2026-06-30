@@ -1,113 +1,142 @@
 "use client";
 
 import Logo from "@/components/elements/Logo";
-import { Avatar, Button, Chip } from "@heroui/react";
-import { CARDANO_NETWORK_LABEL, IS_MAINNET } from "@/lib/cardano";
-import {
-  IconBell,
-  IconCompass,
-  IconLayoutDashboard,
-  IconMessageCircle,
-  IconSearch,
-  IconSettings,
-  IconSwitchHorizontal,
-  IconUser,
-} from "@tabler/icons-react";
+import AppSidebar from "@/components/layouts/AppSidebar";
+import { BOTTOM_NAV, isActivePath } from "@/components/layouts/nav";
+import { Avatar, toast } from "@heroui/react";
+import { subscribe, userChannel } from "@/lib/realtime";
+import { IconBell } from "@tabler/icons-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 
 type Props = {
-  user: { name: string; avatarUrl?: string | null };
+  user: { id: string; name: string; avatarUrl?: string | null };
   children: React.ReactNode;
 };
 
-const NAV_ITEMS = [
-  { label: "Dashboard", icon: IconLayoutDashboard, href: "/dashboard" },
-  { label: "Discover", icon: IconCompass, href: "/users" },
-  { label: "Swaps", icon: IconSwitchHorizontal, href: "/swaps" },
-  { label: "Messages", icon: IconMessageCircle, href: "/messages" },
-  { label: "Notifications", icon: IconBell, href: "/notifications" },
-  { label: "Profile", icon: IconUser, href: "/profile" }, // TODO: profile page
-  { label: "Settings", icon: IconSettings, href: "#" }, // TODO: settings page not built yet
-];
-
 function greeting(name: string): string {
   const h = new Date().getHours();
-  const salutation = h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
+  const salutation =
+    h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
   return `${salutation}, ${name.split(" ")[0]}`;
 }
 
 export default function AppShell({ user, children }: Props) {
   const pathname = usePathname();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [msgUnread, setMsgUnread] = useState(0);
+  const [loggingOut, setLoggingOut] = useState(false);
 
+  // Read in callbacks without making them effect deps.
+  const pathnameRef = useRef(pathname);
+  pathnameRef.current = pathname;
+
+  // Real-time notification + message badges and toasts via the user's private
+  // channel (Pusher, falling back to Ably). No polling.
   useEffect(() => {
-    fetch("/api/notifications")
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
+    let cancelled = false;
+
+    async function refreshMsg() {
+      try {
+        const res = await fetch("/api/messages/unread-count");
+        const data = await res.json();
+        if (!cancelled && typeof data?.count === "number") {
+          setMsgUnread(data.count);
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+
+    async function refreshNotif() {
+      try {
+        const res = await fetch("/api/notifications");
+        const data = await res.json();
+        if (!cancelled && Array.isArray(data)) {
           setUnreadCount(data.filter((n: { read: boolean }) => !n.read).length);
         }
-      })
-      .catch(() => {});
-  }, []);
+      } catch {
+        /* ignore */
+      }
+    }
+
+    refreshMsg();
+    refreshNotif();
+
+    const channel = userChannel(user.id);
+
+    const offNotif = subscribe(channel, "notification:new", (payload) => {
+      refreshNotif();
+      const p = payload as { message?: string };
+      if (p?.message) toast(p.message);
+      window.dispatchEvent(new Event("rt:notification"));
+    });
+
+    const offMsg = subscribe(channel, "message:notify", (payload) => {
+      refreshMsg();
+      const p = payload as { senderName?: string };
+      if (!pathnameRef.current.startsWith("/messages")) {
+        toast(`New message from ${p?.senderName ?? "someone"}`);
+      }
+    });
+
+    const onMsgRead = () => refreshMsg();
+    const onNotifRead = () => refreshNotif();
+    window.addEventListener("messages:read", onMsgRead);
+    window.addEventListener("notifications:read", onNotifRead);
+
+    return () => {
+      cancelled = true;
+      offNotif();
+      offMsg();
+      window.removeEventListener("messages:read", onMsgRead);
+      window.removeEventListener("notifications:read", onNotifRead);
+    };
+  }, [user.id]);
+
+  async function handleLogout() {
+    setLoggingOut(true);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {
+      // Even if the request fails, send the user to login; the cookie is
+      // HttpOnly so we rely on the server clearing it.
+    }
+    window.location.href = "/login";
+  }
 
   const [salutation, firstName] = greeting(user.name).split(", ");
 
   return (
-    <div className="flex min-h-dvh bg-background">
-      {/* ── Sidebar ─────────────────────────────────────────────────── */}
-      <aside className="hidden md:flex flex-col w-56 shrink-0 border-r border-border bg-background sticky top-0 h-dvh">
-        <div className="flex flex-col gap-1 p-4 h-full">
-          {/* Logo */}
-          <div className="mb-4">
-            <Logo />
-            <p className="text-xs text-muted ml-2 -mt-1">Cardano Network</p>
-            {!IS_MAINNET && (
-              <Chip size="sm" color="warning" className="ml-2 mt-1.5">
-                {CARDANO_NETWORK_LABEL}
-              </Chip>
+    <div className="flex h-dvh overflow-hidden bg-background">
+      {/*  Sidebar  */}
+      <AppSidebar
+        user={user}
+        msgUnread={msgUnread}
+        loggingOut={loggingOut}
+        onLogout={handleLogout}
+      />
+
+      {/*  Mobile top header  */}
+      <header className="md:hidden fixed top-0 left-0 right-0 z-20 border-b border-border bg-background px-4 h-16 flex items-center justify-between">
+        <Logo className="[&_h1]:hidden" />
+        <div className="flex items-center gap-2">
+          <Link
+            href="/notifications"
+            aria-label={
+              unreadCount > 0
+                ? `Notifications, ${unreadCount} unread`
+                : "Notifications"
+            }
+            className="relative block p-2 rounded-lg hover:bg-surface transition-colors text-muted hover:text-foreground"
+          >
+            <IconBell size={20} />
+            {unreadCount > 0 && (
+              <span className="absolute top-1 right-1 size-2 rounded-full bg-danger" />
             )}
-          </div>
-
-          {/* CTA */}
-          <Link href="/users" className="mb-3">
-            <Button
-              className="w-full font-semibold "
-              size="sm"
-            >
-              Start New Swap
-            </Button>
           </Link>
-
-          {/* Nav */}
-          <nav className="flex flex-col gap-0.5 flex-1">
-            {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
-              const active =
-                href !== "#" &&
-                (href === "/dashboard"
-                  ? pathname === "/dashboard"
-                  : pathname.startsWith(href));
-              return (
-                <Link
-                  key={label}
-                  href={href}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-                    active
-                      ? "bg-accent/10 text-accent font-medium"
-                      : "text-muted hover:text-foreground hover:bg-surface"
-                  }`}
-                >
-                  <Icon size={18} stroke={1.75} />
-                  {label}
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Bottom user */}
-          <div className="pt-3 border-t border-border flex items-center gap-2">
+          <Link href="/profile" aria-label="Profile">
             <Avatar size="sm">
               {user.avatarUrl && (
                 <Avatar.Image src={user.avatarUrl} alt={user.name} />
@@ -116,38 +145,14 @@ export default function AppShell({ user, children }: Props) {
                 {user.name.slice(0, 2).toUpperCase()}
               </Avatar.Fallback>
             </Avatar>
-            <span className="text-sm text-foreground font-medium truncate">
-              {user.name.split(" ")[0]}
-            </span>
-          </div>
+          </Link>
         </div>
-      </aside>
+      </header>
 
-      {/* ── Mobile top bar ──────────────────────────────────────────── */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-20 border-b border-border bg-background px-4 h-16 flex items-center justify-between">
-        <Logo />
-        <nav className="flex items-center gap-3 text-sm text-muted">
-          <Link href="/users">Discover</Link>
-          <Link href="/swaps">Swaps</Link>
-        </nav>
-      </div>
-
-      {/* ── Main column ─────────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col md:pt-0 pt-16 min-w-0">
-        {/* Header */}
-        <header className="sticky top-0 z-10 bg-background border-b border-border px-6 py-3 flex items-center gap-4">
-          <div className="flex-1 max-w-sm relative">
-            <IconSearch
-              size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none"
-            />
-            <input
-              type="text"
-              placeholder="Search skills, members, tags..."
-              className="w-full bg-surface border border-border rounded-lg pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted focus:outline-none focus:border-success/50 transition-colors"
-            />
-          </div>
-
+      {/*  Main column  */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden md:pt-0 pt-16 md:pb-0 pb-16">
+        {/* Header (desktop only) */}
+        <header className="hidden md:flex sticky top-0 z-10 bg-background border-b border-border px-6 py-3 items-center gap-4">
           <div className="flex items-center gap-3 ml-auto">
             <p className="text-sm text-muted hidden sm:block">
               {salutation},{" "}
@@ -182,8 +187,36 @@ export default function AppShell({ user, children }: Props) {
           </div>
         </header>
 
-        {children}
+        {/* Scroll region: normal pages scroll here; the chat page fills it
+            exactly and manages its own internal scrolling. */}
+        <div className="flex-1 min-h-0 flex flex-col overflow-y-auto">
+          {children}
+        </div>
       </div>
+
+      {/*  Mobile bottom navigation (icon-only)  */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-20 border-t border-border bg-background h-16 flex items-center justify-around px-2">
+        {BOTTOM_NAV.map(({ label, icon: Icon, href }) => {
+          const active = isActivePath(pathname, href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              aria-label={label}
+              className={`relative flex items-center justify-center size-11 rounded-xl transition-colors ${
+                active ? "text-accent" : "text-muted hover:text-foreground"
+              }`}
+            >
+              <Icon size={22} stroke={1.75} />
+              {href === "/messages" && msgUnread > 0 && (
+                <span className="absolute top-1 right-1 inline-flex items-center justify-center min-w-4 h-4 px-1 rounded-full bg-accent text-accent-foreground text-[9px] font-bold">
+                  {msgUnread > 9 ? "9+" : msgUnread}
+                </span>
+              )}
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }

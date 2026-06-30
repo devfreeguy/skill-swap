@@ -17,6 +17,8 @@ export type ExchangeSwap = {
   id: string;
   status: string;
   adaTxHash?: string | null;
+  initiatorSkill?: string | null;
+  receiverSkill?: string | null;
   proof?: { id: string; adaTxHash: string } | null;
   initiatorId: string;
   receiverId: string;
@@ -26,6 +28,7 @@ export type ExchangeSwap = {
     avatarUrl?: string | null;
     teachSkill?: string | null;
     learnSkill?: string | null;
+    publicKey?: string | null;
   };
   receiver: {
     id: string;
@@ -33,6 +36,7 @@ export type ExchangeSwap = {
     avatarUrl?: string | null;
     teachSkill?: string | null;
     learnSkill?: string | null;
+    publicKey?: string | null;
   };
 };
 
@@ -81,8 +85,8 @@ export default function ExchangeContextPanel({
   const me = isInitiator ? swap.initiator : swap.receiver;
   const other = isInitiator ? swap.receiver : swap.initiator;
 
-  const myTeach = parseSkills(me.teachSkill)[0] ?? "—";
-  const theirTeach = parseSkills(other.teachSkill)[0] ?? "—";
+  const myTeach = parseSkills(me.teachSkill)[0] ?? "-";
+  const theirTeach = parseSkills(other.teachSkill)[0] ?? "-";
 
   const isCompleted = swap.status === "COMPLETED";
   const hasProof = isCompleted && !!swap.proof;

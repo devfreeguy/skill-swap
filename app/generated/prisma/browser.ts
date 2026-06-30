@@ -47,3 +47,8 @@ export type Message = Prisma.MessageModel
  * 
  */
 export type Notification = Prisma.NotificationModel
+/**
+ * Model WalletNonce
+ * 
+ */
+export type WalletNonce = Prisma.WalletNonceModel

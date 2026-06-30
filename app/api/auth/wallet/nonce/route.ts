@@ -4,6 +4,6 @@ import { storeNonce } from "@/lib/wallet-nonce-store";
 
 export async function GET() {
   const nonce = randomBytes(32).toString("hex");
-  storeNonce(nonce);
+  await storeNonce(nonce);
   return NextResponse.json({ nonce });
 }
