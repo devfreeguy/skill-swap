@@ -60,6 +60,21 @@ model Swap {
 
   adaTxHash String?
 
+  // Platform sustainability fee. The initiator pays a small fee (default 2 ADA)
+  // when requesting a swap; it is refunded ONLY if the receiver declines.
+  //   feeTxHash     — the initiator's on-chain fee payment tx
+  //   feeLovelace   — amount paid, in lovelace (audit trail; 1 ADA = 1_000_000)
+  //   refundAddress — the initiator's payment address to refund to on decline
+  //   refundTxHash  — the platform's refund tx (set once refunded)
+  //   paymentStatus — CONFIRMED (verified from the signed tx at request time)
+  //                   → KEPT (accepted/cancelled) | REFUNDED (declined)
+  //                   REFUND_PENDING (refund deferred/retrying) | FAILED
+  feeTxHash     String?
+  feeLovelace   Int?
+  refundAddress String?
+  refundTxHash  String?
+  paymentStatus String?
+
   initiatorDone      Boolean @default(false)
   receiverDone       Boolean @default(false)
   initiatorDelivered Boolean @default(false)

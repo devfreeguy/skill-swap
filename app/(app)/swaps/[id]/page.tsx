@@ -89,6 +89,10 @@ type Swap = {
   id: string;
   status: string;
   adaTxHash?: string | null;
+  feeTxHash?: string | null;
+  feeLovelace?: number | null;
+  paymentStatus?: string | null;
+  refundTxHash?: string | null;
   initiatorSkill?: string | null;
   receiverSkill?: string | null;
   createdAt: string;
@@ -448,6 +452,31 @@ export default function SwapDetailPage() {
   const myOfferedSkill = isInitiator ? initiatorTeach : receiverTeach;
   const partnerOfferedSkill = isInitiator ? receiverTeach : initiatorTeach;
 
+  // Swap-fee status chip (only when a fee was charged on this swap).
+  const feeStatus: {
+    label: string;
+    color: "warning" | "success" | "accent" | "danger" | "default";
+    txHash?: string | null;
+  } | null = (() => {
+    if (!swap.paymentStatus) return null;
+    const ada = ((swap.feeLovelace ?? 0) / 1_000_000).toString();
+    switch (swap.paymentStatus) {
+      case "PENDING":
+        return { label: `Fee ${ada} ADA · confirming`, color: "warning", txHash: swap.feeTxHash };
+      case "CONFIRMED":
+      case "KEPT":
+        return { label: `Fee ${ada} ADA paid`, color: "accent", txHash: swap.feeTxHash };
+      case "REFUND_PENDING":
+        return { label: `Fee refund pending`, color: "warning", txHash: swap.feeTxHash };
+      case "REFUNDED":
+        return { label: `Fee ${ada} ADA refunded`, color: "success", txHash: swap.refundTxHash };
+      case "FAILED":
+        return { label: `Fee payment failed`, color: "danger", txHash: swap.feeTxHash };
+      default:
+        return null;
+    }
+  })();
+
   // Contextual "what to do now" guidance for the current state + role.
   let guideMessage: string | null = null;
   if (isPending && isReceiver) {
@@ -574,6 +603,18 @@ export default function SwapDetailPage() {
               {partnerOfferedSkill}
             </span>
           </p>
+          {feeStatus && (
+            <div className="mt-2 flex items-center gap-2 text-xs">
+              <Chip size="sm" color={feeStatus.color}>
+                {feeStatus.label}
+              </Chip>
+              {feeStatus.txHash && (
+                <span className="text-muted font-mono">
+                  {feeStatus.txHash.slice(0, 8)}…{feeStatus.txHash.slice(-4)}
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Contextual guidance */}

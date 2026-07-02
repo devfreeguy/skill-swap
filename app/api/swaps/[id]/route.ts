@@ -3,9 +3,80 @@ import crypto from "crypto";
 import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/api";
 import { emitToUser, emitToSwap } from "@/lib/socket";
+import { verifyPaymentTx } from "@/lib/cardano/providers";
+import { refundFee } from "@/lib/cardano/refund";
+import {
+  PAYMENTS_ENABLED,
+  PLATFORM_WALLET_ADDRESS,
+  SWAP_FEE_LOVELACE,
+} from "@/lib/cardano/fee";
 
-// crypto (proof hashing) needs the Node runtime.
+// crypto (proof hashing) + on-chain fee settlement need the Node runtime.
 export const runtime = "nodejs";
+
+type FeeSwap = {
+  id: string;
+  status: string;
+  feeTxHash: string | null;
+  feeLovelace: number | null;
+  refundAddress: string | null;
+  paymentStatus: string | null;
+};
+
+/**
+ * Refund the fee to the initiator after a decline. The fee was confirmed
+ * optimistically at request time (decoded from the signed tx), so before moving
+ * any money we RE-VERIFY on-chain that the fee tx actually landed — this is the
+ * safety net against the rare dropped/double-spent tx. Best-effort, idempotent,
+ * never throws:
+ *   - fee already refunded            → no-op
+ *   - fee not on-chain yet            → park at REFUND_PENDING (GET retries)
+ *   - fee on-chain but too small/gone → mark FAILED, refund nothing
+ *   - fee confirmed                   → submit the refund from the platform wallet
+ */
+async function issueDeclineRefund(swap: FeeSwap): Promise<void> {
+  if (!PAYMENTS_ENABLED || !swap.feeTxHash || !swap.refundAddress) return;
+  if (swap.paymentStatus === "REFUNDED") return;
+
+  const check = await verifyPaymentTx(
+    swap.feeTxHash,
+    PLATFORM_WALLET_ADDRESS,
+    BigInt(swap.feeLovelace ?? SWAP_FEE_LOVELACE)
+  );
+  if (check === "PENDING") {
+    // Fee not on-chain yet — defer; a later GET on the declined swap retries.
+    await prisma.swap.update({
+      where: { id: swap.id },
+      data: { paymentStatus: "REFUND_PENDING" },
+    });
+    return;
+  }
+  if (check === "INSUFFICIENT") {
+    // The fee never actually landed (dropped / double-spent) — refund nothing.
+    await prisma.swap.update({
+      where: { id: swap.id },
+      data: { paymentStatus: "FAILED" },
+    });
+    return;
+  }
+
+  try {
+    const refundTxHash = await refundFee({
+      toAddress: swap.refundAddress,
+      lovelace: swap.feeLovelace ?? SWAP_FEE_LOVELACE,
+    });
+    await prisma.swap.update({
+      where: { id: swap.id },
+      data: { paymentStatus: "REFUNDED", refundTxHash },
+    });
+  } catch (e) {
+    console.error("Swap fee refund failed:", swap.id, e);
+    await prisma.swap.update({
+      where: { id: swap.id },
+      data: { paymentStatus: "REFUND_PENDING" },
+    });
+  }
+}
 
 export async function GET(
   request: NextRequest,
@@ -56,6 +127,25 @@ export async function GET(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  // Retry a refund that was deferred because the fee hadn't confirmed on-chain
+  // at decline time, so the UI reflects the eventual REFUNDED / FAILED outcome.
+  if (
+    PAYMENTS_ENABLED &&
+    swap.feeTxHash &&
+    swap.status === "DECLINED" &&
+    swap.paymentStatus === "REFUND_PENDING"
+  ) {
+    await issueDeclineRefund(swap);
+    const fresh = await prisma.swap.findUnique({
+      where: { id },
+      select: { paymentStatus: true, refundTxHash: true },
+    });
+    if (fresh) {
+      swap.paymentStatus = fresh.paymentStatus;
+      swap.refundTxHash = fresh.refundTxHash;
+    }
+  }
+
   return NextResponse.json(swap);
 }
 
@@ -98,9 +188,28 @@ export async function PATCH(
         { status: 400 }
       );
     }
+
+    // The fee was verified from the signed tx at request time, so acceptance is
+    // instant — just a defensive check that it's in the expected state.
+    if (
+      PAYMENTS_ENABLED &&
+      swap.feeTxHash &&
+      swap.paymentStatus !== "CONFIRMED"
+    ) {
+      return NextResponse.json(
+        { error: "The swap-fee payment couldn't be verified." },
+        { status: 400 }
+      );
+    }
+
     const updated = await prisma.swap.update({
       where: { id },
-      data: { status: "ACTIVE" },
+      data: {
+        status: "ACTIVE",
+        ...(PAYMENTS_ENABLED && swap.feeTxHash
+          ? { paymentStatus: "KEPT" }
+          : {}),
+      },
     });
     await prisma.notification.create({
       data: {
@@ -144,6 +253,10 @@ export async function PATCH(
       where: { id },
       data: { status: "DECLINED" },
     });
+
+    // Declining is the only path that refunds the initiator's fee.
+    await issueDeclineRefund(swap);
+
     await prisma.notification.create({
       data: {
         userId: swap.initiatorId,
@@ -327,7 +440,11 @@ export async function PATCH(
 
     const updated = await prisma.swap.update({
       where: { id },
-      data: { status: "CANCELLED" },
+      data: {
+        status: "CANCELLED",
+        // Cancelling is not a decline — the fee is not refunded.
+        ...(PAYMENTS_ENABLED && swap.feeTxHash ? { paymentStatus: "KEPT" } : {}),
+      },
     });
 
     const otherUserId = isInitiator ? swap.receiverId : swap.initiatorId;

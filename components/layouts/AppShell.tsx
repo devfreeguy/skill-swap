@@ -3,17 +3,62 @@
 import Logo from "@/components/elements/Logo";
 import AppSidebar from "@/components/layouts/AppSidebar";
 import { BOTTOM_NAV, isActivePath } from "@/components/layouts/nav";
-import { Avatar, toast } from "@heroui/react";
+import { AlertDialog, Avatar, Button, Dropdown, Label, toast } from "@heroui/react";
 import { subscribe, userChannel } from "@/lib/realtime";
-import { IconBell } from "@tabler/icons-react";
+import { IconBell, IconLogout, IconUser } from "@tabler/icons-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+
+type ShellUser = { id: string; name: string; avatarUrl?: string | null };
 
 type Props = {
-  user: { id: string; name: string; avatarUrl?: string | null };
+  user: ShellUser;
   children: React.ReactNode;
 };
+
+/** Header avatar → dropdown with Profile + Logout. Logout opens a confirmation. */
+function AccountMenu({
+  user,
+  onLogout,
+}: {
+  user: ShellUser;
+  onLogout: () => void;
+}) {
+  const router = useRouter();
+  return (
+    <Dropdown>
+      <Dropdown.Trigger
+        aria-label="Account menu"
+        className="rounded-full transition-opacity hover:opacity-80"
+      >
+        <Avatar size="sm">
+          {user.avatarUrl && <Avatar.Image src={user.avatarUrl} alt={user.name} />}
+          <Avatar.Fallback className="text-xs font-semibold">
+            {user.name.slice(0, 2).toUpperCase()}
+          </Avatar.Fallback>
+        </Avatar>
+      </Dropdown.Trigger>
+      <Dropdown.Popover className="min-w-40">
+        <Dropdown.Menu
+          onAction={(key) => {
+            if (key === "profile") router.push("/profile");
+            else if (key === "logout") onLogout();
+          }}
+        >
+          <Dropdown.Item id="profile" textValue="Profile">
+            <IconUser className="size-4 shrink-0 text-muted" />
+            <Label>Profile</Label>
+          </Dropdown.Item>
+          <Dropdown.Item id="logout" textValue="Logout" variant="danger">
+            <IconLogout className="size-4 shrink-0 text-danger" />
+            <Label>Log out</Label>
+          </Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown.Popover>
+    </Dropdown>
+  );
+}
 
 function greeting(name: string): string {
   const h = new Date().getHours();
@@ -27,6 +72,7 @@ export default function AppShell({ user, children }: Props) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [msgUnread, setMsgUnread] = useState(0);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [logoutOpen, setLogoutOpen] = useState(false);
 
   // Read in callbacks without making them effect deps.
   const pathnameRef = useRef(pathname);
@@ -115,7 +161,7 @@ export default function AppShell({ user, children }: Props) {
         user={user}
         msgUnread={msgUnread}
         loggingOut={loggingOut}
-        onLogout={handleLogout}
+        onLogout={() => setLogoutOpen(true)}
       />
 
       {/*  Mobile top header  */}
@@ -136,16 +182,7 @@ export default function AppShell({ user, children }: Props) {
               <span className="absolute top-1 right-1 size-2 rounded-full bg-danger" />
             )}
           </Link>
-          <Link href="/profile" aria-label="Profile">
-            <Avatar size="sm">
-              {user.avatarUrl && (
-                <Avatar.Image src={user.avatarUrl} alt={user.name} />
-              )}
-              <Avatar.Fallback className="text-xs font-semibold">
-                {user.name.slice(0, 2).toUpperCase()}
-              </Avatar.Fallback>
-            </Avatar>
-          </Link>
+          <AccountMenu user={user} onLogout={() => setLogoutOpen(true)} />
         </div>
       </header>
 
@@ -176,14 +213,7 @@ export default function AppShell({ user, children }: Props) {
               </Link>
             </div>
 
-            <Avatar size="sm">
-              {user.avatarUrl && (
-                <Avatar.Image src={user.avatarUrl} alt={user.name} />
-              )}
-              <Avatar.Fallback className="text-xs font-semibold">
-                {user.name.slice(0, 2).toUpperCase()}
-              </Avatar.Fallback>
-            </Avatar>
+            <AccountMenu user={user} onLogout={() => setLogoutOpen(true)} />
           </div>
         </header>
 
@@ -217,6 +247,38 @@ export default function AppShell({ user, children }: Props) {
           );
         })}
       </nav>
+
+      {/* Logout confirmation — shared by the header menu and the sidebar */}
+      <AlertDialog.Backdrop isOpen={logoutOpen} onOpenChange={setLogoutOpen}>
+        <AlertDialog.Container>
+          <AlertDialog.Dialog className="sm:max-w-[400px]">
+            <AlertDialog.CloseTrigger />
+            <AlertDialog.Header>
+              <AlertDialog.Icon status="warning" />
+              <AlertDialog.Heading>Log out?</AlertDialog.Heading>
+            </AlertDialog.Header>
+            <AlertDialog.Body>
+              <p>
+                You&apos;ll be signed out and need to reconnect your wallet to
+                sign back in.
+              </p>
+            </AlertDialog.Body>
+            <AlertDialog.Footer>
+              <Button slot="close" variant="tertiary">
+                Cancel
+              </Button>
+              <Button
+                variant="danger"
+                onPress={handleLogout}
+                isPending={loggingOut}
+                isDisabled={loggingOut}
+              >
+                Log out
+              </Button>
+            </AlertDialog.Footer>
+          </AlertDialog.Dialog>
+        </AlertDialog.Container>
+      </AlertDialog.Backdrop>
     </div>
   );
 }

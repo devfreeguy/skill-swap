@@ -28,12 +28,23 @@ Still, prefer **targeted, additive migrations** over a blanket `npx prisma db pu
 
 Shape worth remembering:
 - **`User`** — `teachSkill: String?` / `learnSkill: String?` are plain scalar strings (see "Skills are stored as JSON-stringified arrays" below), plus `walletAddress`, `twitterId`, `publicKey`.
-- **`Swap`** — booleans `initiatorDone`, `receiverDone`, `initiatorDelivered`, `receiverDelivered`; `initiatorLastReadAt` / `receiverLastReadAt` (drive unread counts); `initiatorSkill` / `receiverSkill` (skills chosen for this swap).
+- **`Swap`** — booleans `initiatorDone`, `receiverDone`, `initiatorDelivered`, `receiverDelivered`; `initiatorLastReadAt` / `receiverLastReadAt` (drive unread counts); `initiatorSkill` / `receiverSkill` (skills chosen for this swap); swap-fee fields `feeTxHash`, `feeLovelace`, `refundAddress`, `refundTxHash`, `paymentStatus` (see "Swap request fee" gotcha).
 - **`Proof`** — `teachSkill`, `learnSkill`, `metadataHash`, on-chain anchor fields (`chainTxHash`, `chainStatus`, `network`, `anchoredAt`).
 
 ### Skills are stored as JSON-stringified arrays
 
 The onboarding page sends `{ teachSkills: string[], learnSkills: string[] }` (arrays), which `app/api/users/profile/route.ts` serializes via `JSON.stringify()` into the single `teachSkill`/`learnSkill` string columns. When reading `user.teachSkill`, it may be a raw string like `"Python"` (legacy) or a JSON array string like `'["Python","React"]'`. **Always** normalize with `parseSkills()` (`lib/skills.ts`) before comparing — never compare the raw column. Matching (`lib/matching.ts` `scoreMatch`, used by `app/api/users/matches/route.ts`) already does this correctly and is multi-skill aware.
+
+### Swap request fee (on-chain, refund-on-decline)
+
+Requesting a swap costs a fee (default **2 ADA**, `NEXT_PUBLIC_SWAP_FEE_LOVELACE`) paid to `NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS`. **If that address env is unset, fees are fully disabled** (`PAYMENTS_ENABLED` in `lib/cardano/fee.ts`) — local dev keeps working.
+
+Flow:
+- **Request** (`POST /api/swaps`, Node runtime): the initiator's browser builds+signs the fee tx (`lib/cardano/fee-client.ts`, `BrowserWallet`) and posts `signedPaymentTx` + `refundAddress` (the wallet's change address — we refund there because the DB only stores the **stake** address, which can't receive ADA). The server **decodes the signed tx** (`signedTxPaysAtLeast` in `lib/cardano/fee-verify.ts`, Mesh's bundled CST serializer) and rejects it unless an output ≥ the fee goes to the platform address — so validation is **synchronous, no waiting for on-chain confirmation**. Only then does it submit and store `feeTxHash` + `paymentStatus="CONFIRMED"`. Payment is decoded/submitted **only after** all duplicate-swap guards pass, so money never moves for a rejected request.
+- **Accept** is instant — the fee is already `CONFIRMED` (verified from the signed tx), so it's just a synchronous state check; the receiver keeps the fee → `paymentStatus="KEPT"`. **Cancel** also keeps it (`KEPT`).
+- **Decline is the only refund path** (`issueDeclineRefund`): because the request-time confirm is optimistic, the refund path **re-verifies on-chain** (`verifyPaymentTx` in `lib/cardano/providers.ts` reads the fee tx's outputs) before paying anything out — the safety net against a dropped/double-spent fee tx. If confirmed, the platform hot wallet (`PLATFORM_WALLET_MNEMONIC` + `BLOCKFROST_API_KEY`, via `lib/cardano/refund.ts` `MeshWallet`) sends the fee back → `paymentStatus="REFUNDED"`, `refundTxHash` set. If the fee isn't on-chain yet, it parks at `REFUND_PENDING` and a later `GET` retries; if it never landed, `FAILED` (refund nothing). Refunds never throw / never block the decline.
+
+`BLOCKFROST_API_KEY` is **required** once fees are on (refunds are built/submitted through Blockfrost). Both `/api/swaps` routes run on the **Node runtime**.
 
 ### Route protection: `proxy.ts` + the `(app)` layout
 
@@ -121,7 +132,11 @@ Schema models: `User`, `Swap`, `Proof`, `Message`, `Delivery`, `Notification`, `
 | `lib/matching.ts` | `scoreMatch(me, candidate)` → `{ score, type, teachOverlap, learnOverlap }` |
 | `lib/crypto/e2e.ts` | tweetnacl E2E messaging — wallet-derived key pair, encrypt/decrypt |
 | `lib/cardano.ts` | Network resolution (`CARDANO_NETWORK`, `IS_MAINNET`, `CARDANO_LIMIT_NETWORK`). **Type-only** import of `NetworkType` — never import the wallet runtime here (it touches `window` and breaks SSR) |
-| `lib/cardano/providers.ts` | On-chain submit/confirm with Blockfrost → Koios → Maestro fallback |
+| `lib/cardano/providers.ts` | On-chain submit/confirm + `verifyPaymentTx` (fee output check) with Blockfrost → Koios → Maestro fallback |
+| `lib/cardano/fee.ts` | Swap-fee config (`SWAP_FEE_LOVELACE`, `PLATFORM_WALLET_ADDRESS`, `PAYMENTS_ENABLED`) — client-safe |
+| `lib/cardano/fee-client.ts` | Browser: `BrowserWallet` builds+signs the swap-fee tx, returns signed CBOR + refund address |
+| `lib/cardano/fee-verify.ts` | Server: `signedTxPaysAtLeast()` decodes a signed tx (Mesh CST) to verify its fee output synchronously at request time |
+| `lib/cardano/refund.ts` | Server: platform hot wallet (`MeshWallet` + Blockfrost) refunds a declined swap's fee |
 | `lib/socket.ts` | Server-side realtime emit (`emitToUser` / `emitToSwap`) |
 | `lib/realtime.ts` | Client subscribe; Pusher primary, Ably fallback |
 | `lib/realtime-channels.ts` | Shared channel-name helpers (`userChannel`, `swapChannel`) |
@@ -158,8 +173,12 @@ TWITTER_CLIENT_ID=          # X/Twitter OAuth2
 TWITTER_CLIENT_SECRET=
 
 NEXT_PUBLIC_CARDANO_NETWORK= # "mainnet" | "preprod" | "preview" (default preprod)
-BLOCKFROST_API_KEY=         # on-chain submit/verify (optional — falls back to Koios/Maestro)
+BLOCKFROST_API_KEY=         # on-chain submit/verify (optional for proofs; REQUIRED for swap-fee refunds)
 MAESTRO_API_KEY=            # optional provider fallback
+
+NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS= # swap-fee treasury address; blank ⇒ fees off
+NEXT_PUBLIC_SWAP_FEE_LOVELACE=       # fee in lovelace (default 2000000 = 2 ADA)
+PLATFORM_WALLET_MNEMONIC=            # server secret: treasury seed phrase, signs refunds
 
 PUSHER_APP_ID=              # realtime (primary)
 PUSHER_KEY=

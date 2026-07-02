@@ -1,7 +1,7 @@
 "use client";
 
 import Logo from "@/components/elements/Logo";
-import { Avatar, Button, Chip } from "@heroui/react";
+import { Avatar, Chip } from "@heroui/react";
 import { CARDANO_NETWORK_LABEL, IS_MAINNET } from "@/lib/cardano";
 import { NAV_ITEMS, isActivePath } from "@/components/layouts/nav";
 import { IconLogout } from "@tabler/icons-react";
@@ -66,18 +66,23 @@ export default function AppSidebar({
 
         {/* Bottom user */}
         <div className="pt-3 border-t border-border flex items-center gap-2">
-          <Avatar size="sm">
-            {user.avatarUrl && (
-              <Avatar.Image src={user.avatarUrl} alt={user.name} />
-            )}
-            <Avatar.Fallback className="text-xs font-semibold">
-              {user.name.slice(0, 2).toUpperCase()}
-            </Avatar.Fallback>
-          </Avatar>
-
-          <span className="text-sm text-foreground font-medium truncate flex-1">
-            {user.name.split(" ")[0]}
-          </span>
+          <Link
+            href="/profile"
+            aria-label="Profile"
+            className="flex items-center gap-2 flex-1 min-w-0 rounded-lg p-1 -m-1 hover:bg-surface transition-colors"
+          >
+            <Avatar size="sm">
+              {user.avatarUrl && (
+                <Avatar.Image src={user.avatarUrl} alt={user.name} />
+              )}
+              <Avatar.Fallback className="text-xs font-semibold">
+                {user.name.slice(0, 2).toUpperCase()}
+              </Avatar.Fallback>
+            </Avatar>
+            <span className="text-sm text-foreground font-medium truncate">
+              {user.name.split(" ")[0]}
+            </span>
+          </Link>
 
           <button
             onClick={onLogout}

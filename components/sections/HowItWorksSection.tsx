@@ -6,7 +6,7 @@ import StepCard from "@/components/elements/StepCard";
 import {
   IconUser,
   IconTargetArrow,
-  IconCurrencyBitcoin,
+  IconCoins,
   IconTransfer,
   IconCircleCheck,
   IconCertificate,
@@ -30,7 +30,7 @@ const steps = [
   },
   {
     step: "03",
-    icon: IconCurrencyBitcoin,
+    icon: IconCoins,
     title: "Request Exchange",
     description:
       "Submit an ADA-gated swap request. The small commitment filters uncommitted users. Every request that reaches you is intentional.",

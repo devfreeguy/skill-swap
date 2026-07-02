@@ -51,6 +51,8 @@ type Swap = {
   status: string;
   createdAt: string;
   adaTxHash?: string | null;
+  feeLovelace?: number | null;
+  paymentStatus?: string | null;
   initiatorSkill?: string | null;
   receiverSkill?: string | null;
   initiatorId: string;
@@ -98,6 +100,28 @@ const ACTION_LABEL: Record<string, string> = {
   DECLINED: "Details",
   CANCELLED: "Details",
 };
+
+// One-line swap-fee status, mirroring the swap detail page. Returns null when no
+// fee was charged (payments disabled, or a legacy swap).
+function feeLine(s: Swap): { label: string; className: string } | null {
+  if (!s.paymentStatus) return null;
+  const ada = ((s.feeLovelace ?? 0) / 1_000_000).toString();
+  switch (s.paymentStatus) {
+    case "PENDING":
+      return { label: `Fee ${ada} ADA confirming`, className: "text-warning" };
+    case "CONFIRMED":
+    case "KEPT":
+      return { label: `Fee ${ada} ADA paid`, className: "text-muted" };
+    case "REFUND_PENDING":
+      return { label: "Fee refund pending", className: "text-warning" };
+    case "REFUNDED":
+      return { label: `Fee ${ada} ADA refunded`, className: "text-success" };
+    case "FAILED":
+      return { label: "Fee payment failed", className: "text-danger" };
+    default:
+      return null;
+  }
+}
 
 
 // ─── Page ────────────────────────────────────────────────────────────────────
@@ -168,7 +192,12 @@ export default function DashboardPage() {
       s.status !== "DECLINED" &&
       s.status !== "CANCELLED",
   );
-  const recentHistory = swaps.filter((s) => s.status === "COMPLETED");
+  const recentHistory = swaps.filter(
+    (s) =>
+      s.status === "COMPLETED" ||
+      s.status === "DECLINED" ||
+      s.status === "CANCELLED",
+  );
 
   return (
     <main className="flex-1 px-6 py-6 flex flex-col gap-8">
@@ -339,7 +368,17 @@ export default function DashboardPage() {
                               </div>
                             </td>
                             <td className="px-4 py-3 text-muted whitespace-nowrap">
-                              <ExchangePair a={mySkill} b={theirSkill} />
+                              <div className="flex flex-col gap-0.5">
+                                <ExchangePair a={mySkill} b={theirSkill} />
+                                {(() => {
+                                  const fee = feeLine(s);
+                                  return fee ? (
+                                    <span className={`text-[11px] ${fee.className}`}>
+                                      {fee.label}
+                                    </span>
+                                  ) : null;
+                                })()}
+                              </div>
                             </td>
                             <td className="px-4 py-3 whitespace-nowrap">
                               <span className="inline-flex items-center gap-1.5">
@@ -415,6 +454,14 @@ export default function DashboardPage() {
                           <p className="text-xs text-muted truncate">
                             <ExchangePair a={mySkill} b={theirSkill} />
                           </p>
+                          {(() => {
+                            const fee = feeLine(s);
+                            return fee ? (
+                              <span className={`text-[11px] ${fee.className} truncate`}>
+                                {fee.label}
+                              </span>
+                            ) : null;
+                          })()}
                         </div>
                         <div className="flex flex-col items-end gap-1 shrink-0">
                           <span className="inline-flex items-center gap-1.5">
@@ -444,7 +491,7 @@ export default function DashboardPage() {
           </h2>
           {recentHistory.length === 0 ? (
             <Card className="bg-surface border border-border rounded-2xl p-6 text-center text-muted text-sm">
-              Completed swaps will appear here.
+              Past swaps will appear here.
             </Card>
           ) : (
             <div className="flex flex-col gap-3">
@@ -454,6 +501,13 @@ export default function DashboardPage() {
                 const myTeach = firstSkill(
                   isInit ? s.initiator.teachSkill : s.receiver.teachSkill,
                 );
+                const fee = feeLine(s);
+                const title =
+                  s.status === "COMPLETED"
+                    ? `Taught ${myTeach} to ${other.name}`
+                    : s.status === "DECLINED"
+                      ? `Swap with ${other.name} declined`
+                      : `Swap with ${other.name} cancelled`;
                 return (
                   <Card
                     key={s.id}
@@ -461,24 +515,28 @@ export default function DashboardPage() {
                   >
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm font-semibold text-foreground leading-tight">
-                        Taught {myTeach} to {other.name}
+                        {title}
                       </p>
                       <span className="text-xs text-muted shrink-0">
                         {formatMonth(s.createdAt)}
                       </span>
                     </div>
-                    {s.adaTxHash ? (
-                      <>
-                        <div className="flex items-center gap-1.5 text-xs text-success">
-                          <IconCheck size={13} /> Verified on Cardano
-                        </div>
-                        <p className="text-xs text-muted font-mono truncate">
-                          Tx: {s.adaTxHash.slice(0, 8)}...
-                          {s.adaTxHash.slice(-4)}
-                        </p>
-                      </>
-                    ) : (
-                      <p className="text-xs text-muted">No tx hash recorded</p>
+                    {s.status === "COMPLETED" &&
+                      (s.adaTxHash ? (
+                        <>
+                          <div className="flex items-center gap-1.5 text-xs text-success">
+                            <IconCheck size={13} /> Verified on Cardano
+                          </div>
+                          <p className="text-xs text-muted font-mono truncate">
+                            Tx: {s.adaTxHash.slice(0, 8)}...
+                            {s.adaTxHash.slice(-4)}
+                          </p>
+                        </>
+                      ) : (
+                        <p className="text-xs text-muted">No tx hash recorded</p>
+                      ))}
+                    {fee && (
+                      <p className={`text-xs ${fee.className}`}>{fee.label}</p>
                     )}
                   </Card>
                 );

@@ -8,7 +8,7 @@ import { fadeUp, fadeLeft, stagger } from "@/lib/animations";
 import {
   IconTargetArrow,
   IconShieldCheck,
-  IconCurrencyBitcoin,
+  IconCoins,
   IconLink,
 } from "@tabler/icons-react";
 
@@ -26,7 +26,7 @@ const features = [
       "Every completed exchange generates a verifiable record with ADA tx hash, skills exchanged, and timestamp. Your history, permanently traceable.",
   },
   {
-    icon: IconCurrencyBitcoin,
+    icon: IconCoins,
     title: "ADA-Gated Swap Requests",
     description:
       "A small ADA fee filters out time-wasters. Every request is intentional, no spam, no ghosting.",

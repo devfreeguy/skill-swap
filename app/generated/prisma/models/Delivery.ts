@@ -583,14 +583,6 @@ export type EnumDeliverableTypeFieldUpdateOperationsInput = {
   set?: $Enums.DeliverableType
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type DeliveryCreateWithoutUserInput = {
   id?: string
   type?: $Enums.DeliverableType

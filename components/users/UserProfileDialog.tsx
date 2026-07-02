@@ -2,6 +2,14 @@
 
 import { parseSkills } from "@/lib/skills";
 import { scoreMatch } from "@/lib/matching";
+import { useCardano } from "@cardano-foundation/cardano-connect-with-wallet";
+import { CARDANO_LIMIT_NETWORK } from "@/lib/cardano";
+import {
+  PAYMENTS_ENABLED,
+  PLATFORM_WALLET_ADDRESS,
+  SWAP_FEE_ADA,
+  SWAP_FEE_LOVELACE,
+} from "@/lib/cardano/fee";
 import {
   Alert,
   Avatar,
@@ -51,8 +59,10 @@ export default function UserProfileDialog({ userId, children }: Props) {
   const [me, setMe] = useState<SessionUser | null>(null);
   const [profile, setProfile] = useState<ProfileUser | null>(null);
 
+  const { enabledWallet } = useCardano({ limitNetwork: CARDANO_LIMIT_NETWORK });
   const [submitting, setSubmitting] = useState(false);
   const [swapError, setSwapError] = useState("");
+  const [swapStatus, setSwapStatus] = useState("");
   const [swapSuccess, setSwapSuccess] = useState(false);
 
   // The specific skills to exchange, chosen for this request.
@@ -89,20 +99,51 @@ export default function UserProfileDialog({ userId, children }: Props) {
 
   async function requestSwap() {
     setSwapError("");
+    setSwapStatus("");
     if (!offeredSkill || !requestedSkill) {
       setSwapError("Choose what you'll teach and what you want to learn.");
       return;
     }
     setSubmitting(true);
     try {
+      const payload: Record<string, unknown> = {
+        receiverId: userId,
+        initiatorSkill: offeredSkill,
+        receiverSkill: requestedSkill,
+      };
+
+      // Sign the platform fee with the connected wallet before requesting.
+      // It's refunded only if this person declines.
+      if (PAYMENTS_ENABLED) {
+        if (!enabledWallet) {
+          setSwapError("Connect your wallet to pay the swap fee, then try again.");
+          return;
+        }
+        setSwapStatus(
+          `Approve the ${SWAP_FEE_ADA} ADA fee in your wallet…`
+        );
+        try {
+          const { buildAndSignFeeTx } = await import("@/lib/cardano/fee-client");
+          const { signedTx, refundAddress } = await buildAndSignFeeTx({
+            walletName: enabledWallet,
+            toAddress: PLATFORM_WALLET_ADDRESS,
+            lovelace: String(SWAP_FEE_LOVELACE),
+          });
+          payload.signedPaymentTx = signedTx;
+          payload.refundAddress = refundAddress;
+        } catch {
+          setSwapError(
+            "Couldn't sign the fee payment. Make sure your wallet is unlocked and has enough ADA, then try again."
+          );
+          return;
+        }
+        setSwapStatus("Submitting your request…");
+      }
+
       const res = await fetch("/api/swaps", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          receiverId: userId,
-          initiatorSkill: offeredSkill,
-          receiverSkill: requestedSkill,
-        }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -115,6 +156,7 @@ export default function UserProfileDialog({ userId, children }: Props) {
       setSwapError("Something went wrong.");
     } finally {
       setSubmitting(false);
+      setSwapStatus("");
     }
   }
 
@@ -323,6 +365,21 @@ export default function UserProfileDialog({ userId, children }: Props) {
                     </div>
                   )}
 
+                  {!isOwnProfile && PAYMENTS_ENABLED && (
+                    <p className="text-xs text-muted">
+                      A {SWAP_FEE_ADA} ADA platform fee keeps SkillSwap running.
+                      It&apos;s refunded in full only if {profile.name} declines.
+                    </p>
+                  )}
+
+                  {swapStatus && (
+                    <Alert status="accent">
+                      <Alert.Indicator />
+                      <Alert.Content>
+                        <Alert.Description>{swapStatus}</Alert.Description>
+                      </Alert.Content>
+                    </Alert>
+                  )}
                   {swapError && (
                     <Alert status="danger">
                       <Alert.Indicator />

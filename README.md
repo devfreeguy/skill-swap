@@ -37,6 +37,7 @@ public commits, real users.
 - **Two-Sided Deliverables & Completion** — Each party submits concrete deliverables; a swap only completes once both sides have delivered and confirmed.
 - **On-Chain Proof of Skill Swap** — Completed swaps produce a deterministic proof hash that the user's wallet anchors on Cardano (`PENDING → ANCHORING → ANCHORED`), with automatic provider fallback.
 - **Mandatory Wallet Gate** — A connected Cardano wallet is required to use the app; it signs proofs and secures messaging.
+- **Swap Request Fee** — Requesting a swap costs a small on-chain fee (default 2 ADA) paid to the platform treasury to keep SkillSwap sustainable. It is refunded in full — automatically, from a platform hot wallet — only when the other party declines. Accepting, cancelling, or completing keeps the fee.
 - **Realtime Everything** — Swap requests, accept/decline, messages, and notifications update live without polling.
 
 ---
@@ -96,8 +97,13 @@ TWITTER_CLIENT_SECRET=
 
 # Cardano
 NEXT_PUBLIC_CARDANO_NETWORK=     # "mainnet" | "preprod" | "preview" (default preprod)
-BLOCKFROST_API_KEY=              # on-chain submit/verify (optional; falls back to Koios/Maestro)
+BLOCKFROST_API_KEY=              # on-chain submit/verify (optional for proofs; REQUIRED for refunds)
 MAESTRO_API_KEY=                 # optional provider fallback
+
+# Swap fee (leave the platform address blank to disable fees)
+NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS=  # treasury receive address (addr1…/addr_test1…)
+NEXT_PUBLIC_SWAP_FEE_LOVELACE=        # fee in lovelace (default 2000000 = 2 ADA)
+PLATFORM_WALLET_MNEMONIC=             # server secret: treasury seed phrase, signs refunds
 
 # Realtime (Pusher primary, Ably fallback)
 PUSHER_APP_ID=
@@ -153,6 +159,8 @@ User    → teachSkill + learnSkill (JSON-stringified arrays), walletAddress, pu
 Swap    → connects two users, lifecycle:
            PENDING → ACTIVE → COMPLETED | DECLINED | CANCELLED
            two-sided done/delivered flags + per-user last-read timestamps
+           swap-fee fields: feeTxHash, feeLovelace, refundAddress, refundTxHash,
+           paymentStatus (CONFIRMED at request → KEPT | REFUNDED | REFUND_PENDING | FAILED)
 Proof   → created on completion; deterministic metadataHash,
            on-chain status (PENDING → ANCHORING → ANCHORED | FAILED)
 Delivery → many per participant per swap (LINK/FILE/IMAGE/DOCUMENT/TEXT)

@@ -994,6 +994,11 @@ export const SwapScalarFieldEnum = {
   initiatorSkill: 'initiatorSkill',
   receiverSkill: 'receiverSkill',
   adaTxHash: 'adaTxHash',
+  feeTxHash: 'feeTxHash',
+  feeLovelace: 'feeLovelace',
+  refundAddress: 'refundAddress',
+  refundTxHash: 'refundTxHash',
+  paymentStatus: 'paymentStatus',
   initiatorDone: 'initiatorDone',
   receiverDone: 'receiverDone',
   initiatorDelivered: 'initiatorDelivered',
@@ -1158,6 +1163,20 @@ export type ListEnumSwapStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$P
 
 
 /**
+ * Reference to a field of type 'Int'
+ */
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+/**
+ * Reference to a field of type 'Int[]'
+ */
+export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
@@ -1175,20 +1194,6 @@ export type EnumDeliverableTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$
  * Reference to a field of type 'DeliverableType[]'
  */
 export type ListEnumDeliverableTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeliverableType[]'>
-    
-
-
-/**
- * Reference to a field of type 'Int'
- */
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-/**
- * Reference to a field of type 'Int[]'
- */
-export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 

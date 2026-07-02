@@ -20,8 +20,18 @@ export type SwapModel = runtime.Types.Result.DefaultSelection<Prisma.$SwapPayloa
 
 export type AggregateSwap = {
   _count: SwapCountAggregateOutputType | null
+  _avg: SwapAvgAggregateOutputType | null
+  _sum: SwapSumAggregateOutputType | null
   _min: SwapMinAggregateOutputType | null
   _max: SwapMaxAggregateOutputType | null
+}
+
+export type SwapAvgAggregateOutputType = {
+  feeLovelace: number | null
+}
+
+export type SwapSumAggregateOutputType = {
+  feeLovelace: number | null
 }
 
 export type SwapMinAggregateOutputType = {
@@ -32,6 +42,11 @@ export type SwapMinAggregateOutputType = {
   initiatorSkill: string | null
   receiverSkill: string | null
   adaTxHash: string | null
+  feeTxHash: string | null
+  feeLovelace: number | null
+  refundAddress: string | null
+  refundTxHash: string | null
+  paymentStatus: string | null
   initiatorDone: boolean | null
   receiverDone: boolean | null
   initiatorDelivered: boolean | null
@@ -51,6 +66,11 @@ export type SwapMaxAggregateOutputType = {
   initiatorSkill: string | null
   receiverSkill: string | null
   adaTxHash: string | null
+  feeTxHash: string | null
+  feeLovelace: number | null
+  refundAddress: string | null
+  refundTxHash: string | null
+  paymentStatus: string | null
   initiatorDone: boolean | null
   receiverDone: boolean | null
   initiatorDelivered: boolean | null
@@ -70,6 +90,11 @@ export type SwapCountAggregateOutputType = {
   initiatorSkill: number
   receiverSkill: number
   adaTxHash: number
+  feeTxHash: number
+  feeLovelace: number
+  refundAddress: number
+  refundTxHash: number
+  paymentStatus: number
   initiatorDone: number
   receiverDone: number
   initiatorDelivered: number
@@ -83,6 +108,14 @@ export type SwapCountAggregateOutputType = {
 }
 
 
+export type SwapAvgAggregateInputType = {
+  feeLovelace?: true
+}
+
+export type SwapSumAggregateInputType = {
+  feeLovelace?: true
+}
+
 export type SwapMinAggregateInputType = {
   id?: true
   initiatorId?: true
@@ -91,6 +124,11 @@ export type SwapMinAggregateInputType = {
   initiatorSkill?: true
   receiverSkill?: true
   adaTxHash?: true
+  feeTxHash?: true
+  feeLovelace?: true
+  refundAddress?: true
+  refundTxHash?: true
+  paymentStatus?: true
   initiatorDone?: true
   receiverDone?: true
   initiatorDelivered?: true
@@ -110,6 +148,11 @@ export type SwapMaxAggregateInputType = {
   initiatorSkill?: true
   receiverSkill?: true
   adaTxHash?: true
+  feeTxHash?: true
+  feeLovelace?: true
+  refundAddress?: true
+  refundTxHash?: true
+  paymentStatus?: true
   initiatorDone?: true
   receiverDone?: true
   initiatorDelivered?: true
@@ -129,6 +172,11 @@ export type SwapCountAggregateInputType = {
   initiatorSkill?: true
   receiverSkill?: true
   adaTxHash?: true
+  feeTxHash?: true
+  feeLovelace?: true
+  refundAddress?: true
+  refundTxHash?: true
+  paymentStatus?: true
   initiatorDone?: true
   receiverDone?: true
   initiatorDelivered?: true
@@ -179,6 +227,18 @@ export type SwapAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: SwapAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: SwapSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: SwapMinAggregateInputType
@@ -209,6 +269,8 @@ export type SwapGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: SwapCountAggregateInputType | true
+  _avg?: SwapAvgAggregateInputType
+  _sum?: SwapSumAggregateInputType
   _min?: SwapMinAggregateInputType
   _max?: SwapMaxAggregateInputType
 }
@@ -221,6 +283,11 @@ export type SwapGroupByOutputType = {
   initiatorSkill: string | null
   receiverSkill: string | null
   adaTxHash: string | null
+  feeTxHash: string | null
+  feeLovelace: number | null
+  refundAddress: string | null
+  refundTxHash: string | null
+  paymentStatus: string | null
   initiatorDone: boolean
   receiverDone: boolean
   initiatorDelivered: boolean
@@ -231,6 +298,8 @@ export type SwapGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   _count: SwapCountAggregateOutputType | null
+  _avg: SwapAvgAggregateOutputType | null
+  _sum: SwapSumAggregateOutputType | null
   _min: SwapMinAggregateOutputType | null
   _max: SwapMaxAggregateOutputType | null
 }
@@ -261,6 +330,11 @@ export type SwapWhereInput = {
   initiatorSkill?: Prisma.StringNullableFilter<"Swap"> | string | null
   receiverSkill?: Prisma.StringNullableFilter<"Swap"> | string | null
   adaTxHash?: Prisma.StringNullableFilter<"Swap"> | string | null
+  feeTxHash?: Prisma.StringNullableFilter<"Swap"> | string | null
+  feeLovelace?: Prisma.IntNullableFilter<"Swap"> | number | null
+  refundAddress?: Prisma.StringNullableFilter<"Swap"> | string | null
+  refundTxHash?: Prisma.StringNullableFilter<"Swap"> | string | null
+  paymentStatus?: Prisma.StringNullableFilter<"Swap"> | string | null
   initiatorDone?: Prisma.BoolFilter<"Swap"> | boolean
   receiverDone?: Prisma.BoolFilter<"Swap"> | boolean
   initiatorDelivered?: Prisma.BoolFilter<"Swap"> | boolean
@@ -286,6 +360,11 @@ export type SwapOrderByWithRelationInput = {
   initiatorSkill?: Prisma.SortOrderInput | Prisma.SortOrder
   receiverSkill?: Prisma.SortOrderInput | Prisma.SortOrder
   adaTxHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  feeTxHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  feeLovelace?: Prisma.SortOrderInput | Prisma.SortOrder
+  refundAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  refundTxHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   initiatorDone?: Prisma.SortOrder
   receiverDone?: Prisma.SortOrder
   initiatorDelivered?: Prisma.SortOrder
@@ -314,6 +393,11 @@ export type SwapWhereUniqueInput = Prisma.AtLeast<{
   initiatorSkill?: Prisma.StringNullableFilter<"Swap"> | string | null
   receiverSkill?: Prisma.StringNullableFilter<"Swap"> | string | null
   adaTxHash?: Prisma.StringNullableFilter<"Swap"> | string | null
+  feeTxHash?: Prisma.StringNullableFilter<"Swap"> | string | null
+  feeLovelace?: Prisma.IntNullableFilter<"Swap"> | number | null
+  refundAddress?: Prisma.StringNullableFilter<"Swap"> | string | null
+  refundTxHash?: Prisma.StringNullableFilter<"Swap"> | string | null
+  paymentStatus?: Prisma.StringNullableFilter<"Swap"> | string | null
   initiatorDone?: Prisma.BoolFilter<"Swap"> | boolean
   receiverDone?: Prisma.BoolFilter<"Swap"> | boolean
   initiatorDelivered?: Prisma.BoolFilter<"Swap"> | boolean
@@ -339,6 +423,11 @@ export type SwapOrderByWithAggregationInput = {
   initiatorSkill?: Prisma.SortOrderInput | Prisma.SortOrder
   receiverSkill?: Prisma.SortOrderInput | Prisma.SortOrder
   adaTxHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  feeTxHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  feeLovelace?: Prisma.SortOrderInput | Prisma.SortOrder
+  refundAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  refundTxHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   initiatorDone?: Prisma.SortOrder
   receiverDone?: Prisma.SortOrder
   initiatorDelivered?: Prisma.SortOrder
@@ -349,8 +438,10 @@ export type SwapOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.SwapCountOrderByAggregateInput
+  _avg?: Prisma.SwapAvgOrderByAggregateInput
   _max?: Prisma.SwapMaxOrderByAggregateInput
   _min?: Prisma.SwapMinOrderByAggregateInput
+  _sum?: Prisma.SwapSumOrderByAggregateInput
 }
 
 export type SwapScalarWhereWithAggregatesInput = {
@@ -364,6 +455,11 @@ export type SwapScalarWhereWithAggregatesInput = {
   initiatorSkill?: Prisma.StringNullableWithAggregatesFilter<"Swap"> | string | null
   receiverSkill?: Prisma.StringNullableWithAggregatesFilter<"Swap"> | string | null
   adaTxHash?: Prisma.StringNullableWithAggregatesFilter<"Swap"> | string | null
+  feeTxHash?: Prisma.StringNullableWithAggregatesFilter<"Swap"> | string | null
+  feeLovelace?: Prisma.IntNullableWithAggregatesFilter<"Swap"> | number | null
+  refundAddress?: Prisma.StringNullableWithAggregatesFilter<"Swap"> | string | null
+  refundTxHash?: Prisma.StringNullableWithAggregatesFilter<"Swap"> | string | null
+  paymentStatus?: Prisma.StringNullableWithAggregatesFilter<"Swap"> | string | null
   initiatorDone?: Prisma.BoolWithAggregatesFilter<"Swap"> | boolean
   receiverDone?: Prisma.BoolWithAggregatesFilter<"Swap"> | boolean
   initiatorDelivered?: Prisma.BoolWithAggregatesFilter<"Swap"> | boolean
@@ -381,6 +477,11 @@ export type SwapCreateInput = {
   initiatorSkill?: string | null
   receiverSkill?: string | null
   adaTxHash?: string | null
+  feeTxHash?: string | null
+  feeLovelace?: number | null
+  refundAddress?: string | null
+  refundTxHash?: string | null
+  paymentStatus?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -406,6 +507,11 @@ export type SwapUncheckedCreateInput = {
   initiatorSkill?: string | null
   receiverSkill?: string | null
   adaTxHash?: string | null
+  feeTxHash?: string | null
+  feeLovelace?: number | null
+  refundAddress?: string | null
+  refundTxHash?: string | null
+  paymentStatus?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -427,6 +533,11 @@ export type SwapUpdateInput = {
   initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeLovelace?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -452,6 +563,11 @@ export type SwapUncheckedUpdateInput = {
   initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeLovelace?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -475,6 +591,11 @@ export type SwapCreateManyInput = {
   initiatorSkill?: string | null
   receiverSkill?: string | null
   adaTxHash?: string | null
+  feeTxHash?: string | null
+  feeLovelace?: number | null
+  refundAddress?: string | null
+  refundTxHash?: string | null
+  paymentStatus?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -492,6 +613,11 @@ export type SwapUpdateManyMutationInput = {
   initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeLovelace?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -511,6 +637,11 @@ export type SwapUncheckedUpdateManyInput = {
   initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeLovelace?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -540,6 +671,11 @@ export type SwapCountOrderByAggregateInput = {
   initiatorSkill?: Prisma.SortOrder
   receiverSkill?: Prisma.SortOrder
   adaTxHash?: Prisma.SortOrder
+  feeTxHash?: Prisma.SortOrder
+  feeLovelace?: Prisma.SortOrder
+  refundAddress?: Prisma.SortOrder
+  refundTxHash?: Prisma.SortOrder
+  paymentStatus?: Prisma.SortOrder
   initiatorDone?: Prisma.SortOrder
   receiverDone?: Prisma.SortOrder
   initiatorDelivered?: Prisma.SortOrder
@@ -551,6 +687,10 @@ export type SwapCountOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
+export type SwapAvgOrderByAggregateInput = {
+  feeLovelace?: Prisma.SortOrder
+}
+
 export type SwapMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   initiatorId?: Prisma.SortOrder
@@ -559,6 +699,11 @@ export type SwapMaxOrderByAggregateInput = {
   initiatorSkill?: Prisma.SortOrder
   receiverSkill?: Prisma.SortOrder
   adaTxHash?: Prisma.SortOrder
+  feeTxHash?: Prisma.SortOrder
+  feeLovelace?: Prisma.SortOrder
+  refundAddress?: Prisma.SortOrder
+  refundTxHash?: Prisma.SortOrder
+  paymentStatus?: Prisma.SortOrder
   initiatorDone?: Prisma.SortOrder
   receiverDone?: Prisma.SortOrder
   initiatorDelivered?: Prisma.SortOrder
@@ -578,6 +723,11 @@ export type SwapMinOrderByAggregateInput = {
   initiatorSkill?: Prisma.SortOrder
   receiverSkill?: Prisma.SortOrder
   adaTxHash?: Prisma.SortOrder
+  feeTxHash?: Prisma.SortOrder
+  feeLovelace?: Prisma.SortOrder
+  refundAddress?: Prisma.SortOrder
+  refundTxHash?: Prisma.SortOrder
+  paymentStatus?: Prisma.SortOrder
   initiatorDone?: Prisma.SortOrder
   receiverDone?: Prisma.SortOrder
   initiatorDelivered?: Prisma.SortOrder
@@ -587,6 +737,10 @@ export type SwapMinOrderByAggregateInput = {
   completedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type SwapSumOrderByAggregateInput = {
+  feeLovelace?: Prisma.SortOrder
 }
 
 export type SwapScalarRelationFilter = {
@@ -687,6 +841,14 @@ export type EnumSwapStatusFieldUpdateOperationsInput = {
   set?: $Enums.SwapStatus
 }
 
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
@@ -759,6 +921,11 @@ export type SwapCreateWithoutInitiatorInput = {
   initiatorSkill?: string | null
   receiverSkill?: string | null
   adaTxHash?: string | null
+  feeTxHash?: string | null
+  feeLovelace?: number | null
+  refundAddress?: string | null
+  refundTxHash?: string | null
+  paymentStatus?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -782,6 +949,11 @@ export type SwapUncheckedCreateWithoutInitiatorInput = {
   initiatorSkill?: string | null
   receiverSkill?: string | null
   adaTxHash?: string | null
+  feeTxHash?: string | null
+  feeLovelace?: number | null
+  refundAddress?: string | null
+  refundTxHash?: string | null
+  paymentStatus?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -813,6 +985,11 @@ export type SwapCreateWithoutReceiverInput = {
   initiatorSkill?: string | null
   receiverSkill?: string | null
   adaTxHash?: string | null
+  feeTxHash?: string | null
+  feeLovelace?: number | null
+  refundAddress?: string | null
+  refundTxHash?: string | null
+  paymentStatus?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -836,6 +1013,11 @@ export type SwapUncheckedCreateWithoutReceiverInput = {
   initiatorSkill?: string | null
   receiverSkill?: string | null
   adaTxHash?: string | null
+  feeTxHash?: string | null
+  feeLovelace?: number | null
+  refundAddress?: string | null
+  refundTxHash?: string | null
+  paymentStatus?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -888,6 +1070,11 @@ export type SwapScalarWhereInput = {
   initiatorSkill?: Prisma.StringNullableFilter<"Swap"> | string | null
   receiverSkill?: Prisma.StringNullableFilter<"Swap"> | string | null
   adaTxHash?: Prisma.StringNullableFilter<"Swap"> | string | null
+  feeTxHash?: Prisma.StringNullableFilter<"Swap"> | string | null
+  feeLovelace?: Prisma.IntNullableFilter<"Swap"> | number | null
+  refundAddress?: Prisma.StringNullableFilter<"Swap"> | string | null
+  refundTxHash?: Prisma.StringNullableFilter<"Swap"> | string | null
+  paymentStatus?: Prisma.StringNullableFilter<"Swap"> | string | null
   initiatorDone?: Prisma.BoolFilter<"Swap"> | boolean
   receiverDone?: Prisma.BoolFilter<"Swap"> | boolean
   initiatorDelivered?: Prisma.BoolFilter<"Swap"> | boolean
@@ -921,6 +1108,11 @@ export type SwapCreateWithoutProofInput = {
   initiatorSkill?: string | null
   receiverSkill?: string | null
   adaTxHash?: string | null
+  feeTxHash?: string | null
+  feeLovelace?: number | null
+  refundAddress?: string | null
+  refundTxHash?: string | null
+  paymentStatus?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -945,6 +1137,11 @@ export type SwapUncheckedCreateWithoutProofInput = {
   initiatorSkill?: string | null
   receiverSkill?: string | null
   adaTxHash?: string | null
+  feeTxHash?: string | null
+  feeLovelace?: number | null
+  refundAddress?: string | null
+  refundTxHash?: string | null
+  paymentStatus?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -981,6 +1178,11 @@ export type SwapUpdateWithoutProofInput = {
   initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeLovelace?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1005,6 +1207,11 @@ export type SwapUncheckedUpdateWithoutProofInput = {
   initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeLovelace?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1025,6 +1232,11 @@ export type SwapCreateWithoutDeliveriesInput = {
   initiatorSkill?: string | null
   receiverSkill?: string | null
   adaTxHash?: string | null
+  feeTxHash?: string | null
+  feeLovelace?: number | null
+  refundAddress?: string | null
+  refundTxHash?: string | null
+  paymentStatus?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -1049,6 +1261,11 @@ export type SwapUncheckedCreateWithoutDeliveriesInput = {
   initiatorSkill?: string | null
   receiverSkill?: string | null
   adaTxHash?: string | null
+  feeTxHash?: string | null
+  feeLovelace?: number | null
+  refundAddress?: string | null
+  refundTxHash?: string | null
+  paymentStatus?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -1085,6 +1302,11 @@ export type SwapUpdateWithoutDeliveriesInput = {
   initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeLovelace?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1109,6 +1331,11 @@ export type SwapUncheckedUpdateWithoutDeliveriesInput = {
   initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeLovelace?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1129,6 +1356,11 @@ export type SwapCreateWithoutMessagesInput = {
   initiatorSkill?: string | null
   receiverSkill?: string | null
   adaTxHash?: string | null
+  feeTxHash?: string | null
+  feeLovelace?: number | null
+  refundAddress?: string | null
+  refundTxHash?: string | null
+  paymentStatus?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -1153,6 +1385,11 @@ export type SwapUncheckedCreateWithoutMessagesInput = {
   initiatorSkill?: string | null
   receiverSkill?: string | null
   adaTxHash?: string | null
+  feeTxHash?: string | null
+  feeLovelace?: number | null
+  refundAddress?: string | null
+  refundTxHash?: string | null
+  paymentStatus?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -1189,6 +1426,11 @@ export type SwapUpdateWithoutMessagesInput = {
   initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeLovelace?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1213,6 +1455,11 @@ export type SwapUncheckedUpdateWithoutMessagesInput = {
   initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeLovelace?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1233,6 +1480,11 @@ export type SwapCreateWithoutNotificationsInput = {
   initiatorSkill?: string | null
   receiverSkill?: string | null
   adaTxHash?: string | null
+  feeTxHash?: string | null
+  feeLovelace?: number | null
+  refundAddress?: string | null
+  refundTxHash?: string | null
+  paymentStatus?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -1257,6 +1509,11 @@ export type SwapUncheckedCreateWithoutNotificationsInput = {
   initiatorSkill?: string | null
   receiverSkill?: string | null
   adaTxHash?: string | null
+  feeTxHash?: string | null
+  feeLovelace?: number | null
+  refundAddress?: string | null
+  refundTxHash?: string | null
+  paymentStatus?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -1293,6 +1550,11 @@ export type SwapUpdateWithoutNotificationsInput = {
   initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeLovelace?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1317,6 +1579,11 @@ export type SwapUncheckedUpdateWithoutNotificationsInput = {
   initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeLovelace?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1338,6 +1605,11 @@ export type SwapCreateManyInitiatorInput = {
   initiatorSkill?: string | null
   receiverSkill?: string | null
   adaTxHash?: string | null
+  feeTxHash?: string | null
+  feeLovelace?: number | null
+  refundAddress?: string | null
+  refundTxHash?: string | null
+  paymentStatus?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -1356,6 +1628,11 @@ export type SwapCreateManyReceiverInput = {
   initiatorSkill?: string | null
   receiverSkill?: string | null
   adaTxHash?: string | null
+  feeTxHash?: string | null
+  feeLovelace?: number | null
+  refundAddress?: string | null
+  refundTxHash?: string | null
+  paymentStatus?: string | null
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -1373,6 +1650,11 @@ export type SwapUpdateWithoutInitiatorInput = {
   initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeLovelace?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1396,6 +1678,11 @@ export type SwapUncheckedUpdateWithoutInitiatorInput = {
   initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeLovelace?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1418,6 +1705,11 @@ export type SwapUncheckedUpdateManyWithoutInitiatorInput = {
   initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeLovelace?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1435,6 +1727,11 @@ export type SwapUpdateWithoutReceiverInput = {
   initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeLovelace?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1458,6 +1755,11 @@ export type SwapUncheckedUpdateWithoutReceiverInput = {
   initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeLovelace?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1480,6 +1782,11 @@ export type SwapUncheckedUpdateManyWithoutReceiverInput = {
   initiatorSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   receiverSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adaTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeLovelace?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refundTxHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   initiatorDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   receiverDone?: Prisma.BoolFieldUpdateOperationsInput | boolean
   initiatorDelivered?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1548,6 +1855,11 @@ export type SwapSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   initiatorSkill?: boolean
   receiverSkill?: boolean
   adaTxHash?: boolean
+  feeTxHash?: boolean
+  feeLovelace?: boolean
+  refundAddress?: boolean
+  refundTxHash?: boolean
+  paymentStatus?: boolean
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -1574,6 +1886,11 @@ export type SwapSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   initiatorSkill?: boolean
   receiverSkill?: boolean
   adaTxHash?: boolean
+  feeTxHash?: boolean
+  feeLovelace?: boolean
+  refundAddress?: boolean
+  refundTxHash?: boolean
+  paymentStatus?: boolean
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -1595,6 +1912,11 @@ export type SwapSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   initiatorSkill?: boolean
   receiverSkill?: boolean
   adaTxHash?: boolean
+  feeTxHash?: boolean
+  feeLovelace?: boolean
+  refundAddress?: boolean
+  refundTxHash?: boolean
+  paymentStatus?: boolean
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -1616,6 +1938,11 @@ export type SwapSelectScalar = {
   initiatorSkill?: boolean
   receiverSkill?: boolean
   adaTxHash?: boolean
+  feeTxHash?: boolean
+  feeLovelace?: boolean
+  refundAddress?: boolean
+  refundTxHash?: boolean
+  paymentStatus?: boolean
   initiatorDone?: boolean
   receiverDone?: boolean
   initiatorDelivered?: boolean
@@ -1627,7 +1954,7 @@ export type SwapSelectScalar = {
   updatedAt?: boolean
 }
 
-export type SwapOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "initiatorId" | "receiverId" | "status" | "initiatorSkill" | "receiverSkill" | "adaTxHash" | "initiatorDone" | "receiverDone" | "initiatorDelivered" | "receiverDelivered" | "initiatorLastReadAt" | "receiverLastReadAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["swap"]>
+export type SwapOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "initiatorId" | "receiverId" | "status" | "initiatorSkill" | "receiverSkill" | "adaTxHash" | "feeTxHash" | "feeLovelace" | "refundAddress" | "refundTxHash" | "paymentStatus" | "initiatorDone" | "receiverDone" | "initiatorDelivered" | "receiverDelivered" | "initiatorLastReadAt" | "receiverLastReadAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["swap"]>
 export type SwapInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   initiator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   receiver?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1664,6 +1991,11 @@ export type $SwapPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     initiatorSkill: string | null
     receiverSkill: string | null
     adaTxHash: string | null
+    feeTxHash: string | null
+    feeLovelace: number | null
+    refundAddress: string | null
+    refundTxHash: string | null
+    paymentStatus: string | null
     initiatorDone: boolean
     receiverDone: boolean
     initiatorDelivered: boolean
@@ -2109,6 +2441,11 @@ export interface SwapFieldRefs {
   readonly initiatorSkill: Prisma.FieldRef<"Swap", 'String'>
   readonly receiverSkill: Prisma.FieldRef<"Swap", 'String'>
   readonly adaTxHash: Prisma.FieldRef<"Swap", 'String'>
+  readonly feeTxHash: Prisma.FieldRef<"Swap", 'String'>
+  readonly feeLovelace: Prisma.FieldRef<"Swap", 'Int'>
+  readonly refundAddress: Prisma.FieldRef<"Swap", 'String'>
+  readonly refundTxHash: Prisma.FieldRef<"Swap", 'String'>
+  readonly paymentStatus: Prisma.FieldRef<"Swap", 'String'>
   readonly initiatorDone: Prisma.FieldRef<"Swap", 'Boolean'>
   readonly receiverDone: Prisma.FieldRef<"Swap", 'Boolean'>
   readonly initiatorDelivered: Prisma.FieldRef<"Swap", 'Boolean'>

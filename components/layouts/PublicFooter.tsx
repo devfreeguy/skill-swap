@@ -18,9 +18,9 @@ const links = [
 ];
 
 const socials = [
-  { icon: IconBrandX, href: "https://x.com" },
-  { icon: IconBrandGithub, href: "https://github.com" },
-  { icon: IconBrandDiscord, href: "https://discord.com" },
+  { icon: IconBrandX, href: "https://x.com/myskillswap" },
+  { icon: IconBrandGithub, href: "https://github.com/devfreeguy/skill-swap" },
+  { icon: IconBrandDiscord, href: "https://discord.gg/eXkDkkAM3" },
 ];
 
 export default function PublicFooter() {

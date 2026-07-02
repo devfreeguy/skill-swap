@@ -17,6 +17,9 @@ const nextConfig: NextConfig = {
         "libsodium-wrappers-sumo/dist/modules-sumo-esm/libsodium-sumo.mjs",
     },
   },
+
+  //  Allowed host
+  allowedDevOrigins: ["192.168.1.250"],
 };
 
 export default nextConfig;
