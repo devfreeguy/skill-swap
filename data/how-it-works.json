@@ -1,0 +1,46 @@
+{
+  "title": "How SkillSwap Works",
+  "subtitle": "A peer-to-peer skill exchange where every trade is fair, verifiable, and recorded on Cardano.",
+  "sections": [
+    {
+      "id": "the-idea",
+      "heading": "The Idea",
+      "body": "SkillSwap is built on one principle: **teach what you know, learn what you don't** — no money changing hands for the skills themselves.\n\nYou list what you can *teach* and what you want to *learn*. The network finds people whose needs mirror yours, you exchange knowledge directly, and each completed exchange leaves behind a **verifiable proof** anchored on the Cardano blockchain."
+    },
+    {
+      "id": "set-your-skills",
+      "heading": "1. Set Your Skills",
+      "body": "Connect your Cardano wallet and declare two things:\n\n- **What you can teach** — the skills you're confident sharing.\n- **What you want to learn** — the skills you're looking for.\n\nYour profile is your position in the network. A connected wallet is required — it's how you sign in, secure your messages, and prove your exchanges."
+    },
+    {
+      "id": "find-a-match",
+      "heading": "2. Find a Match",
+      "body": "The matching engine only surfaces **bidirectional matches** — people who teach what you want *and* want what you teach.\n\n> No one-sided connections. Every match is a fair trade by design.\n\nA `Perfect Match` is someone whose teach/learn skills mirror yours exactly. A `Strong Match` overlaps on at least one skill in each direction."
+    },
+    {
+      "id": "request-a-swap",
+      "heading": "3. Request a Swap",
+      "body": "When you find someone to trade with, you send a swap request and pay a small **2 ADA platform fee**.\n\nThis fee keeps SkillSwap sustainable and filters out low-effort requests — but it's designed to never punish you for reaching out:\n\n- If the other person **declines**, you're refunded the **full 2 ADA**, automatically.\n- You only ever part with the fee when an exchange actually goes ahead.\n\nThe payment is verified **instantly** — we read your signed transaction directly, so there's no waiting for on-chain confirmation before your request is sent."
+    },
+    {
+      "id": "exchange-skills",
+      "heading": "4. Exchange Skills",
+      "body": "Once your match **accepts**, the swap becomes active and a private, **end-to-end encrypted** conversation opens between you.\n\nBoth sides:\n\n1. Share their skill and any deliverables.\n2. Confirm completion independently.\n\nA swap only completes when **both** parties have delivered and confirmed — no single person controls the outcome."
+    },
+    {
+      "id": "earn-your-proof",
+      "heading": "5. Earn Your Proof",
+      "body": "When both sides confirm, SkillSwap generates a **deterministic proof** of the exchange — the participants, the skills traded, and a content hash.\n\nYou then anchor that proof on Cardano with a single signed transaction. The result is a permanent, independently verifiable record that the exchange happened:\n\n`PENDING → ANCHORING → ANCHORED`\n\nThe proof belongs to you. Anyone can re-hash the stored details and check them against the on-chain record."
+    },
+    {
+      "id": "the-fee-explained",
+      "heading": "The Swap Fee, Explained",
+      "body": "The 2 ADA fee moves through clear states so you always know where your money is:\n\n- **Paid** — you requested the swap and the fee is confirmed.\n- **Kept** — the match accepted (or you cancelled); the fee sustains the platform.\n- **Refunded** — the match declined; your 2 ADA was returned in full.\n\nEvery refund is re-checked on-chain before it's issued, so a refund is always backed by a real, confirmed payment. You can see the live status on each swap and in your dashboard."
+    },
+    {
+      "id": "why-cardano",
+      "heading": "Why Cardano",
+      "body": "Every meaningful action is backed by real cryptography:\n\n- **Wallet sign-in** proves who you are without passwords.\n- **The swap fee and its refund** are real on-chain transactions.\n- **Your proof of exchange** is anchored on-chain and verifiable by anyone, forever.\n\nSkillSwap doesn't just *say* an exchange happened — it lets you prove it. [Get started](/login) and make your first trade."
+    }
+  ]
+}

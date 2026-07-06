@@ -10,9 +10,9 @@ import Logo from "@/components/elements/Logo";
 import ThemeToggle from "@/components/elements/ThemeToggle";
 
 const links = [
-  { label: "How it Works", href: "#how-it-works" },
-  { label: "Ledger", href: "#ledger" },
-  { label: "Community", href: "#discovery" },
+  { label: "How it Works", href: "/how-it-works" },
+  { label: "Ledger", href: "/#ledger" },
+  { label: "Community", href: "/#discovery" },
 ];
 
 export default function PublicHeader() {
@@ -45,20 +45,20 @@ export default function PublicHeader() {
           <Logo />
 
           <div className="hidden md:flex items-center gap-6">
-            <Link
-              href="#how-it-works"
+            <NextLink
+              href="/how-it-works"
               className="no-underline text-sm transition-colors text-muted hover:text-foreground"
             >
               How it works
-            </Link>
+            </NextLink>
             <Link
-              href="#ledger"
+              href="/#ledger"
               className="no-underline text-sm transition-colors text-muted hover:text-foreground"
             >
               Ledger
             </Link>
             <Link
-              href="#discovery"
+              href="/#discovery"
               className="no-underline text-sm transition-colors text-muted hover:text-foreground"
             >
               Community

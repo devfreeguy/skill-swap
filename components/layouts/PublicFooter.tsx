@@ -11,9 +11,9 @@ import Logo from "@/components/elements/Logo";
 import { fadeUp, fadeIn } from "@/lib/animations";
 
 const links = [
-  { label: "How it Works", href: "#how-it-works" },
-  { label: "Contribution Ledger", href: "#ledger" },
-  { label: "Community", href: "#discovery" },
+  { label: "How it Works", href: "/how-it-works" },
+  { label: "Contribution Ledger", href: "/#ledger" },
+  { label: "Community", href: "/#discovery" },
   { label: "Get Started", href: "/login" },
 ];
 
@@ -47,6 +47,20 @@ export default function PublicFooter() {
               {link.label}
             </Link>
           ))}
+
+          <div className="flex items-center gap-4 pt-2">
+            {socials.map((s) => (
+              <a
+                key={s.href}
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted hover:text-foreground transition-colors"
+              >
+                <s.icon size={18} />
+              </a>
+            ))}
+          </div>
         </div>
       </motion.div>
 
@@ -70,20 +84,6 @@ export default function PublicFooter() {
         viewport={{ once: true, amount: 0.4 }}
       >
         <div className="max-w-6xl mx-auto px-4 md:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            {socials.map((s) => (
-              <a
-                key={s.href}
-                href={s.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted hover:text-foreground transition-colors"
-              >
-                <s.icon size={18} />
-              </a>
-            ))}
-          </div>
-
           <p className="text-xs text-muted font-medium">Built on Cardano.</p>
 
           <p className="text-xs text-muted">
