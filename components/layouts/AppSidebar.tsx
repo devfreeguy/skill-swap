@@ -1,6 +1,7 @@
 "use client";
 
 import Logo from "@/components/elements/Logo";
+import ThemeToggle from "@/components/elements/ThemeToggle";
 import { Avatar, Chip } from "@heroui/react";
 import { CARDANO_NETWORK_LABEL, IS_MAINNET } from "@/lib/cardano";
 import { NAV_ITEMS, isActivePath } from "@/components/layouts/nav";
@@ -83,6 +84,8 @@ export default function AppSidebar({
               {user.name.split(" ")[0]}
             </span>
           </Link>
+
+          <ThemeToggle />
 
           <button
             onClick={onLogout}

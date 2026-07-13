@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   motion,
   useMotionValue,
@@ -14,19 +14,7 @@ import { Card } from "@heroui/react";
 import { IconBriefcase, IconArrowsExchange, IconCircleCheck } from "@tabler/icons-react";
 import { fadeUp, stagger } from "@/lib/animations";
 
-const stats = [
-  { Icon: IconCircleCheck, rawValue: 1247, suffix: "+", label: "Contributions" },
-  { Icon: IconArrowsExchange, rawValue: 340, suffix: "+", label: "Exchanges" },
-  { Icon: IconBriefcase, rawValue: 89, suffix: "+", label: "Skills" },
-];
-
-function StatValue({
-  rawValue,
-  suffix,
-}: {
-  rawValue: number;
-  suffix: string;
-}) {
+function StatValue({ rawValue, suffix }: { rawValue: number; suffix: string }) {
   const count = useMotionValue(0);
   const formatted = useTransform(count, (v) => {
     const n = Math.round(v);
@@ -36,7 +24,7 @@ function StatValue({
   const inView = useInView(ref, { once: true });
 
   useEffect(() => {
-    if (inView) {
+    if (inView && rawValue > 0) {
       animate(count, rawValue, { duration: 1.5, ease: "easeOut" });
     }
   }, [inView, count, rawValue]);
@@ -45,6 +33,23 @@ function StatValue({
 }
 
 export default function StatsSection() {
+  const [data, setData] = useState({ contributions: 0, exchanges: 0, skills: 0 });
+
+  useEffect(() => {
+    fetch("/api/stats")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d && typeof d.contributions === "number") setData(d);
+      })
+      .catch(() => {});
+  }, []);
+
+  const stats = [
+    { Icon: IconCircleCheck, rawValue: data.contributions, suffix: "+", label: "Contributions" },
+    { Icon: IconArrowsExchange, rawValue: data.exchanges, suffix: "+", label: "Exchanges" },
+    { Icon: IconBriefcase, rawValue: data.skills, suffix: "+", label: "Skills" },
+  ];
+
   return (
     <SectionWrapper
       id="stats"

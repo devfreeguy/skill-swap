@@ -2,6 +2,7 @@
 
 import LemniscateLoader from "@/components/layouts/Loader";
 import SkillSelector from "@/components/elements/SkillSelector";
+import ThemeToggle from "@/components/elements/ThemeToggle";
 import WalletConnectButton from "@/components/elements/WalletConnectButton";
 import { parseSkills } from "@/lib/skills";
 import { truncateAddress } from "@/lib/utils";
@@ -376,6 +377,15 @@ export default function ProfilePage() {
                   <WalletConnectButton mode="login" />
                 </div>
               )}
+            </div>
+
+            <Separator className="my-4" />
+
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted">
+                Appearance
+              </p>
+              <ThemeToggle />
             </div>
 
             <Separator className="my-4" />

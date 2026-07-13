@@ -256,10 +256,9 @@ export default function DashboardPage() {
             </svg>
           }
         />
-        {/* TODO: reputation not in real DB - placeholder */}
         <StatCard
           label="Reputation Score"
-          value="-"
+          value={completedCount * 10}
           valueClass="text-accent"
           icon={
             <svg

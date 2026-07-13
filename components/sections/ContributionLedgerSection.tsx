@@ -29,12 +29,6 @@ const records = [
   },
 ];
 
-const summary = [
-  { value: "1,247", label: "Total Contributions" },
-  { value: "89", label: "Skills on Network" },
-  { value: "340", label: "Exchanges Completed" },
-  { value: "98%", label: "Verified Records" },
-];
 
 function ContributionCard({
   record,
@@ -97,7 +91,7 @@ export default function ContributionLedgerSection() {
 
       {/* Record cards */}
       <motion.div
-        className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"
+        className="grid grid-cols-1 md:grid-cols-3 gap-4"
         variants={stagger}
         whileInView="visible"
         initial="hidden"
@@ -110,26 +104,6 @@ export default function ContributionLedgerSection() {
         ))}
       </motion.div>
 
-      {/* Summary dashboard */}
-      <motion.div
-        className="bg-surface border border-border rounded-2xl p-6 md:p-8 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8"
-        variants={fadeUp}
-        whileInView="visible"
-        initial="hidden"
-        viewport={{ once: true, amount: 0.4 }}
-      >
-        {summary.map((stat, i) => (
-          <div
-            key={stat.label}
-            className={`flex flex-col gap-1 ${i < summary.length - 1 ? "md:border-r md:border-border md:pr-8" : ""}`}
-          >
-            <p className="text-3xl font-bold text-foreground tabular-nums">
-              {stat.value}
-            </p>
-            <p className="text-xs text-muted leading-snug">{stat.label}</p>
-          </div>
-        ))}
-      </motion.div>
     </SectionWrapper>
   );
 }

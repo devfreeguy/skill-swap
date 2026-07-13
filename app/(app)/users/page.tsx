@@ -9,7 +9,6 @@ import { parseSkills } from "@/lib/skills";
 import { matchPercent } from "@/lib/utils";
 import type { MatchType } from "@/lib/matching";
 import FilterPill from "@/components/users/FilterPill";
-import TrendIcon from "@/components/users/TrendIcon";
 import { Button, Card } from "@heroui/react";
 import { IconStar, IconTrendingUp } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
@@ -24,44 +23,40 @@ type MatchUser = UserCardData & {
   learnOverlap: string[];
 };
 
-// ─── Mock data ───────────────────────────────────────────────────────────────
-
-// TODO: replace with real trending data once analytics API exists
-const TRENDING_SKILLS = [
-  { name: "React", trend: "up" as const },
-  { name: "UI Design", trend: "up" as const },
-  { name: "Video Editing", trend: "flat" as const },
-  { name: "Cardano Dev", trend: "up" as const },
-  { name: "Public Speaking", trend: "down" as const },
-];
-
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function DiscoverPage() {
   const router = useRouter();
   const [users, setUsers] = useState<UserCardData[]>([]);
   const [matches, setMatches] = useState<MatchUser[]>([]);
+  const [topSkills, setTopSkills] = useState<{ name: string; count: number }[]>([]);
   const [search, setSearch] = useState("");
   const [onlyPerfect, setOnlyPerfect] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     Promise.all([
       fetch("/api/auth/me").then((r) => r.json()),
       fetch("/api/users").then((r) => r.json()),
       fetch("/api/users/matches").then((r) => r.json()),
+      fetch("/api/users/top-skills").then((r) => r.json()),
     ])
-      .then(([me, userData, matchData]) => {
+      .then(([me, userData, matchData, skillData]) => {
+        if (cancelled) return;
         if (me.error) {
           router.replace("/login");
           return;
         }
         setUsers(Array.isArray(userData) ? userData : []);
         setMatches(Array.isArray(matchData) ? matchData : []);
+        setTopSkills(Array.isArray(skillData) ? skillData : []);
         setLoading(false);
       })
-      .catch(() => router.replace("/login"));
-  }, [router]);
+      .catch(() => { if (!cancelled) router.replace("/login"); });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (loading)
     return <LemniscateLoader loading text="Loading..." overlayOpacity={1} />;
@@ -168,34 +163,38 @@ export default function DiscoverPage() {
 
       {/* ── Right sidebar ─────────────────────────────────────────── */}
       <aside className="hidden lg:flex flex-col w-72 shrink-0 border-l border-border px-5 py-6 gap-6 overflow-y-auto">
-        {/* Trending Skills */}
+        {/* Top Skills */}
         <section>
           <div className="flex items-center gap-2 mb-1">
             <IconTrendingUp size={18} className="text-accent" />
-            <h3 className="font-semibold text-foreground">Trending Skills</h3>
+            <h3 className="font-semibold text-foreground">Top Skills</h3>
           </div>
           <p className="text-xs text-muted mb-4">
-            Highly requested in the network this week.
+            Most popular skills across the network.
           </p>
 
-          <div className="flex flex-col gap-3">
-            {TRENDING_SKILLS.map((skill, i) => (
-              <div key={skill.name} className="flex items-center gap-3">
-                <span className="text-sm text-muted w-4 shrink-0">{i + 1}</span>
-                <div className="flex-1 flex items-center gap-2 min-w-0">
-                  <div className="size-8 rounded-lg bg-surface border border-border flex items-center justify-center shrink-0">
-                    <span className="text-xs font-bold text-muted">
-                      {skill.name.slice(0, 2).toUpperCase()}
+          {topSkills.length === 0 ? (
+            <p className="text-xs text-muted">No skills data yet.</p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {topSkills.map((skill, i) => (
+                <div key={skill.name} className="flex items-center gap-3">
+                  <span className="text-sm text-muted w-4 shrink-0">{i + 1}</span>
+                  <div className="flex-1 flex items-center gap-2 min-w-0">
+                    <div className="size-8 rounded-lg bg-surface border border-border flex items-center justify-center shrink-0">
+                      <span className="text-xs font-bold text-muted">
+                        {skill.name.slice(0, 2).toUpperCase()}
+                      </span>
+                    </div>
+                    <span className="text-sm font-medium text-foreground truncate">
+                      {skill.name}
                     </span>
                   </div>
-                  <span className="text-sm font-medium text-foreground truncate">
-                    {skill.name}
-                  </span>
+                  <span className="text-xs text-muted tabular-nums">{skill.count}</span>
                 </div>
-                <TrendIcon trend={skill.trend} />
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Can't find a skill? */}
@@ -204,9 +203,8 @@ export default function DiscoverPage() {
             Can&apos;t find a skill?
           </p>
           <p className="text-sm text-muted">
-            Add a request to the community board to gauge interest.
+            Post a request to the community board so others can offer to help.
           </p>
-          {/* TODO: community board / request feature not built yet */}
           <Button variant="outline" size="sm" className="w-full">
             Post a Request
           </Button>
