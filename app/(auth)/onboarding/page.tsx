@@ -135,10 +135,6 @@ export default function OnboardingPage() {
         return;
       }
 
-      // Kick off the silent perfect-match search but don't block the redirect;
-      // the dashboard surfaces the result on mount.
-      void fetch("/api/users/perfect-match").catch(() => {});
-
       router.push("/dashboard");
     } catch {
       setError("Something went wrong. Please try again.");

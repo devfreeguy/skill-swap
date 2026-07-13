@@ -136,12 +136,15 @@ export default function DashboardPage() {
   const [matchModalOpen, setMatchModalOpen] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+
     Promise.all([
       fetch("/api/auth/me").then((r) => r.json()),
       fetch("/api/users/matches").then((r) => r.json()),
       fetch("/api/swaps").then((r) => r.json()),
     ])
       .then(([me, matchData, swapData]) => {
+        if (cancelled) return;
         if (me.error) {
           router.replace("/login");
           return;
@@ -152,28 +155,37 @@ export default function DashboardPage() {
         setSwaps(swapList);
         setLoading(false);
 
-        // Silent perfect-match prompt - once per session, and only when the
-        // user isn't already mid-exchange.
+        // Perfect-match prompt — shown once ever per account (localStorage
+        // key is user-scoped so multiple accounts on the same device don't
+        // interfere, and re-registering with the same browser starts fresh).
         const hasActiveSwaps = swapList.some(
           (s) => s.status === "ACTIVE" || s.status === "PENDING",
         );
-        const alreadyShown =
-          sessionStorage.getItem("perfectMatchShown") === "1";
+        const pmKey = `pm_shown_${me.id}`;
+        const alreadyShown = localStorage.getItem(pmKey) === "1";
         if (!hasActiveSwaps && !alreadyShown) {
           fetch("/api/users/perfect-match")
             .then((r) => r.json())
             .then((pm: PerfectMatch | null) => {
+              if (cancelled) return;
               if (pm && pm.id) {
                 setPerfectMatch(pm);
                 setMatchModalOpen(true);
-                sessionStorage.setItem("perfectMatchShown", "1");
+                localStorage.setItem(pmKey, "1");
               }
             })
             .catch(() => {});
         }
       })
-      .catch(() => router.replace("/login"));
-  }, [router]);
+      .catch(() => {
+        if (!cancelled) router.replace("/login");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (loading)
     return <LemniscateLoader loading text="Loading..." overlayOpacity={1} />;
