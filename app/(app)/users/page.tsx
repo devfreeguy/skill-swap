@@ -10,7 +10,7 @@ import { matchPercent } from "@/lib/utils";
 import type { MatchType } from "@/lib/matching";
 import FilterPill from "@/components/users/FilterPill";
 import { Button, Card } from "@heroui/react";
-import { IconStar, IconTrendingUp } from "@tabler/icons-react";
+import { IconSearch, IconStar, IconTrendingUp } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -138,17 +138,21 @@ export default function DiscoverPage() {
 
           {/* Search (inline for this section) */}
           <div className="relative mb-4 max-w-sm">
+            <IconSearch
+              size={15}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none"
+            />
             <input
               type="text"
-              placeholder="Filter by name or skill..."
+              placeholder="Search people or skills..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted focus:outline-none focus:border-accent/50 transition-colors"
+              className="w-full bg-surface border border-border rounded-xl pl-9 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/60 transition-all"
             />
           </div>
 
           {gridUsers.length === 0 ? (
-            <Card className="bg-surface border border-border rounded-2xl p-12 text-center text-muted">
+            <Card className="shadow-sm bg-surface border border-border rounded-2xl p-12 text-center text-muted">
               {search ? `No results for "${search}".` : "No users found."}
             </Card>
           ) : (
@@ -176,13 +180,16 @@ export default function DiscoverPage() {
           {topSkills.length === 0 ? (
             <p className="text-xs text-muted">No skills data yet.</p>
           ) : (
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-0.5">
               {topSkills.map((skill, i) => (
-                <div key={skill.name} className="flex items-center gap-3">
-                  <span className="text-sm text-muted w-4 shrink-0">{i + 1}</span>
+                <div
+                  key={skill.name}
+                  className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-surface-secondary transition-colors -mx-2"
+                >
+                  <span className="text-xs text-muted w-4 shrink-0 tabular-nums">{i + 1}</span>
                   <div className="flex-1 flex items-center gap-2 min-w-0">
-                    <div className="size-8 rounded-lg bg-surface border border-border flex items-center justify-center shrink-0">
-                      <span className="text-xs font-bold text-muted">
+                    <div className="size-7 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
+                      <span className="text-[10px] font-bold text-accent">
                         {skill.name.slice(0, 2).toUpperCase()}
                       </span>
                     </div>
@@ -198,7 +205,7 @@ export default function DiscoverPage() {
         </section>
 
         {/* Can't find a skill? */}
-        <Card className="bg-surface border border-border rounded-2xl p-4 flex flex-col gap-3">
+        <Card className="shadow-sm bg-accent/5 border border-accent/20 rounded-2xl p-4 flex flex-col gap-3">
           <p className="text-sm font-semibold text-accent">
             Can&apos;t find a skill?
           </p>

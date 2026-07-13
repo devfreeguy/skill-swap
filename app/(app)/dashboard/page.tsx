@@ -305,7 +305,7 @@ export default function DashboardPage() {
               Active Swaps
             </h2>
           </div>
-          <Card className="bg-surface border border-border rounded-2xl overflow-hidden">
+          <Card className="shadow-sm bg-surface border border-border rounded-2xl overflow-hidden">
             {activeSwaps.length === 0 ? (
               <div className="p-8 text-center text-muted text-sm">
                 No active swaps.{" "}
@@ -358,7 +358,7 @@ export default function DashboardPage() {
                         return (
                           <tr
                             key={s.id}
-                            className={`${i < activeSwaps.length - 1 ? "border-b border-border" : ""} hover:bg-background/50 transition-colors`}
+                            className={`${i < activeSwaps.length - 1 ? "border-b border-border" : ""} hover:bg-surface-secondary transition-colors`}
                           >
                             <td className="px-4 py-3 whitespace-nowrap">
                               <div className="flex items-center gap-2">
@@ -445,7 +445,7 @@ export default function DashboardPage() {
                       <Link
                         key={s.id}
                         href={`/swaps/${s.id}`}
-                        className="flex items-center gap-3 p-4 hover:bg-background/50 transition-colors"
+                        className="flex items-center gap-3 p-4 hover:bg-surface-secondary transition-colors"
                       >
                         <Avatar size="sm">
                           {other.avatarUrl && (
@@ -501,7 +501,7 @@ export default function DashboardPage() {
             Recent History
           </h2>
           {recentHistory.length === 0 ? (
-            <Card className="bg-surface border border-border rounded-2xl p-6 text-center text-muted text-sm">
+            <Card className="shadow-sm bg-surface border border-border rounded-2xl p-6 text-center text-muted text-sm">
               Past swaps will appear here.
             </Card>
           ) : (
@@ -522,7 +522,7 @@ export default function DashboardPage() {
                 return (
                   <Card
                     key={s.id}
-                    className="bg-surface border border-border rounded-2xl p-4 flex flex-col gap-2"
+                    className="shadow-sm bg-surface border border-border rounded-2xl p-4 flex flex-col gap-2"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm font-semibold text-foreground leading-tight">

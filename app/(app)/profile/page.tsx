@@ -252,7 +252,7 @@ export default function ProfilePage() {
         </div>
 
         {/* ── Section 1: Profile Information ──────────────────────────────── */}
-        <Card className="bg-surface border border-border rounded-2xl p-6">
+        <Card className="shadow-sm bg-surface border border-border rounded-2xl p-6">
           <h2 className="text-base font-semibold text-foreground mb-5">
             Profile Information
           </h2>
@@ -310,7 +310,7 @@ export default function ProfilePage() {
 
         {/* ── Sections 2 + 3: Skills ──────────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="bg-surface border border-border rounded-2xl p-6">
+          <Card className="shadow-sm bg-surface border border-border rounded-2xl p-6">
             <h2 className="text-base font-semibold text-foreground mb-4">
               Skills I Teach
             </h2>
@@ -321,7 +321,7 @@ export default function ProfilePage() {
             />
           </Card>
 
-          <Card className="bg-surface border border-border rounded-2xl p-6">
+          <Card className="shadow-sm bg-surface border border-border rounded-2xl p-6">
             <h2 className="text-base font-semibold text-foreground mb-4">
               Skills I Want to Learn
             </h2>
@@ -337,7 +337,7 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
           {/* Section 4 - Account */}
-          <Card className="bg-surface border border-border rounded-2xl p-6">
+          <Card className="shadow-sm bg-surface border border-border rounded-2xl p-6">
             <h2 className="text-base font-semibold text-foreground mb-4">
               Account
             </h2>
@@ -401,7 +401,7 @@ export default function ProfilePage() {
           </Card>
 
           {/* Section 5 - Exchange Statistics */}
-          <Card className="bg-surface border border-border rounded-2xl p-6">
+          <Card className="shadow-sm bg-surface border border-border rounded-2xl p-6">
             <h2 className="text-base font-semibold text-foreground mb-4">
               Exchange Statistics
             </h2>

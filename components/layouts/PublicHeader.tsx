@@ -8,6 +8,7 @@ import { IconMenu2, IconX } from "@tabler/icons-react";
 
 import Logo from "@/components/elements/Logo";
 import ThemeToggle from "@/components/elements/ThemeToggle";
+import { useAuthDest } from "@/hooks/useAuthDest";
 
 const links = [
   { label: "How it Works", href: "/how-it-works" },
@@ -17,6 +18,7 @@ const links = [
 
 export default function PublicHeader() {
   const [isOpen, setIsOpen] = useState(false);
+  const authDest = useAuthDest();
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -67,13 +69,13 @@ export default function PublicHeader() {
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <NextLink href="/login" className="hidden md:flex">
+            <NextLink href={authDest} className="hidden md:flex">
               <Button
                 variant="secondary"
                 size="sm"
                 className="min-h-0! text-foreground dark:text-accent"
               >
-                Login
+                {authDest === "/dashboard" ? "Go to Dashboard" : "Login"}
               </Button>
             </NextLink>
             <button
@@ -130,13 +132,13 @@ export default function PublicHeader() {
 
               <div className="h-px bg-border my-1" />
 
-              <NextLink href="/login" onClick={() => setIsOpen(false)}>
+              <NextLink href={authDest} onClick={() => setIsOpen(false)}>
                 <Button
                   variant="outline"
                   size="sm"
                   className="rounded-full border-accent w-full"
                 >
-                  Login
+                  {authDest === "/dashboard" ? "Go to Dashboard" : "Login"}
                 </Button>
               </NextLink>
             </motion.div>

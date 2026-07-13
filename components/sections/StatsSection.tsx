@@ -68,7 +68,7 @@ export default function StatsSection() {
             className={cn("w-full", i === 0 ? "col-span-2 md:col-span-1" : "")}
             variants={fadeUp}
           >
-            <Card className="w-full md:w-64 p-4 md:p-6 flex-row items-center bg-surface border border-border">
+            <Card className="shadow-sm w-full md:w-64 p-4 md:p-6 flex-row items-center bg-surface border border-border">
               <div className="flex items-center justify-center aspect-square p-3 rounded-xl bg-accent">
                 <Icon className="text-accent-foreground" size={24} />
               </div>

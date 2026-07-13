@@ -165,7 +165,7 @@ export default function OnboardingPage() {
         animate="visible"
       >
         <motion.div variants={fadeUp}>
-          <Card className="bg-surface border border-border rounded-2xl p-8 flex flex-col gap-6 overflow-visible">
+          <Card className="shadow-md bg-surface border border-border rounded-2xl p-8 flex flex-col gap-6 overflow-visible">
             <div className="flex justify-center">
               <Logo />
             </div>

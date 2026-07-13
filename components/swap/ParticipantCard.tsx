@@ -1,5 +1,6 @@
-import { Avatar, Card, Chip, Separator } from "@heroui/react";
+import { Avatar, Card, Separator } from "@heroui/react";
 import { parseSkills } from "@/lib/skills";
+import SkillTag from "@/components/elements/SkillTag";
 
 type Participant = {
   id: string;
@@ -21,7 +22,7 @@ export default function ParticipantCard({
   const learn = parseSkills(participant.learnSkill);
 
   return (
-    <Card className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-4">
+    <Card className="shadow-sm bg-surface border border-border rounded-2xl p-5 flex flex-col gap-4">
       <div className="flex items-center gap-3">
         <Avatar size="md">
           {participant.avatarUrl && (
@@ -42,12 +43,10 @@ export default function ParticipantCard({
           <p className="text-[10px] font-semibold tracking-widest text-muted uppercase mb-2">
             Teaching
           </p>
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1.5">
             {teach.length > 0 ? (
               teach.map((s) => (
-                <Chip key={s} size="sm">
-                  {s}
-                </Chip>
+                <SkillTag key={s} label={s} variant="teach" />
               ))
             ) : (
               <span className="text-xs text-muted">-</span>
@@ -58,16 +57,10 @@ export default function ParticipantCard({
           <p className="text-[10px] font-semibold tracking-widest text-muted uppercase mb-2">
             Learning
           </p>
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1.5">
             {learn.length > 0 ? (
               learn.map((s) => (
-                <Chip
-                  key={s}
-                  size="sm"
-                  className="border border-success/40 text-success"
-                >
-                  {s}
-                </Chip>
+                <SkillTag key={s} label={s} variant="learn" />
               ))
             ) : (
               <span className="text-xs text-muted">-</span>

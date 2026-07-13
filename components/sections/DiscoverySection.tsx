@@ -7,6 +7,7 @@ import SectionWrapper from "@/components/layouts/SectionWrapper";
 import { fadeUp, stagger } from "@/lib/animations";
 import { IconEye, IconArrowsExchange, IconBookmark } from "@tabler/icons-react";
 import ScrollArea from "@/components/elements/ScrollArea";
+import { useAuthDest } from "@/hooks/useAuthDest";
 
 const users = [
   {
@@ -53,7 +54,7 @@ const users = [
   },
 ];
 
-function UserCard({ user }: { user: (typeof users)[0] }) {
+function UserCard({ user, authDest }: { user: (typeof users)[0]; authDest: string }) {
   return (
     <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-4 min-w-55 md:min-w-0 w-full">
       {/* Header */}
@@ -87,7 +88,7 @@ function UserCard({ user }: { user: (typeof users)[0] }) {
 
       {/* Actions */}
       <div className="flex gap-2 mt-auto">
-        <Link href="/login" className="flex-1">
+        <Link href={authDest} className="flex-1">
           <Button
             size="sm"
             className="w-full gap-1.5 text-xs bg-accent text-accent-foreground"
@@ -97,7 +98,7 @@ function UserCard({ user }: { user: (typeof users)[0] }) {
           </Button>
         </Link>
 
-        <Link href="/login">
+        <Link href={authDest}>
           <Button
             variant="tertiary"
             size="sm"
@@ -114,6 +115,7 @@ function UserCard({ user }: { user: (typeof users)[0] }) {
 }
 
 export default function DiscoverySection() {
+  const authDest = useAuthDest();
   return (
     <SectionWrapper id="discovery">
       <motion.div
@@ -144,7 +146,7 @@ export default function DiscoverySection() {
       >
         {users.map((user) => (
           <motion.div key={user.name} variants={fadeUp} className="w-full">
-            <UserCard user={user} />
+            <UserCard user={user} authDest={authDest} />
           </motion.div>
         ))}
       </motion.div>

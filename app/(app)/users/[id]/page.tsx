@@ -8,10 +8,10 @@ import {
   Avatar,
   Button,
   Card,
-  Chip,
   Modal,
   Surface,
 } from "@heroui/react";
+import SkillTag from "@/components/elements/SkillTag";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -100,7 +100,7 @@ export default function UserProfilePage() {
 
   return (
     <main className="flex-1 px-6 py-6 flex flex-col gap-6 max-w-2xl">
-      <Card className="bg-surface border border-border rounded-2xl p-6 flex flex-col gap-5">
+      <Card className="shadow-sm bg-surface border border-border rounded-2xl p-6 flex flex-col gap-5">
         {/* Header */}
         <div className="flex items-start gap-4">
           <Avatar size="lg">
@@ -111,9 +111,13 @@ export default function UserProfilePage() {
             <h1 className="text-xl font-bold text-foreground">{profile.name}</h1>
             <p className="text-sm text-muted">Joined {joinedDate}</p>
             {!isOwnProfile && match.type !== "DISCOVERY" && (
-              <Chip size="sm" color={match.type === "PERFECT_MATCH" ? "success" : "accent"} className="mt-2">
+              <span className={`inline-flex items-center mt-2 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                match.type === "PERFECT_MATCH"
+                  ? "bg-success/10 text-success border border-success/20"
+                  : "bg-accent/10 text-accent border border-accent/20"
+              }`}>
                 {match.type === "PERFECT_MATCH" ? "Perfect Match" : "Strong Match"}
-              </Chip>
+              </span>
             )}
           </div>
         </div>
@@ -121,34 +125,34 @@ export default function UserProfilePage() {
         {/* Skills */}
         {teach.length > 0 && (
           <div>
-            <p className="text-sm font-medium text-foreground mb-2">Teaches</p>
-            <div className="flex flex-wrap gap-2">
-              {teach.map((s) => <Chip key={s} color="accent">{s}</Chip>)}
+            <p className="text-[10px] uppercase tracking-wider font-semibold text-muted mb-2">Teaches</p>
+            <div className="flex flex-wrap gap-1.5">
+              {teach.map((s) => <SkillTag key={s} label={s} variant="teach" size="md" />)}
             </div>
           </div>
         )}
         {learn.length > 0 && (
           <div>
-            <p className="text-sm font-medium text-foreground mb-2">Wants to learn</p>
-            <div className="flex flex-wrap gap-2">
-              {learn.map((s) => <Chip key={s} color="success">{s}</Chip>)}
+            <p className="text-[10px] uppercase tracking-wider font-semibold text-muted mb-2">Wants to learn</p>
+            <div className="flex flex-wrap gap-1.5">
+              {learn.map((s) => <SkillTag key={s} label={s} variant="learn" size="md" />)}
             </div>
           </div>
         )}
 
         {/* Match insight */}
         {!isOwnProfile && (match.learnOverlap.length > 0 || match.teachOverlap.length > 0) && (
-          <div className="bg-background rounded-xl p-4 flex flex-col gap-2 text-sm">
+          <div className="bg-accent/5 border border-accent/15 rounded-xl p-4 flex flex-col gap-2 text-sm">
             {match.learnOverlap.length > 0 && (
               <p className="text-muted">
                 <span className="text-foreground font-medium">{profile.name}</span> can teach you:{" "}
-                <span className="text-accent-foreground">{match.learnOverlap.join(", ")}</span>
+                <span className="text-accent font-medium">{match.learnOverlap.join(", ")}</span>
               </p>
             )}
             {match.teachOverlap.length > 0 && (
               <p className="text-muted">
                 You can teach <span className="text-foreground font-medium">{profile.name}</span>:{" "}
-                <span className="text-accent-foreground">{match.teachOverlap.join(", ")}</span>
+                <span className="text-accent font-medium">{match.teachOverlap.join(", ")}</span>
               </p>
             )}
           </div>

@@ -659,7 +659,7 @@ export default function SwapDetailPage() {
         </section>
 
         {/* Swap Progress */}
-        <Card className="bg-surface border border-border rounded-2xl p-6">
+        <Card className="shadow-sm bg-surface border border-border rounded-2xl p-6">
           <h2 className="text-base font-semibold text-foreground mb-6">
             Swap Progress
           </h2>
@@ -880,7 +880,7 @@ export default function SwapDetailPage() {
 
         {/* PROOF RECORD */}
         <section id="proof-record">
-          <Card className="bg-surface border border-border rounded-2xl p-4 flex flex-col gap-3">
+          <Card className="shadow-sm bg-surface border border-border rounded-2xl p-4 flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold text-foreground">
                 Proof Record

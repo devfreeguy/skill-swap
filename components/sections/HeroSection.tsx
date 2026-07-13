@@ -8,10 +8,12 @@ import { useIsDarkMode } from "@/lib/theme";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { illustrations } from "@/constants/images";
 import { fadeUp, stagger } from "@/lib/animations";
+import { useAuthDest } from "@/hooks/useAuthDest";
 
 export default function HeroSection() {
   const isDark = useIsDarkMode();
   const isMobile = useIsMobile();
+  const authDest = useAuthDest();
 
   const heroBGSrc = isDark
     ? isMobile
@@ -55,12 +57,12 @@ export default function HeroSection() {
           variants={fadeUp}
           transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
         >
-          <Link href="/login">
+          <Link href={authDest}>
             <Button
               size="lg"
               className="rounded-full w-48 bg-accent text-accent-foreground font-semibold shadow"
             >
-              Find a Match
+              {authDest === "/dashboard" ? "Go to Dashboard" : "Find a Match"}
             </Button>
           </Link>
           <Link href="#discovery">

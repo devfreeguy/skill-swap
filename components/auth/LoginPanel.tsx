@@ -6,6 +6,8 @@ import { Alert, Button, Card } from "@heroui/react";
 import { IconBrandX } from "@tabler/icons-react";
 import Logo from "@/components/elements/Logo";
 import { fadeUp, stagger } from "@/lib/animations";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const WalletConnectButton = dynamic(
   () => import("@/components/elements/WalletConnectButton"),
@@ -21,7 +23,15 @@ const ERROR_MESSAGES: Record<string, string> = {
 };
 
 export default function LoginPanel({ error }: { error?: string }) {
+  const router = useRouter();
   const errorMessage = error ? ERROR_MESSAGES[error] : undefined;
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((r) => r.json())
+      .then((data) => { if (!data.error) router.replace("/dashboard"); })
+      .catch(() => {});
+  }, [router]);
 
   function startTwitter() {
     window.location.href = "/api/auth/twitter";
@@ -36,7 +46,7 @@ export default function LoginPanel({ error }: { error?: string }) {
         animate="visible"
       >
         <motion.div variants={fadeUp}>
-          <Card className="bg-surface border border-border rounded-2xl p-8 flex flex-col gap-6 overflow-visible">
+          <Card className="shadow-md bg-surface border border-border rounded-2xl p-8 flex flex-col gap-6 overflow-visible">
             <div className="flex justify-center">
               <Logo />
             </div>

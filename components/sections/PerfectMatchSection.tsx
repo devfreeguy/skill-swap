@@ -6,6 +6,7 @@ import { Button, Chip } from "@heroui/react";
 import SectionWrapper from "@/components/layouts/SectionWrapper";
 import { fadeUp, stagger } from "@/lib/animations";
 import { IconArrowsExchange } from "@tabler/icons-react";
+import { useAuthDest } from "@/hooks/useAuthDest";
 
 const YOU = { teaches: "React", wants: "Aiken" };
 const MATCH = { name: "David M.", teaches: "Aiken", wants: "React" };
@@ -22,6 +23,7 @@ function SkillRow({ label, value }: { label: string; value: string }) {
 }
 
 export default function PerfectMatchSection() {
+  const authDest = useAuthDest();
   return (
     <SectionWrapper id="match">
       <div className="flex flex-col items-center gap-12">
@@ -108,12 +110,12 @@ export default function PerfectMatchSection() {
           initial="hidden"
           viewport={{ once: true, amount: 0.4 }}
         >
-          <Link href="/login">
+          <Link href={authDest}>
             <Button
               size="lg"
               className="rounded-full bg-accent text-accent-foreground font-semibold px-10"
             >
-              Request Exchange
+              {authDest === "/dashboard" ? "Go to Dashboard" : "Request Exchange"}
             </Button>
           </Link>
         </motion.div>

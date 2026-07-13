@@ -10,11 +10,11 @@ import {
   SWAP_FEE_ADA,
   SWAP_FEE_LOVELACE,
 } from "@/lib/cardano/fee";
+import SkillTag from "@/components/elements/SkillTag";
 import {
   Alert,
   Avatar,
   Button,
-  Chip,
   Modal,
   Spinner,
 } from "@heroui/react";
@@ -212,17 +212,17 @@ export default function UserProfileDialog({ userId, children }: Props) {
                       <Modal.Heading>{profile.name}</Modal.Heading>
                       <p className="text-sm text-muted">Joined {joinedDate}</p>
                       {!isOwnProfile && match && match.type !== "DISCOVERY" && (
-                        <Chip
-                          size="sm"
-                          color={
-                            match.type === "PERFECT_MATCH" ? "success" : "accent"
-                          }
-                          className="mt-2"
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold leading-none mt-2 ${
+                            match.type === "PERFECT_MATCH"
+                              ? "bg-success/10 text-success border border-success/20"
+                              : "bg-accent/10 text-accent border border-accent/20"
+                          }`}
                         >
                           {match.type === "PERFECT_MATCH"
                             ? "Perfect Match"
                             : "Strong Match"}
-                        </Chip>
+                        </span>
                       )}
                     </div>
                   </div>
@@ -242,9 +242,7 @@ export default function UserProfileDialog({ userId, children }: Props) {
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {teach.map((s) => (
-                          <Chip key={s} color="accent">
-                            {s}
-                          </Chip>
+                          <SkillTag key={s} label={s} variant="teach" size="md" />
                         ))}
                       </div>
                     </div>
@@ -257,9 +255,7 @@ export default function UserProfileDialog({ userId, children }: Props) {
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {learn.map((s) => (
-                          <Chip key={s} color="success">
-                            {s}
-                          </Chip>
+                          <SkillTag key={s} label={s} variant="learn" size="md" />
                         ))}
                       </div>
                     </div>

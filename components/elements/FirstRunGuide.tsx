@@ -45,7 +45,7 @@ export default function FirstRunGuide() {
   }
 
   return (
-    <Card className="relative bg-surface border border-border rounded-2xl p-5">
+    <Card className="shadow-sm relative bg-surface border border-border rounded-2xl p-5">
       <button
         onClick={dismiss}
         aria-label="Dismiss guide"

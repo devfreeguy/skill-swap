@@ -1,5 +1,6 @@
-import { Avatar, Button, Card, Chip } from "@heroui/react";
+import { Avatar, Button, Card } from "@heroui/react";
 import { parseSkills } from "@/lib/skills";
+import SkillTag from "@/components/elements/SkillTag";
 import UserProfileDialog from "@/components/users/UserProfileDialog";
 
 export type UserCardData = {
@@ -19,7 +20,7 @@ export default function UserCard({ user }: Props) {
   const learn = parseSkills(user.learnSkill);
 
   return (
-    <Card className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-4 hover:border-accent/30 transition-colors">
+    <Card className="shadow-sm hover:shadow-md hover:-translate-y-0.5 bg-surface border border-border rounded-2xl p-5 flex flex-col gap-4 hover:border-accent/30 transition-[box-shadow,transform,border-color] duration-200">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Avatar size="md">
@@ -36,50 +37,34 @@ export default function UserCard({ user }: Props) {
       </div>
 
       {/* Skills */}
-      <div className="flex flex-col gap-2 text-xs flex-1">
+      <div className="flex flex-col gap-2.5 flex-1">
         {teach.length > 0 && (
           <div>
-            <p className="uppercase tracking-wider text-muted font-semibold mb-1.5">
+            <p className="text-[10px] uppercase tracking-wider text-muted font-semibold mb-1.5">
               Teaches
             </p>
-            <div className="flex flex-col gap-1">
-              <div className="flex flex-wrap items-center gap-1.5">
-                {teach.slice(0, 3).map((s) => (
-                  <Chip key={s} size="sm" color="default">
-                    {s}
-                  </Chip>
-                ))}
-                {teach.length > 3 && (
-                  <Chip size="sm" color="default">
-                    +{teach.length - 3}
-                  </Chip>
-                )}
-              </div>
+            <div className="flex flex-wrap gap-1.5">
+              {teach.slice(0, 3).map((s) => (
+                <SkillTag key={s} label={s} variant="teach" />
+              ))}
+              {teach.length > 3 && (
+                <SkillTag label={`+${teach.length - 3}`} variant="neutral" />
+              )}
             </div>
           </div>
         )}
         {learn.length > 0 && (
           <div>
-            <p className="uppercase tracking-wider text-muted font-semibold mb-1.5">
+            <p className="text-[10px] uppercase tracking-wider text-muted font-semibold mb-1.5">
               Wants to Learn
             </p>
-            <div className="flex flex-col gap-1">
-              <div className="flex flex-wrap items-center gap-1.5">
-                {learn.slice(0, 3).map((s) => (
-                  <Chip
-                    key={s}
-                    size="sm"
-                    className="border border-accent/40 text-accent bg-transparent"
-                  >
-                    {s}
-                  </Chip>
-                ))}
-                {learn.length > 3 && (
-                  <Chip size="sm" color="default">
-                    +{learn.length - 3}
-                  </Chip>
-                )}
-              </div>
+            <div className="flex flex-wrap gap-1.5">
+              {learn.slice(0, 3).map((s) => (
+                <SkillTag key={s} label={s} variant="learn" />
+              ))}
+              {learn.length > 3 && (
+                <SkillTag label={`+${learn.length - 3}`} variant="neutral" />
+              )}
             </div>
           </div>
         )}

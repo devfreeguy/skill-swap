@@ -1,7 +1,8 @@
-import { Avatar, Button, Card, Chip, Separator } from "@heroui/react";
+import { Avatar, Button, Card, Separator } from "@heroui/react";
 import { IconBolt } from "@tabler/icons-react";
 import { parseSkills } from "@/lib/skills";
 import { matchPercent } from "@/lib/utils";
+import SkillTag from "@/components/elements/SkillTag";
 import UserProfileDialog from "@/components/users/UserProfileDialog";
 
 export type MatchCardData = {
@@ -19,9 +20,9 @@ export default function MatchCard({ match }: { match: MatchCardData }) {
   const learnSkills = parseSkills(match.learnSkill);
 
   return (
-    <Card className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-4 hover:border-accent/40 transition-colors">
+    <Card className="shadow-sm hover:shadow-md hover:-translate-y-0.5 bg-surface border border-border rounded-2xl p-5 flex flex-col gap-4 hover:border-accent/40 transition-[box-shadow,transform,border-color] duration-200">
       <div className="flex justify-end">
-        <span className="inline-flex items-center gap-1 text-xs font-semibold bg-surface border border-accent/40 text-accent rounded-full px-2.5 py-1">
+        <span className="inline-flex items-center gap-1 text-xs font-semibold bg-accent/10 border border-accent/25 text-accent rounded-full px-2.5 py-1">
           <IconBolt size={12} />
           {pct}% Match
         </span>
@@ -43,27 +44,25 @@ export default function MatchCard({ match }: { match: MatchCardData }) {
       <div className="flex flex-col gap-3 text-xs">
         {teachSkills.length > 0 && (
           <div className="flex flex-col gap-1.5">
-            <span className="uppercase tracking-wider text-muted font-semibold w-14 shrink-0">
+            <span className="text-[10px] uppercase tracking-wider text-muted font-semibold">
               Teaches
             </span>
             <div className="flex flex-wrap items-center gap-1.5">
               {teachSkills.slice(0, 2).map((s) => (
-                <Chip key={s} size="sm" color="default" className="text-xs">
-                  {s}
-                </Chip>
+                <SkillTag key={s} label={s} variant="teach" />
               ))}
             </div>
           </div>
         )}
         {learnSkills.length > 0 && (
           <div className="flex flex-col gap-1.5">
-            <span className="uppercase tracking-wider text-muted font-semibold w-14 shrink-0">
+            <span className="text-[10px] uppercase tracking-wider text-muted font-semibold">
               Wants
             </span>
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-accent font-medium">
-                {learnSkills.slice(0, 2).join(", ")}
-              </span>
+              {learnSkills.slice(0, 2).map((s) => (
+                <SkillTag key={s} label={s} variant="learn" />
+              ))}
             </div>
           </div>
         )}

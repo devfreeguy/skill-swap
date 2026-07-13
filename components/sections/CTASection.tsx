@@ -7,8 +7,10 @@ import { Button } from "@heroui/react";
 import SectionWrapper from "@/components/layouts/SectionWrapper";
 import { illustrations } from "@/constants/images";
 import { fadeUp } from "@/lib/animations";
+import { useAuthDest } from "@/hooks/useAuthDest";
 
 export default function CTASection() {
+  const authDest = useAuthDest();
   return (
     <SectionWrapper id="cta">
       <motion.div
@@ -64,12 +66,12 @@ export default function CTASection() {
             </p>
 
             <div className="flex items-center gap-4 flex-wrap justify-center">
-              <Link href="/login">
+              <Link href={authDest}>
                 <Button
                   size="lg"
                   className="rounded-full bg-white text-[#01060C] font-semibold px-8"
                 >
-                  Find a Match
+                  {authDest === "/dashboard" ? "Go to Dashboard" : "Find a Match"}
                 </Button>
               </Link>
               <Link href="#how-it-works">

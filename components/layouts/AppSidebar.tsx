@@ -2,7 +2,7 @@
 
 import Logo from "@/components/elements/Logo";
 import ThemeToggle from "@/components/elements/ThemeToggle";
-import { Avatar, Chip } from "@heroui/react";
+import { Avatar } from "@heroui/react";
 import { CARDANO_NETWORK_LABEL, IS_MAINNET } from "@/lib/cardano";
 import { NAV_ITEMS, isActivePath } from "@/components/layouts/nav";
 import { IconLogout } from "@tabler/icons-react";
@@ -41,13 +41,13 @@ export default function AppSidebar({
               <Link
                 key={label}
                 href={href}
-                className={`flex items-center gap-3 p-3 rounded-lg text-sm transition-colors ${
+                className={`flex items-center gap-3 pl-3 pr-3 py-2.5 rounded-lg text-sm transition-all duration-150 border-l-[3px] ${
                   active
-                    ? "bg-accent/10 text-accent font-medium"
-                    : "text-muted hover:text-foreground hover:bg-surface"
+                    ? "border-accent bg-accent/10 text-accent font-semibold"
+                    : "border-transparent text-muted hover:text-foreground hover:bg-surface-secondary"
                 }`}
               >
-                <Icon size={18} stroke={1.75} />
+                <Icon size={18} stroke={active ? 2 : 1.75} />
                 <span className="flex-1">{label}</span>
                 {href === "/messages" && msgUnread > 0 && (
                   <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-accent text-accent-foreground text-[10px] font-bold">
@@ -59,9 +59,9 @@ export default function AppSidebar({
           })}
 
           {!IS_MAINNET && (
-            <Chip variant="secondary" className="m-2 mt-auto w-fit">
+            <span className="inline-flex items-center mx-2 mt-auto px-2.5 py-1 rounded-md text-[11px] font-medium text-muted border border-border bg-background w-fit">
               {CARDANO_NETWORK_LABEL}
-            </Chip>
+            </span>
           )}
         </nav>
 
@@ -70,7 +70,7 @@ export default function AppSidebar({
           <Link
             href="/profile"
             aria-label="Profile"
-            className="flex items-center gap-2 flex-1 min-w-0 rounded-lg p-1 -m-1 hover:bg-surface transition-colors"
+            className="flex items-center gap-2 flex-1 min-w-0 rounded-lg p-1 -m-1 hover:bg-surface-secondary transition-colors"
           >
             <Avatar size="sm">
               {user.avatarUrl && (
@@ -91,7 +91,7 @@ export default function AppSidebar({
             onClick={onLogout}
             disabled={loggingOut}
             aria-label="Log out"
-            className="p-1.5 rounded-lg text-muted hover:text-danger hover:bg-surface transition-colors disabled:opacity-50"
+            className="p-1.5 rounded-lg text-muted hover:text-danger hover:bg-surface-secondary transition-colors disabled:opacity-50"
           >
             <IconLogout size={18} stroke={1.75} />
           </button>
