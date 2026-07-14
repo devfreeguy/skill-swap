@@ -18,8 +18,18 @@ import {
   Modal,
   Spinner,
 } from "@heroui/react";
+import { IconWallet } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
+
+function getAvailableWallets() {
+  if (typeof window === "undefined") return [];
+  const cardano = (window as unknown as Record<string, unknown>).cardano as Record<string, { name?: string; icon?: string }> | undefined;
+  if (!cardano) return [];
+  return ["nami", "eternl", "lace", "flint", "vespr", "begin", "typhon"]
+    .filter((key) => cardano[key])
+    .map((key) => ({ id: key, name: cardano[key].name || key, icon: cardano[key].icon }));
+}
 
 type SessionUser = {
   id: string;
@@ -59,11 +69,12 @@ export default function UserProfileDialog({ userId, children }: Props) {
   const [me, setMe] = useState<SessionUser | null>(null);
   const [profile, setProfile] = useState<ProfileUser | null>(null);
 
-  const { enabledWallet } = useCardano({ limitNetwork: CARDANO_LIMIT_NETWORK });
+  const { enabledWallet, connect } = useCardano({ limitNetwork: CARDANO_LIMIT_NETWORK });
   const [submitting, setSubmitting] = useState(false);
   const [swapError, setSwapError] = useState("");
   const [swapStatus, setSwapStatus] = useState("");
   const [swapSuccess, setSwapSuccess] = useState(false);
+  const [walletConnecting, setWalletConnecting] = useState(false);
 
   // The specific skills to exchange, chosen for this request.
   const [offeredSkill, setOfferedSkill] = useState(""); // what I'll teach them
@@ -97,6 +108,18 @@ export default function UserProfileDialog({ userId, children }: Props) {
       .finally(() => setLoading(false));
   }, [loaded, loading, userId]);
 
+  async function handleConnectWallet(walletId: string) {
+    setWalletConnecting(true);
+    setSwapError("");
+    try {
+      await connect(walletId);
+    } catch {
+      setSwapError("Couldn't connect wallet. Make sure it's unlocked and try again.");
+    } finally {
+      setWalletConnecting(false);
+    }
+  }
+
   async function requestSwap() {
     setSwapError("");
     setSwapStatus("");
@@ -116,7 +139,7 @@ export default function UserProfileDialog({ userId, children }: Props) {
       // It's refunded only if this person declines.
       if (PAYMENTS_ENABLED) {
         if (!enabledWallet) {
-          setSwapError("Connect your wallet to pay the swap fee, then try again.");
+          setSwapError("Connect your Cardano wallet above to pay the swap fee, then try again.");
           return;
         }
         setSwapStatus(
@@ -362,10 +385,51 @@ export default function UserProfileDialog({ userId, children }: Props) {
                   )}
 
                   {!isOwnProfile && PAYMENTS_ENABLED && (
-                    <p className="text-xs text-muted">
-                      A {SWAP_FEE_ADA} ADA platform fee keeps SkillSwap running.
-                      It&apos;s refunded in full only if {profile.name} declines.
-                    </p>
+                    enabledWallet ? (
+                      <p className="text-xs text-muted">
+                        A {SWAP_FEE_ADA} ADA platform fee keeps SkillSwap running.
+                        It&apos;s refunded in full only if {profile.name} declines.
+                      </p>
+                    ) : (
+                      <div className="rounded-xl border border-border p-4 flex flex-col gap-3">
+                        <div className="flex items-center gap-2">
+                          <IconWallet size={15} className="text-muted shrink-0" />
+                          <p className="text-sm font-medium text-foreground">
+                            Connect wallet to pay the {SWAP_FEE_ADA} ADA fee
+                          </p>
+                        </div>
+                        <p className="text-xs text-muted">
+                          The fee is refunded if {profile.name} declines your request.
+                        </p>
+                        {(() => {
+                          const wallets = getAvailableWallets();
+                          return wallets.length === 0 ? (
+                            <p className="text-xs text-muted">
+                              No Cardano wallets found. Install Nami, Eternl, or Lace and reload.
+                            </p>
+                          ) : (
+                            <div className="flex flex-col gap-1">
+                              {wallets.map((w) => (
+                                <button
+                                  key={w.id}
+                                  type="button"
+                                  disabled={walletConnecting}
+                                  onClick={() => handleConnectWallet(w.id)}
+                                  className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg hover:bg-surface-secondary transition-colors text-left cursor-pointer disabled:opacity-50"
+                                >
+                                  {w.icon && (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img src={w.icon} alt={w.name} width={22} height={22} className="rounded-md shrink-0" />
+                                  )}
+                                  <span className="text-sm font-medium text-foreground">{w.name}</span>
+                                  {walletConnecting && <Spinner size="sm" className="ml-auto" />}
+                                </button>
+                              ))}
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    )
                   )}
 
                   {swapStatus && (
@@ -408,10 +472,10 @@ export default function UserProfileDialog({ userId, children }: Props) {
                     <Button
                       onPress={requestSwap}
                       isPending={submitting}
-                      isDisabled={swapSuccess}
+                      isDisabled={swapSuccess || (PAYMENTS_ENABLED && !enabledWallet)}
                       className="bg-accent text-accent-foreground font-semibold"
                     >
-                      Request Swap
+                      {PAYMENTS_ENABLED && !enabledWallet ? "Connect Wallet First" : "Request Swap"}
                     </Button>
                   )}
                 </Modal.Footer>

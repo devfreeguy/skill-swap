@@ -2,43 +2,15 @@
 
 type LemniscateLoaderProps = {
   loading?: boolean;
-
   text?: string;
-
-  /**
-   * Secondary, readable instruction shown below the status text
-   */
   hint?: string;
-
-  /**
-   * Background opacity (0 → 1)
-   */
   overlayOpacity?: number;
-
-  /**
-   * Blur backdrop
-   */
   blur?: boolean;
-
-  /**
-   * Spinner size in px
-   */
   size?: number;
-
-  /**
-   * Additional classes
-   */
   className?: string;
-
-  /**
-   * Override loader color
-   */
   color?: string;
-
-  /**
-   * Override background
-   */
   background?: string;
+  onCancel?: () => void;
 };
 
 /**
@@ -55,6 +27,7 @@ export default function Loader({
   className = "",
   color = "var(--accent)",
   background = "var(--background)",
+  onCancel,
 }: LemniscateLoaderProps) {
   if (!loading) return null;
 
@@ -62,7 +35,7 @@ export default function Loader({
     <div
       className={`
         fixed inset-0 z-9999
-        flex flex-col items-center justify-center
+        flex flex-col items-center justify-center gap-0
         transition-all duration-300
         ${blur ? "backdrop-blur-md" : ""}
         ${className}
@@ -91,6 +64,16 @@ export default function Loader({
         <p className="mt-3 max-w-xs text-center text-sm leading-relaxed text-muted">
           {hint}
         </p>
+      )}
+
+      {onCancel && (
+        <button
+          type="button"
+          onClick={onCancel}
+          className="mt-6 text-xs text-muted hover:text-foreground underline underline-offset-2 transition-colors"
+        >
+          Cancel
+        </button>
       )}
     </div>
   );

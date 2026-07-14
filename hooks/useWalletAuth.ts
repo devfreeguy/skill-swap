@@ -157,10 +157,10 @@ export function useWalletAuth() {
         if (settled) return;
         settled = true;
         setError(
-          "Couldn't get a signature from your wallet. Make sure it's unlocked and connected to this site, then try again."
+          "No response from your wallet. Make sure it's unlocked and on the right network, then try again."
         );
         stopLoading();
-      }, 90_000);
+      }, 45_000);
 
       signMessage(
         nonce,
@@ -282,9 +282,16 @@ export function useWalletAuth() {
     );
   }
 
+  function cancel() {
+    if (signTimeoutRef.current) clearTimeout(signTimeoutRef.current);
+    setError(null);
+    stopLoading();
+  }
+
   return {
     connectAndAuth,
     connectAndLink,
+    cancel,
     isConnected,
     stakeAddress,
     enabledWallet,

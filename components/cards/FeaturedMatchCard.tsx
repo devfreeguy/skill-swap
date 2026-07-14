@@ -2,7 +2,11 @@ import { Avatar, Button, Card } from "@heroui/react";
 import { IconArrowRight, IconBolt } from "@tabler/icons-react";
 import { parseSkills } from "@/lib/skills";
 import SkillTag from "@/components/elements/SkillTag";
-import UserProfileDialog from "@/components/users/UserProfileDialog";
+import dynamic from "next/dynamic";
+const UserProfileDialog = dynamic(
+  () => import("@/components/users/UserProfileDialog"),
+  { ssr: false }
+);
 
 export type FeaturedMatchData = {
   id: string;

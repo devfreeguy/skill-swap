@@ -194,6 +194,21 @@ export default function MessagesPage() {
     setMessages((prev) => [...prev, msg]);
   }, []);
 
+  const handleComplete = useCallback(async () => {
+    if (!selectedSwapId) return;
+    const res = await fetch(`/api/swaps/${selectedSwapId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "complete" }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error ?? "Could not mark as complete.");
+    const chatRes = await fetch(`/api/messages/${selectedSwapId}`).then((r) =>
+      r.json()
+    );
+    setSwapData(chatRes.swap ?? null);
+  }, [selectedSwapId]);
+
   // Live delivery: join the open conversation's room and append incoming
   // messages instantly (decryption happens in the render memo above).
   useEffect(() => {
@@ -468,11 +483,12 @@ export default function MessagesPage() {
 
       {/* ── Panel 3: Exchange Context (desktop only) ─────────────────────── */}
       {selectedSwapId && swapData && (
-        <aside className="hidden xl:flex flex-col w-80 xl:w-88 shrink-0 border-l border-border px-5 py-5 overflow-y-auto">
+        <aside className="hidden xl:flex flex-col w-82 shrink-0 border-l border-border px-5 py-5 overflow-y-auto">
           <ExchangeContextPanel
             swap={swapData}
             currentUserId={me.id}
             recentFiles={recentFiles}
+            onComplete={handleComplete}
           />
         </aside>
       )}

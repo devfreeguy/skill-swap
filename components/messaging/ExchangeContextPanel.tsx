@@ -1,6 +1,11 @@
-import { Separator, Tooltip } from "@heroui/react";
+"use client";
+
+import React from "react";
+import { Button, Separator, Tooltip } from "@heroui/react";
+import AddDeliverableModal from "@/components/swap/AddDeliverableModal";
 import {
   IconArrowsExchange,
+  IconCheck,
   IconCode,
   IconExternalLink,
   IconFile,
@@ -19,7 +24,9 @@ export type ExchangeSwap = {
   adaTxHash?: string | null;
   initiatorSkill?: string | null;
   receiverSkill?: string | null;
-  proof?: { id: string; adaTxHash: string } | null;
+  initiatorDone?: boolean;
+  receiverDone?: boolean;
+  proof?: { id: string; chainStatus?: string | null; chainTxHash?: string | null; network?: string | null } | null;
   initiatorId: string;
   receiverId: string;
   initiator: {
@@ -55,7 +62,14 @@ type Props = {
   swap: ExchangeSwap;
   currentUserId: string;
   recentFiles: RecentFile[];
+  onComplete?: () => Promise<void>;
+  onDeliverableAdded?: () => void;
 };
+
+function cardanoExplorerUrl(txHash: string, network?: string | null): string {
+  const sub = network === "mainnet" ? "" : network === "preview" ? "preview." : "preprod.";
+  return `https://${sub}cardanoscan.io/transaction/${txHash}`;
+}
 
 const STATUS_TEXT: Record<string, { label: string; dotClass: string; textClass: string }> = {
   ACTIVE: { label: "Active", dotClass: "bg-accent", textClass: "text-accent" },
@@ -80,16 +94,29 @@ export default function ExchangeContextPanel({
   swap,
   currentUserId,
   recentFiles,
+  onComplete,
+  onDeliverableAdded,
 }: Props) {
+  const [completing, setCompleting] = React.useState(false);
+  const [completeError, setCompleteError] = React.useState("");
+  const [deliverOpen, setDeliverOpen] = React.useState(false);
+
   const isInitiator = swap.initiatorId === currentUserId;
   const me = isInitiator ? swap.initiator : swap.receiver;
   const other = isInitiator ? swap.receiver : swap.initiator;
 
-  const myTeach = parseSkills(me.teachSkill)[0] ?? "-";
-  const theirTeach = parseSkills(other.teachSkill)[0] ?? "-";
+  // Prefer the skills chosen at request time; fall back to user-profile skills.
+  const myTeach = (isInitiator ? swap.initiatorSkill : swap.receiverSkill)
+    ?? parseSkills(me.teachSkill)[0]
+    ?? "-";
+  const myLearn = (isInitiator ? swap.receiverSkill : swap.initiatorSkill)
+    ?? parseSkills(other.teachSkill)[0]
+    ?? "-";
 
+  const myDone = isInitiator ? (swap.initiatorDone ?? false) : (swap.receiverDone ?? false);
+  const isActive = swap.status === "ACTIVE";
   const isCompleted = swap.status === "COMPLETED";
-  const hasProof = isCompleted && !!swap.proof;
+  const hasProof = isCompleted && swap.proof?.chainStatus === "ANCHORED";
 
   const swapIdShort = `SWP-${swap.id.slice(-4).toUpperCase()}`;
   const statusInfo = STATUS_TEXT[swap.status] ?? {
@@ -148,10 +175,50 @@ export default function ExchangeContextPanel({
               <IconCode size={13} className="text-muted" />
             </div>
             <span className="text-sm font-semibold text-foreground truncate">
-              {theirTeach}
+              {myLearn}
             </span>
           </div>
         </div>
+
+        {/* Complete Swap button */}
+        {isActive && onComplete && (
+          <>
+            <Separator />
+            {myDone ? (
+              <div className="flex items-center gap-2 text-xs text-success">
+                <IconCheck size={13} />
+                You confirmed — waiting for partner
+              </div>
+            ) : (
+              <div className="flex flex-col gap-1">
+                <Button
+                  size="sm"
+                  className="w-full bg-success text-success-foreground font-semibold"
+                  isPending={completing}
+                  isDisabled={completing}
+                  onPress={async () => {
+                    setCompleting(true);
+                    setCompleteError("");
+                    try {
+                      await onComplete();
+                    } catch (e) {
+                      setCompleteError(
+                        e instanceof Error ? e.message : "Something went wrong."
+                      );
+                    } finally {
+                      setCompleting(false);
+                    }
+                  }}
+                >
+                  Mark as Complete
+                </Button>
+                {completeError && (
+                  <p className="text-[11px] text-danger">{completeError}</p>
+                )}
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       {/* Quick Actions */}
@@ -160,7 +227,7 @@ export default function ExchangeContextPanel({
           Quick Actions
         </p>
         <div className="flex flex-col gap-2">
-          <Link href={`/swaps/${swap.id}`}>
+          <Link href={`/swaps/${swap.id}?action=deliverables`}>
             <div className="w-full flex items-center gap-3 px-4 py-2.5 bg-surface border border-border rounded-xl text-sm text-foreground hover:border-accent/30 transition-colors group cursor-pointer">
               <IconFileText size={15} className="text-muted shrink-0" />
               <span className="flex-1 font-medium">View Deliverables</span>
@@ -171,31 +238,29 @@ export default function ExchangeContextPanel({
             </div>
           </Link>
 
-          <Link href={`/swaps/${swap.id}`}>
-            <div className="w-full flex items-center gap-3 px-4 py-2.5 bg-surface border border-border rounded-xl text-sm text-foreground hover:border-accent/30 transition-colors group cursor-pointer">
+          {isActive && (
+            <button
+              type="button"
+              onClick={() => setDeliverOpen(true)}
+              className="w-full flex items-center gap-3 px-4 py-2.5 bg-surface border border-border rounded-xl text-sm text-foreground hover:border-accent/30 transition-colors group cursor-pointer"
+            >
               <IconUpload size={15} className="text-muted shrink-0" />
-              <span className="flex-1 font-medium">Submit Deliverable</span>
-              <IconExternalLink
-                size={13}
-                className="text-muted group-hover:text-accent transition-colors"
-              />
-            </div>
-          </Link>
+              <span className="flex-1 font-medium text-left">Submit Deliverable</span>
+            </button>
+          )}
 
           {hasProof ? (
-            <Link href={`/swaps/${swap.id}`}>
+            <a
+              href={cardanoExplorerUrl(swap.proof!.chainTxHash!, swap.proof!.network)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <div className="w-full flex items-center gap-3 px-4 py-2.5 bg-surface border border-border rounded-xl text-sm text-foreground hover:border-accent/30 transition-colors group cursor-pointer">
-                <IconShieldCheck
-                  size={15}
-                  className="text-accent shrink-0"
-                />
+                <IconShieldCheck size={15} className="text-accent shrink-0" />
                 <span className="flex-1 font-medium">View Proof (Cardano)</span>
-                <IconExternalLink
-                  size={13}
-                  className="text-muted group-hover:text-accent transition-colors"
-                />
+                <IconExternalLink size={13} className="text-muted group-hover:text-accent transition-colors" />
               </div>
-            </Link>
+            </a>
           ) : (
             <Tooltip>
               <Tooltip.Trigger>
@@ -211,7 +276,7 @@ export default function ExchangeContextPanel({
                 </div>
               </Tooltip.Trigger>
               <Tooltip.Content>
-                Available after completion
+                {isCompleted ? "Anchoring on-chain — check back shortly" : "Available after completion"}
               </Tooltip.Content>
             </Tooltip>
           )}
@@ -258,6 +323,13 @@ export default function ExchangeContextPanel({
           </div>
         </div>
       )}
+
+      <AddDeliverableModal
+        swapId={swap.id}
+        isOpen={deliverOpen}
+        onOpenChange={setDeliverOpen}
+        onSuccess={onDeliverableAdded}
+      />
     </div>
   );
 }

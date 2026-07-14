@@ -12,6 +12,7 @@ import { usePathname } from "next/navigation";
 type Props = {
   user: { name: string; avatarUrl?: string | null };
   msgUnread: number;
+  notifUnread: number;
   loggingOut: boolean;
   onLogout: () => void;
 };
@@ -20,6 +21,7 @@ type Props = {
 export default function AppSidebar({
   user,
   msgUnread,
+  notifUnread,
   loggingOut,
   onLogout,
 }: Props) {
@@ -52,6 +54,11 @@ export default function AppSidebar({
                 {href === "/messages" && msgUnread > 0 && (
                   <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-accent text-accent-foreground text-[10px] font-bold">
                     {msgUnread > 99 ? "99+" : msgUnread}
+                  </span>
+                )}
+                {href === "/notifications" && notifUnread > 0 && (
+                  <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-danger text-white text-[10px] font-bold">
+                    {notifUnread > 99 ? "99+" : notifUnread}
                   </span>
                 )}
               </Link>

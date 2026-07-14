@@ -19,10 +19,13 @@ export async function GET(
     where: { id: swapId },
     include: {
       initiator: {
-        select: { id: true, name: true, avatarUrl: true, publicKey: true },
+        select: { id: true, name: true, avatarUrl: true, publicKey: true, teachSkill: true, learnSkill: true },
       },
       receiver: {
-        select: { id: true, name: true, avatarUrl: true, publicKey: true },
+        select: { id: true, name: true, avatarUrl: true, publicKey: true, teachSkill: true, learnSkill: true },
+      },
+      proof: {
+        select: { id: true, chainStatus: true, chainTxHash: true, network: true },
       },
     },
   });

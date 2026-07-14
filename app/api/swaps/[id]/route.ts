@@ -98,7 +98,18 @@ export async function GET(
         select: { id: true, name: true, avatarUrl: true, teachSkill: true, learnSkill: true },
       },
       deliveries: {
-        select: { id: true, userId: true, resourceLink: true, notes: true, submittedAt: true },
+        select: {
+          id: true,
+          userId: true,
+          type: true,
+          title: true,
+          resourceLink: true,
+          notes: true,
+          fileName: true,
+          fileSize: true,
+          mimeType: true,
+          submittedAt: true,
+        },
       },
       proof: {
         select: {

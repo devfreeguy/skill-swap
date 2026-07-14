@@ -60,9 +60,15 @@ export function subscribe(
 
   const p = getPusher();
   if (p) {
-    const ch = p.subscribe(channel);
-    ch.bind(event, handler);
-    cleanups.push(() => ch.unbind(event, handler));
+    try {
+      const ch = p.subscribe(channel);
+      ch.bind(event, handler);
+      cleanups.push(() => {
+        try { ch.unbind(event, handler); } catch { /* ignore */ }
+      });
+    } catch {
+      // Channel in failed state (auth error) — fall through to Ably fallback
+    }
   }
 
   const a = getAbly();

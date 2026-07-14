@@ -1,4 +1,8 @@
 import { buildProofMetadata, PROOF_LABEL } from "@/lib/cardano/proof-metadata";
+import { withTimeout } from "@/lib/cardano/timeout";
+
+const ENABLE_TIMEOUT_MS = 30_000;
+const SIGN_TIMEOUT_MS = 120_000;
 
 /**
  * Build and sign the on-chain proof transaction with the user's connected
@@ -14,7 +18,11 @@ export async function buildAndSignProofTx(args: {
 }): Promise<string> {
   const { BrowserWallet, Transaction } = await import("@meshsdk/core");
 
-  const wallet = await BrowserWallet.enable(args.walletName);
+  const wallet = await withTimeout(
+    BrowserWallet.enable(args.walletName),
+    ENABLE_TIMEOUT_MS,
+    "Wallet did not respond. Make sure your extension is unlocked and try again."
+  );
 
   const metadata = buildProofMetadata({
     swapId: args.swapId,
@@ -26,5 +34,9 @@ export async function buildAndSignProofTx(args: {
   tx.setMetadata(Number(PROOF_LABEL), metadata);
 
   const unsignedTx = await tx.build();
-  return wallet.signTx(unsignedTx);
+  return withTimeout(
+    wallet.signTx(unsignedTx),
+    SIGN_TIMEOUT_MS,
+    "Wallet timed out while signing. Check the extension popup and try again."
+  );
 }

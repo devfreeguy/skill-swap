@@ -5,12 +5,12 @@ import DeliverableItem from "@/components/swap/DeliverableItem";
 import SwapProgressTracker, {
   type ProgressStep,
 } from "@/components/swap/SwapProgressTracker";
+import AddDeliverableModal from "@/components/swap/AddDeliverableModal";
+import AnchorProofModal from "@/components/swap/AnchorProofModal";
 import { parseSkills } from "@/lib/skills";
 import { relativeTime } from "@/lib/utils";
 import ExchangePair from "@/components/elements/ExchangePair";
 import ParticipantCard from "@/components/swap/ParticipantCard";
-import { CARDANO_LIMIT_NETWORK } from "@/lib/cardano";
-import { useCardano } from "@cardano-foundation/cardano-connect-with-wallet";
 import { subscribe, swapChannel } from "@/lib/realtime";
 import type { DeliverableType } from "@/app/generated/prisma/client";
 import {
@@ -18,33 +18,22 @@ import {
   Button,
   Card,
   Chip,
-  Input,
-  Label,
-  Modal,
   Separator,
-  TextArea,
-  TextField,
 } from "@heroui/react";
 import {
   IconArrowLeft,
   IconArrowsExchange,
   IconBulb,
   IconCheck,
-  IconFile,
-  IconFileText,
   IconFlag,
-  IconLink,
   IconMessage,
-  IconNote,
-  IconPaperclip,
-  IconPhoto,
   IconPlus,
   IconShieldCheck,
   IconUpload,
   IconUserCheck,
 } from "@tabler/icons-react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -119,26 +108,6 @@ const STATUS_COLOR: Record<
   CANCELLED: "default",
 };
 
-const DELIVERABLE_TYPES: {
-  id: DeliverableType;
-  label: string;
-  icon: typeof IconLink;
-  accept?: string;
-}[] = [
-  { id: "LINK", label: "Link", icon: IconLink },
-  { id: "TEXT", label: "Note", icon: IconNote },
-  { id: "IMAGE", label: "Image", icon: IconPhoto, accept: "image/*" },
-  {
-    id: "DOCUMENT",
-    label: "Document",
-    icon: IconFileText,
-    accept: ".pdf,.doc,.docx,.txt,.md,.ppt,.pptx,.xls,.xlsx",
-  },
-  { id: "FILE", label: "File", icon: IconFile },
-];
-
-const MAX_DELIVERABLE_BYTES = 10 * 1024 * 1024; // 10MB
-
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function txExplorerUrl(txHash: string, network?: string | null): string {
@@ -157,6 +126,7 @@ function txExplorerUrl(txHash: string, network?: string | null): string {
 export default function SwapDetailPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
   const swapId = params.id;
 
   const [me, setMe] = useState<SessionUser | null>(null);
@@ -165,65 +135,15 @@ export default function SwapDetailPage() {
   const [notFound, setNotFound] = useState(false);
 
   const [deliverOpen, setDeliverOpen] = useState(false);
-  const [addType, setAddType] = useState<DeliverableType>("LINK");
-  const [dTitle, setDTitle] = useState("");
-  const [dLink, setDLink] = useState("");
-  const [dText, setDText] = useState("");
-  const [dFile, setDFile] = useState<{
-    data: string;
-    name: string;
-    size: number;
-    mime: string;
-  } | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [deliveryError, setDeliveryError] = useState("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const deliverablesRef = useRef<HTMLDivElement>(null);
 
   const [actionPending, setActionPending] = useState(false);
   const [actionError, setActionError] = useState("");
 
-  const { enabledWallet } = useCardano({
-    limitNetwork: CARDANO_LIMIT_NETWORK,
-  });
-  const [anchoring, setAnchoring] = useState(false);
-  const [anchorError, setAnchorError] = useState("");
-  const anchorPollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(
-    () => () => {
-      if (anchorPollRef.current) clearTimeout(anchorPollRef.current);
-    },
-    []
-  );
+  const [anchorOpen, setAnchorOpen] = useState(false);
 
   function openDeliverModal() {
-    setAddType("LINK");
-    setDTitle("");
-    setDLink("");
-    setDText("");
-    setDFile(null);
-    setDeliveryError("");
     setDeliverOpen(true);
-  }
-
-  function handleFilePick(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > MAX_DELIVERABLE_BYTES) {
-      setDeliveryError("File must be under 10MB.");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setDFile({
-        data: reader.result as string,
-        name: file.name,
-        size: file.size,
-        mime: file.type,
-      });
-      setDeliveryError("");
-    };
-    reader.readAsDataURL(file);
-    e.target.value = "";
   }
 
   async function loadSwap() {
@@ -252,6 +172,20 @@ export default function SwapDetailPage() {
   useEffect(() => {
     loadSwap().catch(() => router.replace("/login"));
   }, [swapId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-trigger the action from the URL param once the swap has loaded, then
+  // clear the param so refreshing or navigating back doesn't repeat it.
+  useEffect(() => {
+    const action = searchParams.get("action");
+    if (!action || loading) return;
+    if (action === "submit") {
+      openDeliverModal();
+    } else if (action === "deliverables") {
+      deliverablesRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    router.replace(`/swaps/${swapId}`, { scroll: false });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
 
   // Live swap updates - refetch when the other party accepts, delivers,
   // confirms, cancels, or the on-chain status changes.
@@ -285,58 +219,6 @@ export default function SwapDetailPage() {
     }
   }
 
-  async function submitDeliverable() {
-    setDeliveryError("");
-
-    const body: Record<string, unknown> = {
-      type: addType,
-      title: dTitle.trim() || undefined,
-    };
-
-    if (addType === "LINK") {
-      if (!dLink.trim()) {
-        setDeliveryError("Please enter a link.");
-        return;
-      }
-      body.resourceLink = dLink.trim();
-    } else if (addType === "TEXT") {
-      if (!dText.trim()) {
-        setDeliveryError("Please enter some text.");
-        return;
-      }
-      body.notes = dText.trim();
-    } else {
-      if (!dFile) {
-        setDeliveryError("Please choose a file.");
-        return;
-      }
-      body.file = dFile.data;
-      body.fileName = dFile.name;
-      body.fileSize = dFile.size;
-      body.mimeType = dFile.mime;
-    }
-
-    setSubmitting(true);
-    try {
-      const res = await fetch(`/api/swaps/${swapId}/deliver`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setDeliveryError(data.error || "Delivery failed.");
-        return;
-      }
-      setDeliverOpen(false);
-      await loadSwap();
-    } catch {
-      setDeliveryError("Something went wrong.");
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
   async function removeDeliverable(deliveryId: string) {
     try {
       const res = await fetch(
@@ -349,61 +231,35 @@ export default function SwapDetailPage() {
     }
   }
 
-  function pollAnchorConfirmation(attempt = 0) {
-    if (attempt > 10) return;
-    anchorPollRef.current = setTimeout(async () => {
+  // Auto-open the anchor modal the moment a swap becomes COMPLETED with a
+  // pending proof — whether that's on initial load or via a live swap:update.
+  useEffect(() => {
+    if (
+      swap?.status === "COMPLETED" &&
+      swap.proof?.metadataHash &&
+      (swap.proof.chainStatus === "PENDING" || swap.proof.chainStatus === "FAILED")
+    ) {
+      setAnchorOpen(true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [swap?.status, swap?.proof?.chainStatus]);
+
+  // Silently poll for on-chain confirmation after the tx has been submitted.
+  useEffect(() => {
+    if (swap?.proof?.chainStatus !== "ANCHORING") return;
+    const interval = setInterval(async () => {
       try {
         const res = await fetch(`/api/swaps/${swapId}/anchor`);
         const data = await res.json();
         if (data.chainStatus === "ANCHORED") {
+          clearInterval(interval);
           await loadSwap();
-          return;
         }
-      } catch {
-        /* keep polling */
-      }
-      pollAnchorConfirmation(attempt + 1);
+      } catch { /* keep polling */ }
     }, 15_000);
-  }
-
-  async function anchorProof() {
-    if (!swap?.proof?.metadataHash) return;
-    if (!enabledWallet) {
-      setAnchorError("Connect your wallet to anchor the proof on-chain.");
-      return;
-    }
-    setAnchorError("");
-    setAnchoring(true);
-    try {
-      const { buildAndSignProofTx } = await import(
-        "@/lib/cardano/anchor-client"
-      );
-      const signedTx = await buildAndSignProofTx({
-        walletName: enabledWallet,
-        swapId: swap.id,
-        hash: swap.proof.metadataHash,
-        network: swap.proof.network ?? "preprod",
-      });
-      const res = await fetch(`/api/swaps/${swapId}/anchor`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ signedTx }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setAnchorError(data.error || "Anchoring failed.");
-        return;
-      }
-      await loadSwap();
-      pollAnchorConfirmation();
-    } catch {
-      setAnchorError(
-        "Couldn't sign or submit the transaction. Please try again."
-      );
-    } finally {
-      setAnchoring(false);
-    }
-  }
+    return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [swap?.proof?.chainStatus]);
 
   if (loading)
     return <LemniscateLoader loading text="Loading..." overlayOpacity={1} />;
@@ -574,7 +430,7 @@ export default function SwapDetailPage() {
   return (
     <div className="flex flex-col lg:flex-row lg:flex-1 lg:min-h-0">
       {/* ── Main column ─────────────────────────────────────────────── */}
-      <div className="flex-1 lg:overflow-y-auto px-6 py-6 flex flex-col gap-6 min-w-0">
+      <div className="flex-1 h-fit lg:overflow-y-auto px-6 py-6 flex flex-col gap-6 min-w-0">
         {/* Back + header */}
         <div>
           <Link
@@ -659,8 +515,8 @@ export default function SwapDetailPage() {
         </section>
 
         {/* Swap Progress */}
-        <Card className="shadow-sm bg-surface border border-border rounded-2xl p-6">
-          <h2 className="text-base font-semibold text-foreground mb-6">
+        <Card className="h-min shadow-sm bg-surface border border-border rounded-2xl p-6 flex flex-col gap-4">
+          <h2 className="text-base font-semibold text-foreground">
             Swap Progress
           </h2>
           <div className="overflow-x-auto">
@@ -670,7 +526,7 @@ export default function SwapDetailPage() {
 
         {/* Deliverables - ACTIVE or COMPLETED */}
         {(isActive || isCompleted) && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div ref={deliverablesRef} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {/* My Deliverables */}
             <section>
               <div className="flex items-center gap-2 mb-3">
@@ -737,7 +593,7 @@ export default function SwapDetailPage() {
       </div>
 
       {/* ── Action sidebar (stacks below content on mobile) ──────────── */}
-      <aside className="flex flex-col w-full lg:w-64 shrink-0 border-t border-border lg:border-t-0 lg:border-l px-5 py-6 gap-5 lg:overflow-y-auto">
+      <aside className="flex flex-col w-full lg:w-70 shrink-0 border-t border-border lg:border-t-0 lg:border-l px-5 py-6 gap-5 lg:overflow-y-auto">
         {/* ACTIONS */}
         <section>
           <p className="text-[10px] font-semibold tracking-widest text-muted uppercase mb-3">
@@ -851,17 +707,13 @@ export default function SwapDetailPage() {
                 ) : (
                   <Button
                     className="w-full bg-accent text-accent-foreground font-semibold"
-                    onPress={anchorProof}
-                    isPending={anchoring}
+                    onPress={() => setAnchorOpen(true)}
                   >
                     <IconShieldCheck size={15} />
                     {swap.proof?.chainStatus === "FAILED"
                       ? "Retry Anchor"
                       : "Anchor On-Chain"}
                   </Button>
-                )}
-                {anchorError && (
-                  <p className="text-xs text-danger">{anchorError}</p>
                 )}
               </>
             )}
@@ -971,125 +823,23 @@ export default function SwapDetailPage() {
       </aside>
 
       {/* ── Add deliverable modal ─────────────────────────────────────── */}
-      <Modal.Backdrop isOpen={deliverOpen} onOpenChange={setDeliverOpen}>
-        <Modal.Container>
-          <Modal.Dialog className="sm:max-w-md">
-            <Modal.CloseTrigger />
-            <Modal.Header>
-              <Modal.Heading>Add Deliverable</Modal.Heading>
-              <p className="text-sm text-muted mt-1">
-                Add an outcome of this exchange - a link, a note, or a file. You
-                can add as many as you like.
-              </p>
-            </Modal.Header>
-            <Modal.Body>
-              <div className="flex flex-col gap-4 p-1">
-                {/* Type picker */}
-                <div className="flex flex-wrap gap-2">
-                  {DELIVERABLE_TYPES.map((t) => {
-                    const Icon = t.icon;
-                    const active = addType === t.id;
-                    return (
-                      <button
-                        key={t.id}
-                        type="button"
-                        onClick={() => {
-                          setAddType(t.id);
-                          setDFile(null);
-                          setDeliveryError("");
-                        }}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm transition-colors ${
-                          active
-                            ? "border-accent bg-accent/10 text-accent font-medium"
-                            : "border-border text-muted hover:text-foreground"
-                        }`}
-                      >
-                        <Icon size={14} />
-                        {t.label}
-                      </button>
-                    );
-                  })}
-                </div>
+      <AddDeliverableModal
+        swapId={swapId}
+        isOpen={deliverOpen}
+        onOpenChange={setDeliverOpen}
+        onSuccess={loadSwap}
+      />
 
-                <TextField className="w-full" value={dTitle} onChange={setDTitle}>
-                  <Label>Title (optional)</Label>
-                  <Input placeholder="e.g. Intro to React - recording" />
-                </TextField>
-
-                {addType === "LINK" && (
-                  <TextField
-                    className="w-full"
-                    value={dLink}
-                    onChange={setDLink}
-                    isRequired
-                  >
-                    <Label>Link</Label>
-                    <Input placeholder="https://…" type="url" />
-                  </TextField>
-                )}
-
-                {addType === "TEXT" && (
-                  <TextField
-                    className="w-full"
-                    value={dText}
-                    onChange={setDText}
-                    isRequired
-                  >
-                    <Label>Text</Label>
-                    <TextArea placeholder="Write your note…" rows={4} />
-                  </TextField>
-                )}
-
-                {(addType === "IMAGE" ||
-                  addType === "DOCUMENT" ||
-                  addType === "FILE") && (
-                  <div className="flex flex-col gap-2">
-                    <Label>File</Label>
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="w-full border border-dashed border-border rounded-xl px-4 py-4 text-sm text-muted hover:text-foreground hover:border-accent/40 transition-colors flex items-center justify-center gap-2"
-                    >
-                      <IconPaperclip size={15} />
-                      {dFile ? dFile.name : "Choose a file (max 10MB)"}
-                    </button>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept={
-                        DELIVERABLE_TYPES.find((t) => t.id === addType)?.accept
-                      }
-                      className="hidden"
-                      onChange={handleFilePick}
-                    />
-                  </div>
-                )}
-
-                {deliveryError && (
-                  <Alert status="danger">
-                    <Alert.Indicator />
-                    <Alert.Content>
-                      <Alert.Description>{deliveryError}</Alert.Description>
-                    </Alert.Content>
-                  </Alert>
-                )}
-              </div>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button slot="close" variant="secondary">
-                Cancel
-              </Button>
-              <Button
-                className="bg-success text-success-foreground font-semibold"
-                onPress={submitDeliverable}
-                isPending={submitting}
-              >
-                Add
-              </Button>
-            </Modal.Footer>
-          </Modal.Dialog>
-        </Modal.Container>
-      </Modal.Backdrop>
+      {/* ── Anchor proof modal (auto-opens on completion; undismissable) ── */}
+      {swap.proof?.metadataHash && (
+        <AnchorProofModal
+          swapId={swapId}
+          metadataHash={swap.proof.metadataHash}
+          network={swap.proof.network ?? "preprod"}
+          isOpen={anchorOpen}
+          onSubmitted={() => { setAnchorOpen(false); loadSwap(); }}
+        />
+      )}
     </div>
   );
 }

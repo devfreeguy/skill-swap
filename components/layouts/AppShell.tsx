@@ -160,6 +160,7 @@ export default function AppShell({ user, children }: Props) {
       <AppSidebar
         user={user}
         msgUnread={msgUnread}
+        notifUnread={unreadCount}
         loggingOut={loggingOut}
         onLogout={() => setLogoutOpen(true)}
       />
