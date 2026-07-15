@@ -2,7 +2,6 @@
 
 import Logo from "@/components/elements/Logo";
 import ThemeToggle from "@/components/elements/ThemeToggle";
-import NetworkSwitcher from "@/components/elements/NetworkSwitcher";
 import { Avatar } from "@heroui/react";
 import { useNetworkContext } from "@/components/providers/NetworkProvider";
 import { NAV_ITEMS, isActivePath } from "@/components/layouts/nav";
@@ -66,11 +65,6 @@ export default function AppSidebar({
               </Link>
             );
           })}
-
-          {/* Network switcher */}
-          <div className="mt-auto mb-1 mx-1">
-            <NetworkSwitcher />
-          </div>
 
           {!isMainnet && (
             <span className="inline-flex items-center mx-2 px-2.5 py-1 rounded-md text-[11px] font-medium text-muted border border-border bg-background w-fit">
