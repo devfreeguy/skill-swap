@@ -76,7 +76,7 @@ function normalizeWalletError(err: unknown): string {
 
 export function useWalletAuth() {
   const { limitNetwork } = useNetworkContext();
-  const { isConnected, stakeAddress, signMessage, connect, enabledWallet } =
+  const { isConnected, stakeAddress, signMessage, connect: rawConnect, enabledWallet } =
     useCardano({
       limitNetwork: limitNetwork as NetworkType,
     });
@@ -103,6 +103,28 @@ export function useWalletAuth() {
     },
     []
   );
+
+  /**
+   * Wraps the library's connect() which returns BEFORE the wallet is actually
+   * connected (the underlying Wallet.connect() is fire-and-forget). This wrapper
+   * returns a promise that only resolves after the onConnect callback fires,
+   * ensuring signMessage is called only when the wallet is truly ready.
+   */
+  function connect(walletName: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      rawConnect(
+        walletName,
+        () => {
+          // onConnect — wallet is now connected and authorized
+          resolve();
+        },
+        (error) => {
+          // onError — connection failed or was rejected
+          reject(error);
+        }
+      );
+    });
+  }
 
   function setPhase(text: string, hint = "") {
     setLoadingText(text);
