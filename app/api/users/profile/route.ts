@@ -3,7 +3,6 @@ import { requireAuth } from "@/lib/api";
 import { uploadAvatar } from "@/lib/cloudinary";
 import { signToken } from "@/lib/jwt";
 import { setAuthCookie } from "@/lib/cookies";
-import { syncProfileToOtherNetwork } from "@/lib/network-profile-sync";
 import { getNetwork } from "@/lib/network";
 
 export async function GET(request: NextRequest) {
@@ -77,15 +76,6 @@ export async function PATCH(request: NextRequest) {
     where: { id: currentUser.id },
     data: profileData,
   });
-
-  // Dual-write: keep profile in sync with the other network (best-effort).
-  void syncProfileToOtherNetwork(
-    currentUser.id,
-    getNetwork(request),
-    profileData,
-    currentUser.walletAddress ?? null,
-    currentUser.twitterId ?? null
-  );
 
   const response = NextResponse.json({
     id: updated.id,

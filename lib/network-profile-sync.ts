@@ -143,8 +143,17 @@ const PROFILE_SELECT = Object.fromEntries(
 );
 
 /**
- * When a user logs in on a new network for the first time (newUser was just
- * created), copy their profile from the other network's database.
+ * When a user signs in to a network where no profile exists, attempt to
+ * migrate their profile from the alternative network — but ONLY if the
+ * alternative network contains a fully onboarded profile (both teachSkill
+ * and learnSkill are set).
+ *
+ * This enforces strict dataset isolation between mainnet and testnet by
+ * default. The sole exception is the one-time profile migration described
+ * above. All other data types (swaps, proofs, messages, etc.) remain
+ * isolated. This function never overwrites existing data on the current
+ * network because it should only be called for newly created users.
+ *
  * Uses three strategies in order: twitterId, converted wallet address,
  * stake key hash scan (handles any address format differences).
  *
@@ -208,6 +217,18 @@ export async function syncProfileFromOtherNetwork(
       return false;
     }
 
+    // ── Strict dataset isolation ──────────────────────────────────────────
+    // Only migrate profile data if the alternative network has a fully
+    // onboarded user (both teachSkill AND learnSkill are set). This ensures
+    // we never merge partial/incomplete datasets across environments.
+    if (!otherUser.teachSkill || !otherUser.learnSkill) {
+      console.log(
+        `[sync] ${otherNetwork} user found but NOT fully onboarded ` +
+        `(teachSkill=${!!otherUser.teachSkill}, learnSkill=${!!otherUser.learnSkill}) — skipping`
+      );
+      return false;
+    }
+
     // Copy every non-null field. Copy even partial profiles so name/avatar
     // pre-fill on onboarding if skills haven't been set yet.
     const fieldsToCopy = PROFILE_FIELDS.filter(
@@ -223,54 +244,9 @@ export async function syncProfileFromOtherNetwork(
       });
     }
 
-    return !!(otherUser.teachSkill && otherUser.learnSkill);
+    return true;
   } catch (err) {
     console.error(`[sync] failed:`, err);
     return false;
-  }
-}
-
-/**
- * Write profile fields to the counterpart network's database in the background.
- * Called after every profile PATCH so the two networks stay in sync.
- * Never throws.
- */
-export async function syncProfileToOtherNetwork(
-  userId: string,
-  network: ActiveNetwork,
-  fields: Partial<Record<typeof PROFILE_FIELDS[number], unknown>>,
-  walletAddress: string | null,
-  twitterId: string | null
-): Promise<void> {
-  try {
-    const otherNetwork: ActiveNetwork = network === "mainnet" ? "preprod" : "mainnet";
-    const otherDb = getPrisma(otherNetwork);
-
-    let otherUser: { id: string } | null = null;
-
-    if (twitterId) {
-      otherUser = await otherDb.user.findFirst({
-        where: { twitterId },
-        select: { id: true },
-      });
-    }
-    if (!otherUser && walletAddress) {
-      const otherAddr = crossNetworkStakeAddr(walletAddress, otherNetwork);
-      if (otherAddr) {
-        otherUser = await otherDb.user.findFirst({
-          where: { walletAddress: { equals: otherAddr, mode: "insensitive" } },
-          select: { id: true },
-        });
-      }
-    }
-
-    if (!otherUser) return;
-
-    await otherDb.user.update({
-      where: { id: otherUser.id },
-      data: fields as Parameters<typeof otherDb.user.update>[0]["data"],
-    });
-  } catch {
-    // Best-effort — never fail the profile update.
   }
 }
