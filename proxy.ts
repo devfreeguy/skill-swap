@@ -29,7 +29,7 @@ export async function proxy(request: NextRequest) {
   }
 
   if (!payload.onboarded) {
-    return NextResponse.redirect(new URL("/onboarding", request.url));
+    return NextResponse.redirect(new URL("/migrating", request.url));
   }
 
   return NextResponse.next();
