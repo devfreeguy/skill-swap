@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import { getPrisma } from "@/lib/prisma";
+import { getNetwork } from "@/lib/network";
 import { parseSkills } from "@/lib/skills";
 
 /**
@@ -7,8 +8,10 @@ import { parseSkills } from "@/lib/skills";
  * Counts every occurrence of each skill in both teachSkill and learnSkill
  * columns, then returns the top results sorted by frequency descending.
  */
-export async function GET() {
-  const users = await prisma.user.findMany({
+export async function GET(request: NextRequest) {
+  const db = getPrisma(getNetwork(request));
+
+  const users = await db.user.findMany({
     where: {
       OR: [{ teachSkill: { not: null } }, { learnSkill: { not: null } }],
     },

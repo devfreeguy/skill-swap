@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/api";
+import { getNetwork } from "@/lib/network";
 import { emitToUser } from "@/lib/socket";
 import { submitTx } from "@/lib/cardano/providers";
 import { signedTxPaysAtLeast } from "@/lib/cardano/fee-verify";
-import {
-  PAYMENTS_ENABLED,
-  PLATFORM_WALLET_ADDRESS,
-  SWAP_FEE_LOVELACE,
-} from "@/lib/cardano/fee";
+import { getFeeConfig } from "@/lib/cardano/fee";
 
 // Submitting the fee payment tx runs on Node.
 export const runtime = "nodejs";
@@ -16,9 +12,9 @@ export const runtime = "nodejs";
 export async function GET(request: NextRequest) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
 
-  const swaps = await prisma.swap.findMany({
+  const swaps = await db.swap.findMany({
     where: {
       OR: [{ initiatorId: currentUser.id }, { receiverId: currentUser.id }],
     },
@@ -51,7 +47,11 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
+
+  const network = getNetwork(request);
+  const { PAYMENTS_ENABLED, PLATFORM_WALLET_ADDRESS, SWAP_FEE_LOVELACE } =
+    getFeeConfig(network);
 
   const body = await request.json();
   const { receiverId, initiatorSkill, receiverSkill, adaTxHash, signedPaymentTx, refundAddress } =
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
   // One conversation per pair at a time: block a new swap if there's already a
   // pending or active one with this person (in either direction). Concurrent
   // swaps with *different* people are still allowed.
-  const ongoing = await prisma.swap.findFirst({
+  const ongoing = await db.swap.findFirst({
     where: {
       status: { in: ["PENDING", "ACTIVE"] },
       OR: [
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
   // Don't allow re-swapping the same skill pair you've already completed with
   // this person (a different skill exchange with them later is fine). The pair
   // is matched in both directions.
-  const alreadyExchanged = await prisma.swap.findFirst({
+  const alreadyExchanged = await db.swap.findFirst({
     where: {
       status: "COMPLETED",
       OR: [
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
 
     let feeTxHash: string;
     try {
-      ({ txHash: feeTxHash } = await submitTx(signedPaymentTx));
+      ({ txHash: feeTxHash } = await submitTx(signedPaymentTx, network));
     } catch {
       return NextResponse.json(
         { error: "Couldn't submit the swap-fee payment. Please try again." },
@@ -176,7 +176,7 @@ export async function POST(request: NextRequest) {
     };
   }
 
-  const swap = await prisma.swap.create({
+  const swap = await db.swap.create({
     data: {
       initiatorId: currentUser.id,
       receiverId,
@@ -189,7 +189,7 @@ export async function POST(request: NextRequest) {
   });
 
   const requestMessage = `${currentUser.name} wants to learn ${receiverSkill} and will teach you ${initiatorSkill}.`;
-  await prisma.notification.create({
+  await db.notification.create({
     data: {
       userId: receiverId,
       type: "SWAP_REQUEST",

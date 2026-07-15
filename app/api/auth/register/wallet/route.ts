@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import verifySignature from "@cardano-foundation/cardano-verify-datasignature";
-import prisma from "@/lib/prisma";
+import { getPrisma } from "@/lib/prisma";
+import { getNetwork } from "@/lib/network";
 import { signToken } from "@/lib/jwt";
 import { setAuthCookie } from "@/lib/cookies";
 import { consumeNonce } from "@/lib/wallet-nonce-store";
+import { syncProfileFromOtherNetwork } from "@/lib/network-profile-sync";
 
 // CIP-8 verification (cardano-verify-datasignature) needs Node APIs.
 export const runtime = "nodejs";
@@ -19,7 +21,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (!(await consumeNonce(nonce))) {
+  const network = getNetwork(request);
+  const db = getPrisma(network);
+
+  if (!(await consumeNonce(nonce, db))) {
     return NextResponse.json(
       { error: "Invalid or expired nonce" },
       { status: 401 }
@@ -41,7 +46,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const existingWallet = await prisma.user.findUnique({ where: { walletAddress } });
+  const existingWallet = await db.user.findUnique({ where: { walletAddress } });
   if (existingWallet) {
     return NextResponse.json(
       { error: "Wallet already linked to an account" },
@@ -50,7 +55,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (email) {
-    const existingEmail = await prisma.user.findUnique({ where: { email } });
+    const existingEmail = await db.user.findUnique({ where: { email } });
     if (existingEmail) {
       return NextResponse.json(
         { error: "Email already in use" },
@@ -59,7 +64,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const user = await prisma.user.create({
+  const user = await db.user.create({
     data: {
       name,
       email: email || null,
@@ -67,15 +72,21 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  const token = await signToken({ id: user.id, email: user.email ?? "", name: user.name, onboarded: false });
+  // Silently copy profile from the other network's DB (best-effort).
+  await syncProfileFromOtherNetwork(user.id, network, walletAddress, null);
+
+  // Re-fetch to pick up any synced fields (e.g. teachSkill, learnSkill).
+  const finalUser = await db.user.findUnique({ where: { id: user.id } }) ?? user;
+
+  const token = await signToken({ id: finalUser.id, email: finalUser.email ?? "", name: finalUser.name, onboarded: !!(finalUser.teachSkill && finalUser.learnSkill) });
   const response = NextResponse.json({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    avatarUrl: user.avatarUrl,
-    teachSkill: user.teachSkill,
-    learnSkill: user.learnSkill,
-    walletAddress: user.walletAddress,
+    id: finalUser.id,
+    name: finalUser.name,
+    email: finalUser.email,
+    avatarUrl: finalUser.avatarUrl,
+    teachSkill: finalUser.teachSkill,
+    learnSkill: finalUser.learnSkill,
+    walletAddress: finalUser.walletAddress,
   });
   setAuthCookie(response, token);
   return response;

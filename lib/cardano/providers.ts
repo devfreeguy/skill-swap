@@ -2,8 +2,7 @@
  * Multi-provider Cardano access with automatic fallback.
  *
  * Submitting and confirming a transaction each try a chain of providers in
- * order and fall back to the next on failure, so a single provider outage
- * doesn't break on-chain proof anchoring:
+ * order and fall back to the next on failure:
  *
  *   Blockfrost (keyed) → Koios (free, no key) → Maestro (keyed, optional)
  *
@@ -12,11 +11,6 @@
 
 export type CardanoNetwork = "mainnet" | "preprod" | "preview";
 
-export const NETWORK: CardanoNetwork = ((): CardanoNetwork => {
-  const v = process.env.NEXT_PUBLIC_CARDANO_NETWORK;
-  return v === "mainnet" || v === "preprod" || v === "preview" ? v : "preprod";
-})();
-
 interface TxOutput {
   address: string;
   lovelace: bigint;
@@ -24,15 +18,8 @@ interface TxOutput {
 
 interface Provider {
   name: string;
-  /** Submit a CBOR-hex signed tx; resolves to the tx hash. */
   submitTx(txHex: string): Promise<string>;
-  /** Whether the tx is on-chain (confirmed in a block). */
   isConfirmed(txHash: string): Promise<boolean>;
-  /**
-   * The tx's outputs once it's on-chain, or `null` if the tx isn't visible yet
-   * (still pending / not found). Optional — only providers that can resolve
-   * outputs implement it.
-   */
   getOutputs?(txHash: string): Promise<TxOutput[] | null>;
 }
 
@@ -47,10 +34,13 @@ function hexToBytes(hex: string): Uint8Array {
 
 // ── Blockfrost ────────────────────────────────────────────────────────────────
 
-function blockfrost(): Provider | null {
-  const key = process.env.BLOCKFROST_API_KEY;
+function blockfrost(network: CardanoNetwork): Provider | null {
+  const key =
+    network === "mainnet"
+      ? (process.env.BLOCKFROST_API_KEY_MAINNET ?? process.env.BLOCKFROST_API_KEY)
+      : (process.env.BLOCKFROST_API_KEY_PREPROD ?? process.env.BLOCKFROST_API_KEY);
   if (!key) return null;
-  const base = `https://cardano-${NETWORK}.blockfrost.io/api/v0`;
+  const base = `https://cardano-${network}.blockfrost.io/api/v0`;
   return {
     name: "blockfrost",
     async submitTx(txHex) {
@@ -91,11 +81,11 @@ function blockfrost(): Provider | null {
 
 // ── Koios (free, no key) ──────────────────────────────────────────────────────
 
-function koios(): Provider {
+function koios(network: CardanoNetwork): Provider {
   const host =
-    NETWORK === "mainnet"
+    network === "mainnet"
       ? "api.koios.rest"
-      : NETWORK === "preprod"
+      : network === "preprod"
         ? "preprod.koios.rest"
         : "preview.koios.rest";
   const base = `https://${host}/api/v1`;
@@ -108,7 +98,6 @@ function koios(): Provider {
         body: hexToBytes(txHex) as unknown as BodyInit,
       });
       if (!res.ok) throw new Error(`koios submit ${res.status}`);
-      // Koios returns the tx hash as a quoted JSON string.
       return (await res.json()) as string;
     },
     async isConfirmed(txHash) {
@@ -137,7 +126,7 @@ function koios(): Provider {
         outputs: { payment_addr?: { bech32?: string }; value: string }[];
       }[];
       const row = rows.find((r) => r.tx_hash === txHash);
-      if (!row) return null; // not on-chain yet
+      if (!row) return null;
       return (row.outputs ?? []).map((o) => ({
         address: o.payment_addr?.bech32 ?? "",
         lovelace: BigInt(o.value ?? "0"),
@@ -148,10 +137,10 @@ function koios(): Provider {
 
 // ── Maestro (keyed, optional) ─────────────────────────────────────────────────
 
-function maestro(): Provider | null {
+function maestro(network: CardanoNetwork): Provider | null {
   const key = process.env.MAESTRO_API_KEY;
   if (!key) return null;
-  const base = `https://${NETWORK}.gomaestro-api.org/v1`;
+  const base = `https://${network}.gomaestro-api.org/v1`;
   return {
     name: "maestro",
     async submitTx(txHex) {
@@ -174,18 +163,19 @@ function maestro(): Provider | null {
   };
 }
 
-function providers(): Provider[] {
-  return [blockfrost(), koios(), maestro()].filter(
+function getProviders(network: CardanoNetwork): Provider[] {
+  return [blockfrost(network), koios(network), maestro(network)].filter(
     (p): p is Provider => p !== null
   );
 }
 
 /** Submit a signed tx, trying each provider until one succeeds. */
 export async function submitTx(
-  txHex: string
+  txHex: string,
+  network: CardanoNetwork = "preprod"
 ): Promise<{ txHash: string; provider: string }> {
   const errors: string[] = [];
-  for (const p of providers()) {
+  for (const p of getProviders(network)) {
     try {
       const txHash = await p.submitTx(txHex);
       return { txHash, provider: p.name };
@@ -198,26 +188,17 @@ export async function submitTx(
 
 export type PaymentCheck = "CONFIRMED" | "PENDING" | "INSUFFICIENT";
 
-/**
- * Verify that `txHash` pays at least `minLovelace` to `toAddress` on-chain.
- *
- *   CONFIRMED    — tx is on-chain and pays ≥ minLovelace to the address
- *   INSUFFICIENT — tx is on-chain but pays too little (or nothing) there
- *   PENDING      — tx not visible on-chain yet, or no provider could resolve it
- *
- * The caller treats PENDING as "check again later" and only acts on the
- * terminal CONFIRMED / INSUFFICIENT results.
- */
 export async function verifyPaymentTx(
   txHash: string,
   toAddress: string,
-  minLovelace: bigint
+  minLovelace: bigint,
+  network: CardanoNetwork = "preprod"
 ): Promise<PaymentCheck> {
-  for (const p of providers()) {
+  for (const p of getProviders(network)) {
     if (!p.getOutputs) continue;
     try {
       const outputs = await p.getOutputs(txHash);
-      if (outputs === null) return "PENDING"; // reached provider; tx not yet on-chain
+      if (outputs === null) return "PENDING";
       const paid = outputs
         .filter((o) => o.address === toAddress)
         .reduce((sum, o) => sum + o.lovelace, BigInt(0));
@@ -230,8 +211,11 @@ export async function verifyPaymentTx(
 }
 
 /** True if any provider reports the tx as confirmed on-chain. */
-export async function isTxConfirmed(txHash: string): Promise<boolean> {
-  for (const p of providers()) {
+export async function isTxConfirmed(
+  txHash: string,
+  network: CardanoNetwork = "preprod"
+): Promise<boolean> {
+  for (const p of getProviders(network)) {
     try {
       if (await p.isConfirmed(txHash)) return true;
     } catch {

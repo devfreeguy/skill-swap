@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/api";
 import { uploadMessageFile } from "@/lib/cloudinary";
 import { emitToUser, emitToSwap } from "@/lib/socket";
@@ -11,11 +10,11 @@ export async function GET(
 ) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
 
   const { swapId } = await params;
 
-  const swap = await prisma.swap.findUnique({
+  const swap = await db.swap.findUnique({
     where: { id: swapId },
     include: {
       initiator: {
@@ -40,7 +39,7 @@ export async function GET(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const messages = await prisma.message.findMany({
+  const messages = await db.message.findMany({
     where: { swapId },
     include: {
       sender: { select: { id: true, name: true, avatarUrl: true } },
@@ -57,11 +56,11 @@ export async function POST(
 ) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
 
   const { swapId } = await params;
 
-  const swap = await prisma.swap.findUnique({ where: { id: swapId } });
+  const swap = await db.swap.findUnique({ where: { id: swapId } });
   if (!swap) {
     return NextResponse.json({ error: "Swap not found" }, { status: 404 });
   }
@@ -134,7 +133,7 @@ export async function POST(
     fileUrl = uploaded.url;
   }
 
-  const message = await prisma.message.create({
+  const message = await db.message.create({
     data: {
       swapId,
       senderId: currentUser.id,

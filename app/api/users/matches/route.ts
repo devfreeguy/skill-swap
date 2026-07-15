@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/api";
 import { scoreMatch } from "@/lib/matching";
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
 
-  const candidates = await prisma.user.findMany({
+  const candidates = await db.user.findMany({
     where: {
       id: { not: currentUser.id },
       OR: [{ teachSkill: { not: null } }, { learnSkill: { not: null } }],

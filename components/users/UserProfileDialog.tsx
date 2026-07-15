@@ -3,13 +3,9 @@
 import { parseSkills } from "@/lib/skills";
 import { scoreMatch } from "@/lib/matching";
 import { useCardano } from "@cardano-foundation/cardano-connect-with-wallet";
-import { CARDANO_LIMIT_NETWORK } from "@/lib/cardano";
-import {
-  PAYMENTS_ENABLED,
-  PLATFORM_WALLET_ADDRESS,
-  SWAP_FEE_ADA,
-  SWAP_FEE_LOVELACE,
-} from "@/lib/cardano/fee";
+import { useNetworkContext } from "@/components/providers/NetworkProvider";
+import { getFeeConfig } from "@/lib/cardano/fee";
+import type { NetworkType } from "@cardano-foundation/cardano-connect-with-wallet-core";
 import SkillTag from "@/components/elements/SkillTag";
 import {
   Alert,
@@ -69,7 +65,9 @@ export default function UserProfileDialog({ userId, children }: Props) {
   const [me, setMe] = useState<SessionUser | null>(null);
   const [profile, setProfile] = useState<ProfileUser | null>(null);
 
-  const { enabledWallet, connect } = useCardano({ limitNetwork: CARDANO_LIMIT_NETWORK });
+  const { network, limitNetwork } = useNetworkContext();
+  const { PAYMENTS_ENABLED, PLATFORM_WALLET_ADDRESS, SWAP_FEE_ADA, SWAP_FEE_LOVELACE } = getFeeConfig(network);
+  const { enabledWallet, connect } = useCardano({ limitNetwork: limitNetwork as NetworkType });
   const [submitting, setSubmitting] = useState(false);
   const [swapError, setSwapError] = useState("");
   const [swapStatus, setSwapStatus] = useState("");

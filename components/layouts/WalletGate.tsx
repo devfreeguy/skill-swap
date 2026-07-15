@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { Modal } from "@heroui/react";
 import { IconWallet } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-import { CARDANO_NETWORK_LABEL, IS_MAINNET } from "@/lib/cardano";
+import { useNetworkContext } from "@/components/providers/NetworkProvider";
 
 const WalletConnectButton = dynamic(
   () => import("@/components/elements/WalletConnectButton"),
@@ -18,6 +18,7 @@ const WalletConnectButton = dynamic(
  * modal until they link one. Renders nothing once a wallet is present.
  */
 export default function WalletGate() {
+  const { isMainnet, label } = useNetworkContext();
   const [needsWallet, setNeedsWallet] = useState(false);
 
   useEffect(() => {
@@ -57,9 +58,9 @@ export default function WalletGate() {
               for your completed swaps and secures your end-to-end encrypted
               messages. You can&apos;t access the app until one is linked.
             </p>
-            {!IS_MAINNET && (
+            {!isMainnet && (
               <p className="text-xs text-muted">
-                You&apos;re on <strong>{CARDANO_NETWORK_LABEL}</strong> - you can
+                You&apos;re on <strong>{label}</strong> - you can
                 get free test ADA from a faucet to cover the tiny proof fee.
               </p>
             )}

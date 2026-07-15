@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import verifySignature from "@cardano-foundation/cardano-verify-datasignature";
-import prisma from "@/lib/prisma";
+import { getPrisma } from "@/lib/prisma";
+import { getNetwork } from "@/lib/network";
 import { signToken } from "@/lib/jwt";
 import { setAuthCookie } from "@/lib/cookies";
 import { consumeNonce } from "@/lib/wallet-nonce-store";
@@ -19,7 +20,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const user = await prisma.user.findUnique({ where: { walletAddress } });
+  const db = getPrisma(getNetwork(request));
+
+  const user = await db.user.findUnique({ where: { walletAddress } });
   if (!user) {
     return NextResponse.json(
       { error: "Wallet not linked to any account" },
@@ -28,7 +31,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Nonce must have been issued by /api/auth/wallet/nonce and is single-use.
-  if (!(await consumeNonce(nonce))) {
+  if (!(await consumeNonce(nonce, db))) {
     return NextResponse.json(
       { error: "Invalid or expired nonce" },
       { status: 401 }

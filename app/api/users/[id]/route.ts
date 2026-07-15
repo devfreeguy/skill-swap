@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/api";
 
 export async function GET(
@@ -8,11 +7,11 @@ export async function GET(
 ) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { db } = auth;
 
   const { id } = await params;
 
-  const user = await prisma.user.findUnique({
+  const user = await db.user.findUnique({
     where: { id },
     select: {
       id: true,

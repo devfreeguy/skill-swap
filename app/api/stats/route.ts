@@ -1,16 +1,19 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import { getPrisma } from "@/lib/prisma";
+import { getNetwork } from "@/lib/network";
 import { parseSkills } from "@/lib/skills";
 
 /**
  * Public endpoint — platform-wide aggregate stats for the landing page.
  * No authentication required.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const db = getPrisma(getNetwork(request));
+
   const [proofs, completedSwaps, usersWithSkills] = await Promise.all([
-    prisma.proof.count(),
-    prisma.swap.count({ where: { status: "COMPLETED" } }),
-    prisma.user.findMany({
+    db.proof.count(),
+    db.swap.count({ where: { status: "COMPLETED" } }),
+    db.user.findMany({
       where: {
         OR: [{ teachSkill: { not: null } }, { learnSkill: { not: null } }],
       },

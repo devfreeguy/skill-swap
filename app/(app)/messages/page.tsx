@@ -15,8 +15,9 @@ import MessageComposer from "@/components/messaging/MessageComposer";
 import SystemEvent from "@/components/messaging/SystemEvent";
 import { cn, formatDaySeparator, isSameDay } from "@/lib/utils";
 import { parseSkills } from "@/lib/skills";
-import { CARDANO_LIMIT_NETWORK } from "@/lib/cardano";
+import { useNetworkContext } from "@/components/providers/NetworkProvider";
 import { useCardano } from "@cardano-foundation/cardano-connect-with-wallet";
+import type { NetworkType } from "@cardano-foundation/cardano-connect-with-wallet-core";
 import {
   decryptMessage,
   getMyKeyPair,
@@ -80,7 +81,8 @@ export default function MessagesPage() {
   const [mobileView, setMobileView] = useState<"list" | "chat">("list");
   const [contextDrawerOpen, setContextDrawerOpen] = useState(false);
 
-  const { enabledWallet } = useCardano({ limitNetwork: CARDANO_LIMIT_NETWORK });
+  const { limitNetwork } = useNetworkContext();
+  const { enabledWallet } = useCardano({ limitNetwork: limitNetwork as NetworkType });
   const [myKeyPair, setMyKeyPair] = useState<E2EKeyPair | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
