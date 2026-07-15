@@ -4,8 +4,9 @@ import { Button, Modal, Separator } from "@heroui/react";
 import { IconShieldCheck } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useCardano } from "@cardano-foundation/cardano-connect-with-wallet";
-import { CARDANO_LIMIT_NETWORK } from "@/lib/cardano";
+import { useNetworkContext } from "@/components/providers/NetworkProvider";
 import dynamic from "next/dynamic";
+import type { NetworkType } from "@cardano-foundation/cardano-connect-with-wallet-core";
 
 const WalletConnectButton = dynamic(
   () => import("@/components/elements/WalletConnectButton"),
@@ -32,7 +33,8 @@ export default function AnchorProofModal({
   isOpen,
   onSubmitted,
 }: Props) {
-  const { enabledWallet } = useCardano({ limitNetwork: CARDANO_LIMIT_NETWORK });
+  const { limitNetwork } = useNetworkContext();
+  const { enabledWallet } = useCardano({ limitNetwork: limitNetwork as NetworkType });
   const [signing, setSigning] = useState(false);
   const [error, setError] = useState("");
 

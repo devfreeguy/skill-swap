@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/api";
 
 export async function PATCH(
@@ -8,11 +7,11 @@ export async function PATCH(
 ) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
 
   const { id } = await params;
 
-  const notification = await prisma.notification.findUnique({ where: { id } });
+  const notification = await db.notification.findUnique({ where: { id } });
   if (!notification) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -20,7 +19,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const updated = await prisma.notification.update({
+  const updated = await db.notification.update({
     where: { id },
     data: { read: true },
   });

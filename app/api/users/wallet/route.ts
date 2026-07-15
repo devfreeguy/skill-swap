@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import verifySignature from "@cardano-foundation/cardano-verify-datasignature";
-import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/api";
 import { signToken } from "@/lib/jwt";
 import { setAuthCookie } from "@/lib/cookies";
@@ -17,7 +16,7 @@ export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
 
   const body = await request.json();
   const { walletAddress, signature, key, nonce } = body;
@@ -30,7 +29,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Single-use nonce issued by /api/auth/wallet/nonce.
-  if (!consumeNonce(nonce)) {
+  if (!(await consumeNonce(nonce, db))) {
     return NextResponse.json(
       { error: "Invalid or expired nonce" },
       { status: 401 }
@@ -52,7 +51,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Reject a wallet already bound to a different account.
-  const existing = await prisma.user.findUnique({ where: { walletAddress } });
+  const existing = await db.user.findUnique({ where: { walletAddress } });
   if (existing && existing.id !== currentUser.id) {
     return NextResponse.json(
       { error: "This wallet is already linked to another account." },
@@ -60,7 +59,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const updated = await prisma.user.update({
+  const updated = await db.user.update({
     where: { id: currentUser.id },
     data: { walletAddress },
   });
@@ -85,9 +84,9 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
 
-  const updated = await prisma.user.update({
+  const updated = await db.user.update({
     where: { id: currentUser.id },
     data: { walletAddress: null },
   });

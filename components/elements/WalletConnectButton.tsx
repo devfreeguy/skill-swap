@@ -5,13 +5,10 @@ import { Alert, Button, Chip, Popover } from "@heroui/react";
 import Image from "next/image";
 import { useCardano } from "@cardano-foundation/cardano-connect-with-wallet";
 import { useWalletAuth } from "@/hooks/useWalletAuth";
-import {
-  CARDANO_LIMIT_NETWORK,
-  CARDANO_NETWORK_LABEL,
-  IS_MAINNET,
-} from "@/lib/cardano";
+import { useNetworkContext } from "@/components/providers/NetworkProvider";
 import LemniscateLoader from "@/components/layouts/Loader";
 import { truncateAddress } from "@/lib/utils";
+import type { NetworkType } from "@cardano-foundation/cardano-connect-with-wallet-core";
 
 type WalletInfo = {
   name: string;
@@ -21,8 +18,6 @@ type WalletInfo = {
 
 // 0 = testnet (preprod/preview), 1 = mainnet, null = unknown (not yet authorized)
 type NetworkId = 0 | 1 | null;
-
-const EXPECTED_NETWORK_ID: NetworkId = IS_MAINNET ? 1 : 0;
 
 function getAvailableWallets(): WalletInfo[] {
   if (typeof window === "undefined") return [];
@@ -61,8 +56,11 @@ export default function WalletConnectButton({
   mode = "login",
   onLinked,
 }: WalletConnectButtonProps) {
+  const { isMainnet, label, limitNetwork } = useNetworkContext();
+  const expectedNetworkId: NetworkId = isMainnet ? 1 : 0;
+
   const { isConnected, disconnect } = useCardano({
-    limitNetwork: CARDANO_LIMIT_NETWORK,
+    limitNetwork: limitNetwork as NetworkType,
   });
   const {
     connectAndAuth,
@@ -149,8 +147,8 @@ export default function WalletConnectButton({
         <div className="flex flex-col gap-2 w-full">
           <div className="flex items-center justify-center gap-2">
             <span className="text-xs text-muted">Network</span>
-            <Chip size="sm" color={IS_MAINNET ? "success" : "warning"}>
-              {CARDANO_NETWORK_LABEL}
+            <Chip size="sm" color={isMainnet ? "success" : "warning"}>
+              {label}
             </Chip>
           </div>
           <div className="flex items-center gap-2 w-full">
@@ -175,11 +173,11 @@ export default function WalletConnectButton({
             <div className="flex-1">
               <p className="text-xs font-medium text-foreground">Required network</p>
               <p className="text-xs text-muted mt-0.5">
-                Your wallet must be on <span className="font-semibold text-foreground">{CARDANO_NETWORK_LABEL}</span> before connecting.
+                Your wallet must be on <span className="font-semibold text-foreground">{label}</span> before connecting.
               </p>
             </div>
-            <Chip size="sm" color={IS_MAINNET ? "success" : "warning"}>
-              {CARDANO_NETWORK_LABEL}
+            <Chip size="sm" color={isMainnet ? "success" : "warning"}>
+              {label}
             </Chip>
           </div>
 
@@ -220,8 +218,8 @@ export default function WalletConnectButton({
                     wallets.map((w) => {
                       const netId = walletNetworks[w.id] ?? null;
                       const netKnown = netId !== null && netId !== undefined;
-                      const wrongNetwork = netKnown && netId !== EXPECTED_NETWORK_ID;
-                      const netLabel = netId === 1 ? "Mainnet" : netId === 0 ? (IS_MAINNET ? "Testnet" : "Preprod") : null;
+                      const wrongNetwork = netKnown && netId !== expectedNetworkId;
+                      const netLabel = netId === 1 ? "Mainnet" : netId === 0 ? (isMainnet ? "Testnet" : "Preprod") : null;
 
                       return (
                         <div key={w.id}>
@@ -262,7 +260,7 @@ export default function WalletConnectButton({
                           </button>
                           {wrongNetwork && (
                             <p className="text-[11px] text-danger px-3 pb-1.5 -mt-0.5">
-                              Switch to {CARDANO_NETWORK_LABEL} in your wallet settings first.
+                              Switch to {label} in your wallet settings first.
                             </p>
                           )}
                         </div>

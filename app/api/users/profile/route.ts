@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/api";
 import { uploadAvatar } from "@/lib/cloudinary";
 import { signToken } from "@/lib/jwt";
 import { setAuthCookie } from "@/lib/cookies";
+import { syncProfileToOtherNetwork } from "@/lib/network-profile-sync";
+import { getNetwork } from "@/lib/network";
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
 
   const [user, completedSwaps, proofsEarned] = await Promise.all([
-    prisma.user.findUnique({
+    db.user.findUnique({
       where: { id: currentUser.id },
       select: {
         id: true,
@@ -25,13 +26,13 @@ export async function GET(request: NextRequest) {
         createdAt: true,
       },
     }),
-    prisma.swap.count({
+    db.swap.count({
       where: {
         status: "COMPLETED",
         OR: [{ initiatorId: currentUser.id }, { receiverId: currentUser.id }],
       },
     }),
-    prisma.proof.count({
+    db.proof.count({
       where: { userId: currentUser.id },
     }),
   ]);
@@ -47,7 +48,7 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
 
   const body = await request.json();
   const { name, email, bio, teachSkill, learnSkill, teachSkills, learnSkills, avatarFile } = body;
@@ -63,17 +64,28 @@ export async function PATCH(request: NextRequest) {
   const finalLearnSkill =
     learnSkills !== undefined ? JSON.stringify(learnSkills) : learnSkill;
 
-  const updated = await prisma.user.update({
+  const profileData = {
+    ...(name !== undefined && { name }),
+    ...(email !== undefined && { email: email || null }),
+    ...(bio !== undefined && { bio: bio || null }),
+    ...(finalTeachSkill !== undefined && { teachSkill: finalTeachSkill }),
+    ...(finalLearnSkill !== undefined && { learnSkill: finalLearnSkill }),
+    ...(avatarUrl !== undefined && { avatarUrl }),
+  };
+
+  const updated = await db.user.update({
     where: { id: currentUser.id },
-    data: {
-      ...(name !== undefined && { name }),
-      ...(email !== undefined && { email: email || null }),
-      ...(bio !== undefined && { bio: bio || null }),
-      ...(finalTeachSkill !== undefined && { teachSkill: finalTeachSkill }),
-      ...(finalLearnSkill !== undefined && { learnSkill: finalLearnSkill }),
-      ...(avatarUrl !== undefined && { avatarUrl }),
-    },
+    data: profileData,
   });
+
+  // Dual-write: keep profile in sync with the other network (best-effort).
+  void syncProfileToOtherNetwork(
+    currentUser.id,
+    getNetwork(request),
+    profileData,
+    currentUser.walletAddress ?? null,
+    currentUser.twitterId ?? null
+  );
 
   const response = NextResponse.json({
     id: updated.id,

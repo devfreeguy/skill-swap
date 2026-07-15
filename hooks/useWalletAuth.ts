@@ -3,7 +3,8 @@
 import { useCardano } from "@cardano-foundation/cardano-connect-with-wallet";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { CARDANO_LIMIT_NETWORK, CARDANO_NETWORK_LABEL } from "@/lib/cardano";
+import { useNetworkContext } from "@/components/providers/NetworkProvider";
+import type { NetworkType } from "@cardano-foundation/cardano-connect-with-wallet-core";
 
 /**
  * Turn a wallet/library error (CIP-30 APIError, WrongNetworkTypeError, plain
@@ -30,7 +31,7 @@ function normalizeWalletError(err: unknown): string {
     lower.includes("testnet") ||
     lower.includes("wrong network")
   ) {
-    return `Please switch your wallet to ${CARDANO_NETWORK_LABEL}, then try again.`;
+    return `Please switch your wallet to the required network, then try again.`;
   }
 
   // Wallet is locked
@@ -74,9 +75,10 @@ function normalizeWalletError(err: unknown): string {
 }
 
 export function useWalletAuth() {
+  const { limitNetwork } = useNetworkContext();
   const { isConnected, stakeAddress, signMessage, connect, enabledWallet } =
     useCardano({
-      limitNetwork: CARDANO_LIMIT_NETWORK,
+      limitNetwork: limitNetwork as NetworkType,
     });
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -218,10 +220,13 @@ export function useWalletAuth() {
         const loginData = await loginRes.json();
 
         if (loginRes.ok) {
+          // Existing user: if not onboarded, go through /migrating so the sync
+          // API can copy their profile from the other network (handles the case
+          // where they were registered on this network before the sync was fixed).
           router.push(
             loginData.teachSkill && loginData.learnSkill
               ? "/dashboard"
-              : "/onboarding"
+              : "/migrating"
           );
           return;
         }
@@ -245,7 +250,10 @@ export function useWalletAuth() {
           });
           const regData = await regRes.json();
           if (regRes.ok) {
-            router.push("/onboarding");
+            // New account: always go through /migrating — it will sync the
+            // profile from the other network (if any) and redirect to the
+            // right destination with a fresh JWT.
+            router.push("/migrating");
             return;
           }
           setError(regData.error ?? "Couldn't create your account. Please try again.");

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { getPrisma } from "@/lib/prisma";
+import { getNetwork } from "@/lib/network";
 import { signToken } from "@/lib/jwt";
 import { setAuthCookie } from "@/lib/cookies";
 import {
@@ -9,6 +10,7 @@ import {
   TWITTER_STATE_COOKIE,
   TWITTER_VERIFIER_COOKIE,
 } from "@/lib/twitter";
+import { syncProfileFromOtherNetwork } from "@/lib/network-profile-sync";
 
 // Token exchange + profile fetch run on Node.
 export const runtime = "nodejs";
@@ -50,14 +52,17 @@ export async function GET(request: NextRequest) {
     return loginError("twitter_failed");
   }
 
+  const network = getNetwork(request);
+  const db = getPrisma(network);
+
   // Find the linked account, or create one from the X profile.
-  let user = await prisma.user.findUnique({
+  let user = await db.user.findUnique({
     where: { twitterId: profile.id },
   });
 
   let isNew = false;
   if (!user) {
-    user = await prisma.user.create({
+    user = await db.user.create({
       data: {
         twitterId: profile.id,
         name: profile.name || profile.username,
@@ -65,6 +70,12 @@ export async function GET(request: NextRequest) {
       },
     });
     isNew = true;
+
+    // Silently copy profile from the other network's DB (best-effort).
+    await syncProfileFromOtherNetwork(user.id, network, null, profile.id);
+
+    // Re-fetch to pick up any synced fields.
+    user = (await db.user.findUnique({ where: { id: user.id } })) ?? user;
   }
 
   const onboarded = isOnboarded(user);
@@ -75,8 +86,10 @@ export async function GET(request: NextRequest) {
     onboarded,
   });
 
-  const destination =
-    isNew || !onboarded ? "/onboarding" : "/dashboard";
+  // New users on this network always go through /migrating so the sync API
+  // can run synchronously with a visible loading state. Returning onboarded
+  // users go straight to the dashboard.
+  const destination = isNew || !onboarded ? "/migrating" : "/dashboard";
   const response = NextResponse.redirect(`${appBaseUrl()}${destination}`);
   setAuthCookie(response, token);
 

@@ -2,8 +2,9 @@
 
 import Logo from "@/components/elements/Logo";
 import ThemeToggle from "@/components/elements/ThemeToggle";
+import NetworkSwitcher from "@/components/elements/NetworkSwitcher";
 import { Avatar } from "@heroui/react";
-import { CARDANO_NETWORK_LABEL, IS_MAINNET } from "@/lib/cardano";
+import { useNetworkContext } from "@/components/providers/NetworkProvider";
 import { NAV_ITEMS, isActivePath } from "@/components/layouts/nav";
 import { IconLogout } from "@tabler/icons-react";
 import Link from "next/link";
@@ -26,6 +27,7 @@ export default function AppSidebar({
   onLogout,
 }: Props) {
   const pathname = usePathname();
+  const { isMainnet, label } = useNetworkContext();
 
   return (
     <aside className="hidden md:flex flex-col w-64 shrink-0 border-r border-border bg-background sticky top-0 h-dvh">
@@ -37,11 +39,11 @@ export default function AppSidebar({
 
         {/* Nav */}
         <nav className="flex flex-col gap-0.5 flex-1">
-          {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
+          {NAV_ITEMS.map(({ label: navLabel, icon: Icon, href }) => {
             const active = isActivePath(pathname, href);
             return (
               <Link
-                key={label}
+                key={navLabel}
                 href={href}
                 className={`flex items-center gap-3 pl-3 pr-3 py-2.5 rounded-lg text-sm transition-all duration-150 border-l-[3px] ${
                   active
@@ -50,7 +52,7 @@ export default function AppSidebar({
                 }`}
               >
                 <Icon size={18} stroke={active ? 2 : 1.75} />
-                <span className="flex-1">{label}</span>
+                <span className="flex-1">{navLabel}</span>
                 {href === "/messages" && msgUnread > 0 && (
                   <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-accent text-accent-foreground text-[10px] font-bold">
                     {msgUnread > 99 ? "99+" : msgUnread}
@@ -65,9 +67,14 @@ export default function AppSidebar({
             );
           })}
 
-          {!IS_MAINNET && (
-            <span className="inline-flex items-center mx-2 mt-auto px-2.5 py-1 rounded-md text-[11px] font-medium text-muted border border-border bg-background w-fit">
-              {CARDANO_NETWORK_LABEL}
+          {/* Network switcher */}
+          <div className="mt-auto mb-1 mx-1">
+            <NetworkSwitcher />
+          </div>
+
+          {!isMainnet && (
+            <span className="inline-flex items-center mx-2 px-2.5 py-1 rounded-md text-[11px] font-medium text-muted border border-border bg-background w-fit">
+              {label}
             </span>
           )}
         </nav>

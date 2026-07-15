@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/api";
 import { getPusherServer } from "@/lib/socket";
 import { userChannel, swapChannel } from "@/lib/realtime-channels";
@@ -12,7 +11,7 @@ import { userChannel, swapChannel } from "@/lib/realtime-channels";
 export async function POST(request: NextRequest) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
 
   const form = await request.formData();
   const socketId = String(form.get("socket_id") ?? "");
@@ -28,7 +27,7 @@ export async function POST(request: NextRequest) {
   } else if (channel.startsWith("private-swap-")) {
     const swapId = channel.slice("private-swap-".length);
     if (channel === swapChannel(swapId)) {
-      const swap = await prisma.swap.findUnique({
+      const swap = await db.swap.findUnique({
         where: { id: swapId },
         select: { initiatorId: true, receiverId: true },
       });

@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/api";
+import { getNetwork } from "@/lib/network";
 import { emitToUser, emitToSwap } from "@/lib/socket";
 import { verifyPaymentTx } from "@/lib/cardano/providers";
 import { refundFee } from "@/lib/cardano/refund";
-import {
-  PAYMENTS_ENABLED,
-  PLATFORM_WALLET_ADDRESS,
-  SWAP_FEE_LOVELACE,
-} from "@/lib/cardano/fee";
+import { getFeeConfig } from "@/lib/cardano/fee";
+import type { PrismaClient } from "@/app/generated/prisma/client";
+import type { ActiveNetwork } from "@/lib/network";
 
 // crypto (proof hashing) + on-chain fee settlement need the Node runtime.
 export const runtime = "nodejs";
@@ -34,18 +32,25 @@ type FeeSwap = {
  *   - fee on-chain but too small/gone → mark FAILED, refund nothing
  *   - fee confirmed                   → submit the refund from the platform wallet
  */
-async function issueDeclineRefund(swap: FeeSwap): Promise<void> {
+async function issueDeclineRefund(
+  swap: FeeSwap,
+  db: PrismaClient,
+  network: ActiveNetwork
+): Promise<void> {
+  const { PAYMENTS_ENABLED, PLATFORM_WALLET_ADDRESS, SWAP_FEE_LOVELACE } =
+    getFeeConfig(network);
   if (!PAYMENTS_ENABLED || !swap.feeTxHash || !swap.refundAddress) return;
   if (swap.paymentStatus === "REFUNDED") return;
 
   const check = await verifyPaymentTx(
     swap.feeTxHash,
     PLATFORM_WALLET_ADDRESS,
-    BigInt(swap.feeLovelace ?? SWAP_FEE_LOVELACE)
+    BigInt(swap.feeLovelace ?? SWAP_FEE_LOVELACE),
+    network
   );
   if (check === "PENDING") {
     // Fee not on-chain yet — defer; a later GET on the declined swap retries.
-    await prisma.swap.update({
+    await db.swap.update({
       where: { id: swap.id },
       data: { paymentStatus: "REFUND_PENDING" },
     });
@@ -53,7 +58,7 @@ async function issueDeclineRefund(swap: FeeSwap): Promise<void> {
   }
   if (check === "INSUFFICIENT") {
     // The fee never actually landed (dropped / double-spent) — refund nothing.
-    await prisma.swap.update({
+    await db.swap.update({
       where: { id: swap.id },
       data: { paymentStatus: "FAILED" },
     });
@@ -64,14 +69,15 @@ async function issueDeclineRefund(swap: FeeSwap): Promise<void> {
     const refundTxHash = await refundFee({
       toAddress: swap.refundAddress,
       lovelace: swap.feeLovelace ?? SWAP_FEE_LOVELACE,
+      network,
     });
-    await prisma.swap.update({
+    await db.swap.update({
       where: { id: swap.id },
       data: { paymentStatus: "REFUNDED", refundTxHash },
     });
   } catch (e) {
     console.error("Swap fee refund failed:", swap.id, e);
-    await prisma.swap.update({
+    await db.swap.update({
       where: { id: swap.id },
       data: { paymentStatus: "REFUND_PENDING" },
     });
@@ -84,11 +90,12 @@ export async function GET(
 ) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
+  const network = getNetwork(request);
 
   const { id } = await params;
 
-  const swap = await prisma.swap.findUnique({
+  const swap = await db.swap.findUnique({
     where: { id },
     include: {
       initiator: {
@@ -138,6 +145,8 @@ export async function GET(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  const { PAYMENTS_ENABLED } = getFeeConfig(network);
+
   // Retry a refund that was deferred because the fee hadn't confirmed on-chain
   // at decline time, so the UI reflects the eventual REFUNDED / FAILED outcome.
   if (
@@ -146,8 +155,8 @@ export async function GET(
     swap.status === "DECLINED" &&
     swap.paymentStatus === "REFUND_PENDING"
   ) {
-    await issueDeclineRefund(swap);
-    const fresh = await prisma.swap.findUnique({
+    await issueDeclineRefund(swap, db, network);
+    const fresh = await db.swap.findUnique({
       where: { id },
       select: { paymentStatus: true, refundTxHash: true },
     });
@@ -166,7 +175,9 @@ export async function PATCH(
 ) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
+  const network = getNetwork(request);
+  const { PAYMENTS_ENABLED, SWAP_FEE_LOVELACE } = getFeeConfig(network);
 
   const { id } = await params;
   const body = await request.json();
@@ -174,7 +185,7 @@ export async function PATCH(
     action: "accept" | "decline" | "complete" | "cancel";
   };
 
-  const swap = await prisma.swap.findUnique({ where: { id } });
+  const swap = await db.swap.findUnique({ where: { id } });
   if (!swap) {
     return NextResponse.json({ error: "Swap not found" }, { status: 404 });
   }
@@ -213,7 +224,7 @@ export async function PATCH(
       );
     }
 
-    const updated = await prisma.swap.update({
+    const updated = await db.swap.update({
       where: { id },
       data: {
         status: "ACTIVE",
@@ -222,7 +233,7 @@ export async function PATCH(
           : {}),
       },
     });
-    await prisma.notification.create({
+    await db.notification.create({
       data: {
         userId: swap.initiatorId,
         type: "SWAP_ACCEPTED",
@@ -230,7 +241,7 @@ export async function PATCH(
         swapId: id,
       },
     });
-    await prisma.message.create({
+    await db.message.create({
       data: {
         swapId: id,
         senderId: swap.receiverId,
@@ -260,15 +271,15 @@ export async function PATCH(
         { status: 400 }
       );
     }
-    const updated = await prisma.swap.update({
+    const updated = await db.swap.update({
       where: { id },
       data: { status: "DECLINED" },
     });
 
     // Declining is the only path that refunds the initiator's fee.
-    await issueDeclineRefund(swap);
+    await issueDeclineRefund(swap, db, network);
 
-    await prisma.notification.create({
+    await db.notification.create({
       data: {
         userId: swap.initiatorId,
         type: "SWAP_DECLINED",
@@ -276,7 +287,7 @@ export async function PATCH(
         swapId: id,
       },
     });
-    await prisma.message.create({
+    await db.message.create({
       data: {
         swapId: id,
         senderId: swap.receiverId,
@@ -305,9 +316,9 @@ export async function PATCH(
     // one item. Since each side must deliver before confirming, "both confirmed"
     // also guarantees "both delivered" - the single, well-defined completion rule.
     const [myDeliveryCount, initiatorCount, receiverCount] = await Promise.all([
-      prisma.delivery.count({ where: { swapId: id, userId: currentUser.id } }),
-      prisma.delivery.count({ where: { swapId: id, userId: swap.initiatorId } }),
-      prisma.delivery.count({ where: { swapId: id, userId: swap.receiverId } }),
+      db.delivery.count({ where: { swapId: id, userId: currentUser.id } }),
+      db.delivery.count({ where: { swapId: id, userId: swap.initiatorId } }),
+      db.delivery.count({ where: { swapId: id, userId: swap.receiverId } }),
     ]);
 
     if (myDeliveryCount === 0) {
@@ -321,7 +332,7 @@ export async function PATCH(
     if (isInitiator) updateData.initiatorDone = true;
     if (isReceiver) updateData.receiverDone = true;
 
-    const updated = await prisma.swap.update({
+    const updated = await db.swap.update({
       where: { id },
       data: updateData,
     });
@@ -332,15 +343,15 @@ export async function PATCH(
     const bothDelivered = initiatorCount > 0 && receiverCount > 0;
 
     if (bothDone && bothDelivered) {
-      const existingProof = await prisma.proof.findUnique({
+      const existingProof = await db.proof.findUnique({
         where: { swapId: id },
       });
 
       if (!existingProof) {
         const [initiator, receiver, deliveries] = await Promise.all([
-          prisma.user.findUnique({ where: { id: swap.initiatorId } }),
-          prisma.user.findUnique({ where: { id: swap.receiverId } }),
-          prisma.delivery.findMany({ where: { swapId: id } }),
+          db.user.findUnique({ where: { id: swap.initiatorId } }),
+          db.user.findUnique({ where: { id: swap.receiverId } }),
+          db.delivery.findMany({ where: { swapId: id } }),
         ]);
 
         const summary =
@@ -350,8 +361,6 @@ export async function PATCH(
                 .filter(Boolean)
                 .join(" | ")
             : undefined;
-
-        const network = process.env.NEXT_PUBLIC_CARDANO_NETWORK || "preprod";
 
         // Deterministic content hash anchored on-chain. Reproducible from
         // stored data (swap, participants, skills, deliverables) so the chain
@@ -371,11 +380,11 @@ export async function PATCH(
           .update(JSON.stringify(proofPayload))
           .digest("hex");
 
-        await prisma.$transaction([
-          prisma.swap.update({ where: { id }, data: { status: "COMPLETED" } }),
+        await db.$transaction([
+          db.swap.update({ where: { id }, data: { status: "COMPLETED" } }),
           // Proof is created off-chain immediately; the on-chain anchor is a
           // separate, retryable step (POST /api/swaps/[id]/anchor).
-          prisma.proof.create({
+          db.proof.create({
             data: {
               swapId: id,
               userId: swap.initiatorId,
@@ -387,7 +396,7 @@ export async function PATCH(
               ...(summary && { summary }),
             },
           }),
-          prisma.notification.createMany({
+          db.notification.createMany({
             data: [
               {
                 userId: swap.initiatorId,
@@ -403,7 +412,7 @@ export async function PATCH(
               },
             ],
           }),
-          prisma.message.create({
+          db.message.create({
             data: {
               swapId: id,
               senderId: swap.initiatorId,
@@ -428,7 +437,7 @@ export async function PATCH(
         return NextResponse.json({ ...updated, status: "COMPLETED" });
       }
 
-      await prisma.swap.update({
+      await db.swap.update({
         where: { id },
         data: { status: "COMPLETED" },
       });
@@ -449,7 +458,7 @@ export async function PATCH(
       );
     }
 
-    const updated = await prisma.swap.update({
+    const updated = await db.swap.update({
       where: { id },
       data: {
         status: "CANCELLED",
@@ -460,7 +469,7 @@ export async function PATCH(
 
     const otherUserId = isInitiator ? swap.receiverId : swap.initiatorId;
     const cancelMessage = `${currentUser.name} cancelled the swap.`;
-    await prisma.notification.create({
+    await db.notification.create({
       data: {
         userId: otherUserId,
         type: "SWAP_DECLINED",
