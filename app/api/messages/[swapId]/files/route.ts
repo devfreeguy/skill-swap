@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/api";
 
 export async function GET(
@@ -8,11 +7,11 @@ export async function GET(
 ) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
 
   const { swapId } = await params;
 
-  const swap = await prisma.swap.findUnique({ where: { id: swapId } });
+  const swap = await db.swap.findUnique({ where: { id: swapId } });
   if (!swap) {
     return NextResponse.json({ error: "Swap not found" }, { status: 404 });
   }
@@ -23,7 +22,7 @@ export async function GET(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const files = await prisma.message.findMany({
+  const files = await db.message.findMany({
     where: {
       swapId,
       type: { in: ["IMAGE", "DOCUMENT"] },

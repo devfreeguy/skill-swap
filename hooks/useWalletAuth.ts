@@ -3,19 +3,10 @@
 import { useCardano } from "@cardano-foundation/cardano-connect-with-wallet";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { CARDANO_LIMIT_NETWORK, CARDANO_NETWORK_LABEL } from "@/lib/cardano";
-import {
-  type AccountType,
-  WALLET_ALREADY_LINKED_TO_X_ERROR,
-} from "@/lib/account-type";
-
-/** Credentials produced by a successful wallet connect + sign. */
-export interface WalletCredentials {
-  signature: string;
-  key: string;
-  nonce: string;
-  stakeAddress: string | undefined;
-}
+import { useNetworkContext } from "@/components/providers/NetworkProvider";
+import type { NetworkType } from "@cardano-foundation/cardano-connect-with-wallet-core";
+import type { AccountType } from "@/lib/account-type";
+import { WALLET_ALREADY_LINKED_TO_X_ERROR } from "@/lib/account-type";
 
 /**
  * Turn a wallet/library error (CIP-30 APIError, WrongNetworkTypeError, plain
@@ -42,7 +33,7 @@ function normalizeWalletError(err: unknown): string {
     lower.includes("testnet") ||
     lower.includes("wrong network")
   ) {
-    return `Please switch your wallet to ${CARDANO_NETWORK_LABEL}, then try again.`;
+    return `Please switch your wallet to the required network, then try again.`;
   }
 
   // Wallet is locked
@@ -86,9 +77,10 @@ function normalizeWalletError(err: unknown): string {
 }
 
 export function useWalletAuth() {
-  const { isConnected, stakeAddress, signMessage, connect, enabledWallet } =
+  const { limitNetwork } = useNetworkContext();
+  const { isConnected, stakeAddress, signMessage, connect: rawConnect, enabledWallet } =
     useCardano({
-      limitNetwork: CARDANO_LIMIT_NETWORK,
+      limitNetwork: limitNetwork as NetworkType,
     });
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -114,6 +106,28 @@ export function useWalletAuth() {
     []
   );
 
+  /**
+   * Wraps the library's connect() which returns BEFORE the wallet is actually
+   * connected (the underlying Wallet.connect() is fire-and-forget). This wrapper
+   * returns a promise that only resolves after the onConnect callback fires,
+   * ensuring signMessage is called only when the wallet is truly ready.
+   */
+  function connect(walletName: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      rawConnect(
+        walletName,
+        () => {
+          // onConnect — wallet is now connected and authorized
+          resolve();
+        },
+        (error) => {
+          // onError — connection failed or was rejected
+          reject(error);
+        }
+      );
+    });
+  }
+
   function setPhase(text: string, hint = "") {
     setLoadingText(text);
     setLoadingHint(hint);
@@ -122,6 +136,18 @@ export function useWalletAuth() {
   function stopLoading() {
     setIsLoading(false);
     setPhase("");
+  }
+
+  /**
+   * Credentials produced by wallet signing: the signature, public key, nonce,
+   * and stake address. Passed to `onSigned` so the caller can complete auth or
+   * linking.
+   */
+  interface WalletCredentials {
+    signature: string;
+    key: string;
+    nonce: string;
+    stakeAddress: string | undefined;
   }
 
   /**
@@ -221,42 +247,46 @@ export function useWalletAuth() {
       });
       const loginData = await loginRes.json();
 
-      if (loginRes.ok) {
-        // Account-type invariant is enforced server-side; a 200 here means the
-        // wallet belongs to a wallet-type account, so honor its onboarding state.
-        router.push(
-          loginData.teachSkill && loginData.learnSkill
-            ? "/dashboard"
-            : "/onboarding"
-        );
-        return;
-      }
-
-      // 2) No account linked to this wallet → create one with the same
-      //    signature + nonce (the login route returns 404 before it consumes
-      //    the nonce, so it's still valid here).
-      if (loginRes.status === 404) {
-        setPhase("Creating your account…", "Setting up your SkillSwap profile…");
-        const defaultName = `Cardano User ${(stakeAddress ?? "").slice(-6)}`;
-        const regRes = await fetch("/api/auth/register/wallet", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: defaultName,
-            walletAddress: stakeAddress,
-            signature,
-            key,
-            nonce,
-          }),
-        });
-        const regData = await regRes.json();
-        if (regRes.ok) {
-          router.push("/onboarding");
+        if (loginRes.ok) {
+          // Existing user: if not onboarded, go through /migrating so the sync
+          // API can copy their profile from the other network (handles the case
+          // where they were registered on this network before the sync was fixed).
+          router.push(
+            loginData.teachSkill && loginData.learnSkill
+              ? "/dashboard"
+              : "/migrating"
+          );
           return;
         }
-        setError(regData.error ?? "Couldn't create your account. Please try again.");
-        return;
-      }
+
+        // 2) No account linked to this wallet → create one with the same
+        //    signature + nonce (the login route returns 404 before it consumes
+        //    the nonce, so it's still valid here).
+        if (loginRes.status === 404) {
+          setPhase("Creating your account…", "Setting up your SkillSwap profile…");
+          const defaultName = `Cardano User ${(stakeAddress ?? "").slice(-6)}`;
+          const regRes = await fetch("/api/auth/register/wallet", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: defaultName,
+              walletAddress: stakeAddress,
+              signature,
+              key,
+              nonce,
+            }),
+          });
+          const regData = await regRes.json();
+          if (regRes.ok) {
+            // New account: always go through /migrating — it will sync the
+            // profile from the other network (if any) and redirect to the
+            // right destination with a fresh JWT.
+            router.push("/migrating");
+            return;
+          }
+          setError(regData.error ?? "Couldn't create your account. Please try again.");
+          return;
+        }
 
       // Other failures (e.g. 401 signature verification failed, 403 wrong
       // account type). Never redirect to /migrating from here.

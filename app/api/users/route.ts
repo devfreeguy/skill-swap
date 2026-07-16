@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/api";
 import { parseSkills } from "@/lib/skills";
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
 
   const { searchParams } = new URL(request.url);
   const skill = searchParams.get("skill");
 
-  const users = await prisma.user.findMany({
+  const users = await db.user.findMany({
     where: {
       id: { not: currentUser.id },
       OR: [{ teachSkill: { not: null } }, { learnSkill: { not: null } }],

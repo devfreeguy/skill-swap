@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/api";
 import { uploadDeliverable } from "@/lib/cloudinary";
 import { emitToSwap } from "@/lib/socket";
@@ -25,7 +24,7 @@ export async function POST(
 ) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
 
   const { id } = await params;
   const body = await request.json();
@@ -49,7 +48,7 @@ export async function POST(
     mimeType?: string;
   };
 
-  const swap = await prisma.swap.findUnique({ where: { id } });
+  const swap = await db.swap.findUnique({ where: { id } });
   if (!swap) {
     return NextResponse.json({ error: "Swap not found" }, { status: 404 });
   }
@@ -116,7 +115,7 @@ export async function POST(
     }
   }
 
-  const delivery = await prisma.delivery.create({
+  const delivery = await db.delivery.create({
     data: {
       swapId: id,
       userId: currentUser.id,
@@ -130,7 +129,7 @@ export async function POST(
     },
   });
 
-  await prisma.message.create({
+  await db.message.create({
     data: {
       swapId: id,
       senderId: currentUser.id,
@@ -151,7 +150,7 @@ export async function DELETE(
 ) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
 
   const { id } = await params;
   const deliveryId = request.nextUrl.searchParams.get("deliveryId");
@@ -163,8 +162,8 @@ export async function DELETE(
   }
 
   const [swap, delivery] = await Promise.all([
-    prisma.swap.findUnique({ where: { id } }),
-    prisma.delivery.findUnique({ where: { id: deliveryId } }),
+    db.swap.findUnique({ where: { id } }),
+    db.delivery.findUnique({ where: { id: deliveryId } }),
   ]);
 
   if (!delivery || delivery.swapId !== id) {
@@ -180,7 +179,7 @@ export async function DELETE(
     );
   }
 
-  await prisma.delivery.delete({ where: { id: deliveryId } });
+  await db.delivery.delete({ where: { id: deliveryId } });
   emitToSwap(id, "swap:update");
   return NextResponse.json({ success: true });
 }
@@ -192,11 +191,11 @@ export async function GET(
 ) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
 
   const { id } = await params;
 
-  const swap = await prisma.swap.findUnique({ where: { id } });
+  const swap = await db.swap.findUnique({ where: { id } });
   if (!swap) {
     return NextResponse.json({ error: "Swap not found" }, { status: 404 });
   }
@@ -207,7 +206,7 @@ export async function GET(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const deliveries = await prisma.delivery.findMany({
+  const deliveries = await db.delivery.findMany({
     where: { swapId: id, userId: currentUser.id },
     orderBy: { submittedAt: "asc" },
   });

@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/api";
 import { scoreMatch } from "@/lib/matching";
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
 
-  const swaps = await prisma.swap.findMany({
+  const swaps = await db.swap.findMany({
     where: {
       OR: [{ initiatorId: currentUser.id }, { receiverId: currentUser.id }],
       status: { in: ["ACTIVE", "COMPLETED"] },

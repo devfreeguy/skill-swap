@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/api";
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
 
-  const notifications = await prisma.notification.findMany({
+  const notifications = await db.notification.findMany({
     where: { userId: currentUser.id },
     orderBy: { createdAt: "desc" },
   });

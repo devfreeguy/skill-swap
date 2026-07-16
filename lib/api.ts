@@ -1,31 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import type { User } from "@/app/generated/prisma/client";
-
-/**
- * Shared API-route guards. These replace the auth + participant-check blocks
- * that were copy-pasted into nearly every route.
- *
- * Note on "generic CRUD": Prisma already *is* a type-safe CRUD layer
- * (`prisma.x.findMany/create/update/delete`). Wrapping it in a generic
- * read/write/update/delete function would throw away that per-model typing, so
- * we centralize the genuinely repeated *authorization* logic instead.
- */
+import { getPrisma } from "@/lib/prisma";
+import { getNetwork } from "@/lib/network";
+import type { User, PrismaClient } from "@/app/generated/prisma/client";
 
 type AuthGuard =
-  | { user: User; response?: undefined }
-  | { user?: undefined; response: NextResponse };
+  | { user: User; db: PrismaClient; response?: undefined }
+  | { user?: undefined; db?: undefined; response: NextResponse };
 
-/** Resolve the current user, or a 401 response to return. */
+/** Resolve the current user and network DB, or return a 401 response. */
 export async function requireAuth(request: NextRequest): Promise<AuthGuard> {
+  const network = getNetwork(request);
+  const db = getPrisma(network);
   const user = await getCurrentUser(request);
   if (!user) {
     return {
       response: NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
     };
   }
-  return { user };
+  return { user, db };
 }
 
 type SwapGuard =
@@ -37,14 +30,14 @@ type SwapGuard =
 
 /**
  * Load a swap and confirm the user participates in it, or return the right
- * error response (404 / 403). For routes needing related data, query the swap
- * with includes separately after this check passes.
+ * error response (404 / 403).
  */
 export async function requireParticipantSwap(
   swapId: string,
-  userId: string
+  userId: string,
+  db: PrismaClient
 ): Promise<SwapGuard> {
-  const swap = await prisma.swap.findUnique({
+  const swap = await db.swap.findUnique({
     where: { id: swapId },
     select: { id: true, initiatorId: true, receiverId: true, status: true },
   });

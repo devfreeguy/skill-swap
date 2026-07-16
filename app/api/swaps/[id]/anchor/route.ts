@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { requireAuth } from "@/lib/api";
+import { getNetwork } from "@/lib/network";
 import { submitTx, isTxConfirmed } from "@/lib/cardano/providers";
 import { emitToSwap } from "@/lib/socket";
+import type { PrismaClient } from "@/app/generated/prisma/client";
 
 // Provider submission/confirmation runs on Node.
 export const runtime = "nodejs";
 
-async function loadParticipantSwap(id: string, userId: string) {
-  const swap = await prisma.swap.findUnique({
+async function loadParticipantSwap(id: string, userId: string, db: PrismaClient) {
+  const swap = await db.swap.findUnique({
     where: { id },
     include: { proof: true },
   });
@@ -30,7 +31,8 @@ export async function POST(
 ) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
+  const network = getNetwork(request);
 
   const { id } = await params;
   const { signedTx } = (await request.json()) as { signedTx?: string };
@@ -38,7 +40,7 @@ export async function POST(
     return NextResponse.json({ error: "signedTx is required" }, { status: 400 });
   }
 
-  const result = await loadParticipantSwap(id, currentUser.id);
+  const result = await loadParticipantSwap(id, currentUser.id, db);
   if ("error" in result) {
     return NextResponse.json({ error: result.error }, { status: result.status });
   }
@@ -59,9 +61,9 @@ export async function POST(
 
   let txHash: string;
   try {
-    ({ txHash } = await submitTx(signedTx));
+    ({ txHash } = await submitTx(signedTx, network));
   } catch {
-    await prisma.proof.update({
+    await db.proof.update({
       where: { swapId: id },
       data: { chainStatus: "FAILED" },
     });
@@ -71,7 +73,7 @@ export async function POST(
     );
   }
 
-  const updated = await prisma.proof.update({
+  const updated = await db.proof.update({
     where: { swapId: id },
     data: { chainTxHash: txHash, chainStatus: "ANCHORING", anchoredAt: null },
   });
@@ -91,10 +93,11 @@ export async function GET(
 ) {
   const auth = await requireAuth(request);
   if (auth.response) return auth.response;
-  const currentUser = auth.user;
+  const { user: currentUser, db } = auth;
+  const network = getNetwork(request);
 
   const { id } = await params;
-  const result = await loadParticipantSwap(id, currentUser.id);
+  const result = await loadParticipantSwap(id, currentUser.id, db);
   if ("error" in result) {
     return NextResponse.json({ error: result.error }, { status: result.status });
   }
@@ -106,9 +109,9 @@ export async function GET(
   if (
     proof.chainStatus === "ANCHORING" &&
     proof.chainTxHash &&
-    (await isTxConfirmed(proof.chainTxHash))
+    (await isTxConfirmed(proof.chainTxHash, network))
   ) {
-    const updated = await prisma.proof.update({
+    const updated = await db.proof.update({
       where: { swapId: id },
       data: { chainStatus: "ANCHORED", anchoredAt: new Date() },
     });

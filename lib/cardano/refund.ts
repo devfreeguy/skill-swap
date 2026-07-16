@@ -1,24 +1,30 @@
 /**
  * Server-side refund of a swap fee from the platform hot wallet.
- *
- * When a receiver declines a swap, the initiator's fee is returned. The
- * platform wallet (a mnemonic held only on the server) builds, signs, and
- * submits the refund tx via Blockfrost. Mesh + the mnemonic are loaded lazily
- * inside the Node runtime so nothing wallet-related is bundled elsewhere.
- *
- * Requires PLATFORM_WALLET_MNEMONIC and BLOCKFROST_API_KEY.
+ * Both mainnet and preprod use the same mnemonic (same wallet, different
+ * network address). Requires PLATFORM_WALLET_MNEMONIC_{NETWORK} and
+ * BLOCKFROST_API_KEY_{NETWORK}.
  */
-import { IS_MAINNET } from "@/lib/cardano";
+import type { ActiveNetwork } from "@/lib/network";
 
 export async function refundFee(args: {
   toAddress: string;
   lovelace: number;
+  network: ActiveNetwork;
 }): Promise<string> {
-  const mnemonic = process.env.PLATFORM_WALLET_MNEMONIC;
-  const blockfrostKey = process.env.BLOCKFROST_API_KEY;
+  const mnemonicKey =
+    args.network === "mainnet"
+      ? "PLATFORM_WALLET_MNEMONIC_MAINNET"
+      : "PLATFORM_WALLET_MNEMONIC_PREPROD";
+  const mnemonic =
+    process.env[mnemonicKey] ?? process.env.PLATFORM_WALLET_MNEMONIC;
   if (!mnemonic) {
-    throw new Error("PLATFORM_WALLET_MNEMONIC is not configured");
+    throw new Error(`${mnemonicKey} is not configured`);
   }
+
+  const blockfrostKey =
+    args.network === "mainnet"
+      ? (process.env.BLOCKFROST_API_KEY_MAINNET ?? process.env.BLOCKFROST_API_KEY)
+      : (process.env.BLOCKFROST_API_KEY_PREPROD ?? process.env.BLOCKFROST_API_KEY);
   if (!blockfrostKey) {
     throw new Error("BLOCKFROST_API_KEY is required to issue refunds");
   }
@@ -29,7 +35,7 @@ export async function refundFee(args: {
 
   const provider = new BlockfrostProvider(blockfrostKey);
   const wallet = new MeshWallet({
-    networkId: IS_MAINNET ? 1 : 0,
+    networkId: args.network === "mainnet" ? 1 : 0,
     fetcher: provider,
     submitter: provider,
     key: { type: "mnemonic", words: mnemonic.trim().split(/\s+/) },
