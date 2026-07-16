@@ -16,11 +16,11 @@ function normalizeWalletError(err: unknown): string {
   const raw =
     typeof err === "string"
       ? err
-      : (err as { info?: string })?.info ??
+      : ((err as { info?: string })?.info ??
         (err as { message?: string })?.message ??
         (typeof (err as { toString?: () => string })?.toString === "function"
           ? (err as { toString: () => string }).toString()
-          : "");
+          : ""));
   const msg = String(raw ?? "");
   const lower = msg.toLowerCase();
   const code = (err as { code?: number })?.code;
@@ -79,13 +79,15 @@ function normalizeWalletError(err: unknown): string {
 
 export function useWalletAuth() {
   const { limitNetwork } = useNetworkContext();
-  const { isConnected, stakeAddress, signMessage, connect: rawConnect, enabledWallet } =
-  const { limitNetwork } = useNetworkContext();
-  const { isConnected, stakeAddress, signMessage, connect: rawConnect, enabledWallet } =
-    useCardano({
-      limitNetwork: limitNetwork as NetworkType,
-      limitNetwork: limitNetwork as NetworkType,
-    });
+  const {
+    isConnected,
+    stakeAddress,
+    signMessage,
+    connect: rawConnect,
+    enabledWallet,
+  } = useCardano({
+    limitNetwork: limitNetwork as NetworkType,
+  });
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("");
@@ -107,7 +109,7 @@ export function useWalletAuth() {
     () => () => {
       if (signTimeoutRef.current) clearTimeout(signTimeoutRef.current);
     },
-    []
+    [],
   );
 
   /**
@@ -127,29 +129,7 @@ export function useWalletAuth() {
         (error) => {
           // onError — connection failed or was rejected
           reject(error);
-        }
-      );
-    });
-  }
-
-  /**
-   * Wraps the library's connect() which returns BEFORE the wallet is actually
-   * connected (the underlying Wallet.connect() is fire-and-forget). This wrapper
-   * returns a promise that only resolves after the onConnect callback fires,
-   * ensuring signMessage is called only when the wallet is truly ready.
-   */
-  function connect(walletName: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      rawConnect(
-        walletName,
-        () => {
-          // onConnect — wallet is now connected and authorized
-          resolve();
         },
-        (error) => {
-          // onError — connection failed or was rejected
-          reject(error);
-        }
       );
     });
   }
@@ -184,21 +164,21 @@ export function useWalletAuth() {
    */
   async function connectWallet(
     walletName: string,
-    onSigned: (creds: WalletCredentials) => Promise<void>
+    onSigned: (creds: WalletCredentials) => Promise<void>,
   ): Promise<void> {
     try {
       setIsLoading(true);
       setError(null);
       setPhase(
         "Connecting wallet…",
-        "Approve the connection request in your wallet pop-up."
+        "Approve the connection request in your wallet pop-up.",
       );
 
       await connect(walletName);
 
       setPhase(
         "Awaiting signature…",
-        "Open your wallet and sign the message to continue. This is free and won't move any ADA."
+        "Open your wallet and sign the message to continue. This is free and won't move any ADA.",
       );
       const nonceRes = await fetch("/api/auth/wallet/nonce");
       if (!nonceRes.ok) {
@@ -217,7 +197,7 @@ export function useWalletAuth() {
         if (settled) return;
         settled = true;
         setError(
-          "No response from your wallet. Make sure it's unlocked and on the right network, then try again."
+          "No response from your wallet. Make sure it's unlocked and on the right network, then try again.",
         );
         stopLoading();
       }, 45_000);
@@ -236,7 +216,8 @@ export function useWalletAuth() {
               nonce,
               // Use the ref, not the closed-over value, so a fresh connect
               // resolves to the real stake address rather than a stale undefined.
-              stakeAddress: stakeAddressRef.current ?? stakeAddress ?? undefined,
+              stakeAddress:
+                stakeAddressRef.current ?? stakeAddress ?? undefined,
             });
           } catch (e) {
             setError(extractError(e));
@@ -250,7 +231,7 @@ export function useWalletAuth() {
           if (signTimeoutRef.current) clearTimeout(signTimeoutRef.current);
           setError(normalizeWalletError(err));
           stopLoading();
-        }
+        },
       );
     } catch (err) {
       setError(normalizeWalletError(err));
@@ -264,14 +245,21 @@ export function useWalletAuth() {
    * authentication (login / register), never for linking to an existing session.
    */
   async function connectAndAuth(walletName: string) {
-    await connectWallet(walletName, async ({ signature, key, nonce, stakeAddress }) => {
-      // 1) Try to sign in with an existing account.
-      const loginRes = await fetch("/api/auth/wallet", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ walletAddress: stakeAddress, signature, key, nonce }),
-      });
-      const loginData = await loginRes.json();
+    await connectWallet(
+      walletName,
+      async ({ signature, key, nonce, stakeAddress }) => {
+        // 1) Try to sign in with an existing account.
+        const loginRes = await fetch("/api/auth/wallet", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            walletAddress: stakeAddress,
+            signature,
+            key,
+            nonce,
+          }),
+        });
+        const loginData = await loginRes.json();
 
         if (loginRes.ok) {
           // Existing user: if not onboarded, go through /migrating so the sync
@@ -283,8 +271,7 @@ export function useWalletAuth() {
           router.push(
             loginData.teachSkill && loginData.learnSkill
               ? "/dashboard"
-              : "/migrating"
-              : "/migrating"
+              : "/migrating",
           );
           return;
         }
@@ -293,7 +280,10 @@ export function useWalletAuth() {
         //    signature + nonce (the login route returns 404 before it consumes
         //    the nonce, so it's still valid here).
         if (loginRes.status === 404) {
-          setPhase("Creating your account…", "Setting up your SkillSwap profile…");
+          setPhase(
+            "Creating your account…",
+            "Setting up your SkillSwap profile…",
+          );
           const defaultName = `Cardano User ${(stakeAddress ?? "").slice(-6)}`;
           const regRes = await fetch("/api/auth/register/wallet", {
             method: "POST",
@@ -318,14 +308,17 @@ export function useWalletAuth() {
             router.push("/migrating");
             return;
           }
-          setError(regData.error ?? "Couldn't create your account. Please try again.");
+          setError(
+            regData.error ?? "Couldn't create your account. Please try again.",
+          );
           return;
         }
 
-      // Other failures (e.g. 401 signature verification failed, 403 wrong
-      // account type). Never redirect to /migrating from here.
-      setError(loginData.error ?? "Wallet sign-in failed. Please try again.");
-    });
+        // Other failures (e.g. 401 signature verification failed, 403 wrong
+        // account type). Never redirect to /migrating from here.
+        setError(loginData.error ?? "Wallet sign-in failed. Please try again.");
+      },
+    );
   }
 
   /**
@@ -338,21 +331,29 @@ export function useWalletAuth() {
    * it — no redirection, no state change.
    */
   async function connectAndLink(walletName: string, onSuccess?: () => void) {
-    await connectWallet(walletName, async ({ signature, key, nonce, stakeAddress }) => {
-      const res = await fetch("/api/users/wallet", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ walletAddress: stakeAddress, signature, key, nonce }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        onSuccess?.();
-        return;
-      }
-      // Surface the server's message verbatim (includes the "already linked to
-      // another profile" rule). Do NOT navigate anywhere.
-      setError(data.error ?? "Couldn't link your wallet. Please try again.");
-    });
+    await connectWallet(
+      walletName,
+      async ({ signature, key, nonce, stakeAddress }) => {
+        const res = await fetch("/api/users/wallet", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            walletAddress: stakeAddress,
+            signature,
+            key,
+            nonce,
+          }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          onSuccess?.();
+          return;
+        }
+        // Surface the server's message verbatim (includes the "already linked to
+        // another profile" rule). Do NOT navigate anywhere.
+        setError(data.error ?? "Couldn't link your wallet. Please try again.");
+      },
+    );
   }
 
   function cancel() {
