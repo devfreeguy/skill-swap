@@ -19,13 +19,12 @@ function loginError(reason: string): NextResponse {
   return NextResponse.redirect(`${appBaseUrl()}/login?error=${reason}`);
 }
 
-/** Profile is incomplete until the user has a name and both skill fields. */
+/** Profile is onboarded when both skill fields are set (matches wallet routes). */
 function isOnboarded(user: {
-  name: string | null;
   teachSkill: string | null;
   learnSkill: string | null;
 }): boolean {
-  return !!(user.name && user.teachSkill && user.learnSkill);
+  return !!(user.teachSkill && user.learnSkill);
 }
 
 export async function GET(request: NextRequest) {
@@ -60,7 +59,6 @@ export async function GET(request: NextRequest) {
     where: { twitterId: profile.id },
   });
 
-  let isNew = false;
   if (!user) {
     user = await db.user.create({
       data: {
@@ -70,7 +68,6 @@ export async function GET(request: NextRequest) {
         accountType: "x",
       },
     });
-    isNew = true;
 
     // Silently copy profile from the other network's DB (best-effort).
     await syncProfileFromOtherNetwork(user.id, network, null, profile.id);
@@ -87,10 +84,9 @@ export async function GET(request: NextRequest) {
     onboarded,
   });
 
-  // New users on this network always go through /migrating so the sync API
-  // can run synchronously with a visible loading state. Returning onboarded
-  // users go straight to the dashboard.
-  const destination = isNew || !onboarded ? "/migrating" : "/dashboard";
+  // Route purely on onboarded status — sync already ran above for new users,
+  // so if skills were copied the user is onboarded and goes straight to dashboard.
+  const destination = onboarded ? "/dashboard" : "/migrating";
   const response = NextResponse.redirect(`${appBaseUrl()}${destination}`);
   setAuthCookie(response, token);
 

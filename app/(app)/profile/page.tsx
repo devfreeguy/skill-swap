@@ -69,7 +69,6 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [disconnecting, setDisconnecting] = useState(false);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -194,22 +193,6 @@ export default function ProfilePage() {
     }
   }, [name, email, teachSkills, learnSkills, avatarFile]);
 
-  const handleDisconnectWallet = useCallback(async () => {
-    setDisconnecting(true);
-    try {
-      const res = await fetch("/api/users/wallet", { method: "DELETE" });
-      if (!res.ok) {
-        toast.danger("Failed to disconnect wallet.");
-        return;
-      }
-      setProfile((prev) => (prev ? { ...prev, walletAddress: null } : prev));
-      toast.success("Wallet disconnected.");
-    } catch {
-      toast.danger("Something went wrong.");
-    } finally {
-      setDisconnecting(false);
-    }
-  }, []);
 
   if (loading) {
     return <LemniscateLoader loading text="Loading…" overlayOpacity={1} />;
@@ -348,29 +331,18 @@ export default function ProfilePage() {
               </p>
 
               {profile.walletAddress ? (
-                <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-background border border-border">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="size-9 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
-                      <IconWallet size={16} className="text-accent" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-foreground">
-                        Cardano Wallet
-                      </p>
-                      <p className="text-xs text-muted font-mono truncate">
-                        {truncateAddress(profile.walletAddress)}
-                      </p>
-                    </div>
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-background border border-border">
+                  <div className="size-9 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+                    <IconWallet size={16} className="text-accent" />
                   </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    isPending={disconnecting}
-                    onPress={handleDisconnectWallet}
-                    className="shrink-0"
-                  >
-                    Disconnect
-                  </Button>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground">
+                      Cardano Wallet
+                    </p>
+                    <p className="text-xs text-muted font-mono truncate">
+                      {truncateAddress(profile.walletAddress)}
+                    </p>
+                  </div>
                 </div>
               ) : (
                 <div className="p-3 rounded-xl bg-background border border-border">

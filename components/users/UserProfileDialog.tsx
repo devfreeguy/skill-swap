@@ -18,6 +18,35 @@ import { IconWallet } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
+type WalletInfo = { id: string; name: string; icon?: string };
+
+function getAvailableWallets(): WalletInfo[] {
+  if (typeof window === "undefined") return [];
+  const cardano = (window as unknown as { cardano?: Record<string, { name?: string; icon?: string }> }).cardano;
+  if (!cardano) return [];
+  return ["eternl", "nami", "lace", "vespr", "flint", "begin", "typhon"]
+    .filter((k) => cardano[k])
+    .map((k) => ({ id: k, name: cardano[k].name || k, icon: cardano[k].icon }));
+}
+
+/**
+ * Silently probe which wallet the user already has enabled (CIP-30 isEnabled),
+ * without triggering any extension popup. Handles the race condition where
+ * CCWW hasn't polled yet after a page navigation but the wallet is ready.
+ */
+async function detectEnabledWallet(): Promise<string | null> {
+  if (typeof window === "undefined") return null;
+  const cardano = (window as unknown as { cardano?: Record<string, { isEnabled: () => Promise<boolean> }> }).cardano;
+  if (!cardano) return null;
+  for (const id of ["eternl", "nami", "lace", "vespr", "flint", "begin", "typhon"]) {
+    if (!cardano[id]) continue;
+    try {
+      if (await cardano[id].isEnabled()) return id;
+    } catch { /* skip */ }
+  }
+  return null;
+}
+
 type SessionUser = {
   id: string;
   name: string;
@@ -59,11 +88,13 @@ export default function UserProfileDialog({ userId, children }: Props) {
 
   const { network, limitNetwork } = useNetworkContext();
   const { PAYMENTS_ENABLED, PLATFORM_WALLET_ADDRESS, SWAP_FEE_ADA, SWAP_FEE_LOVELACE } = getFeeConfig(network);
-  const { enabledWallet } = useCardano({ limitNetwork: limitNetwork as NetworkType });
+  const { enabledWallet, connect } = useCardano({ limitNetwork: limitNetwork as NetworkType });
   const [submitting, setSubmitting] = useState(false);
   const [swapError, setSwapError] = useState("");
   const [swapStatus, setSwapStatus] = useState("");
   const [swapSuccess, setSwapSuccess] = useState(false);
+  const [needsReconnect, setNeedsReconnect] = useState(false);
+  const [reconnecting, setReconnecting] = useState(false);
 
   // The specific skills to exchange, chosen for this request.
   const [offeredSkill, setOfferedSkill] = useState(""); // what I'll teach them
@@ -97,12 +128,23 @@ export default function UserProfileDialog({ userId, children }: Props) {
       .finally(() => setLoading(false));
   }, [loaded, loading, userId]);
 
+  function handleReconnect(walletId: string) {
+    setReconnecting(true);
+    setSwapError("");
+    connect(walletId, () => {
+      setNeedsReconnect(false);
+      setReconnecting(false);
+    });
+  }
+
   async function requestSwap() {
     setSwapError("");
     setSwapStatus("");
+    setNeedsReconnect(false);
 
     if (!me?.walletAddress) {
-      setSwapError("Connect your wallet from your Profile to send swap requests.");
+      // Account has no wallet linked at all — direct them to link one from Profile.
+      setSwapError("Link a Cardano wallet from your Profile page to send swap requests.");
       return;
     }
 
@@ -118,20 +160,25 @@ export default function UserProfileDialog({ userId, children }: Props) {
         receiverSkill: requestedSkill,
       };
 
-      // Sign the platform fee with the connected wallet before requesting.
-      // It's refunded only if this person declines.
       if (PAYMENTS_ENABLED) {
-        if (!enabledWallet) {
-          setSwapError("Connect your wallet from your Profile to pay the swap fee, then try again.");
+        // CCWW may not have polled yet after a page navigation even though the
+        // wallet extension is already enabled. Probe silently first so we don't
+        // incorrectly block wallet-type users who are already authenticated.
+        const walletId = enabledWallet ?? await detectEnabledWallet();
+
+        if (!walletId) {
+          // Genuinely not connected — show the reconnect widget.
+          setNeedsReconnect(true);
+          setSwapError("Your wallet extension needs to be reconnected. Select it below.");
+          setSubmitting(false);
           return;
         }
-        setSwapStatus(
-          `Approve the ${SWAP_FEE_ADA} ADA fee in your wallet…`
-        );
+
+        setSwapStatus(`Approve the ${SWAP_FEE_ADA} ADA fee in your wallet…`);
         try {
           const { buildAndSignFeeTx } = await import("@/lib/cardano/fee-client");
           const { signedTx, refundAddress } = await buildAndSignFeeTx({
-            walletName: enabledWallet,
+            walletName: walletId,
             toAddress: PLATFORM_WALLET_ADDRESS,
             lovelace: String(SWAP_FEE_LOVELACE),
           });
@@ -139,7 +186,7 @@ export default function UserProfileDialog({ userId, children }: Props) {
           payload.refundAddress = refundAddress;
         } catch {
           setSwapError(
-            "Couldn't sign the fee payment. Make sure your wallet is unlocked and has enough ADA, then try again."
+            "Couldn't sign the fee. Make sure your wallet is unlocked and has enough ADA, then try again."
           );
           return;
         }
@@ -395,6 +442,34 @@ export default function UserProfileDialog({ userId, children }: Props) {
                       A {SWAP_FEE_ADA} ADA platform fee keeps SkillSwap running.
                       It's refunded in full only if {profile.name} declines.
                     </p>
+                  )}
+
+                  {/* Reconnect widget: shown when the fee requires a wallet but the
+                      extension isn't connected (e.g. after a page reload race). */}
+                  {needsReconnect && (
+                    <div className="rounded-xl border border-warning/30 bg-warning/5 p-4 flex flex-col gap-3">
+                      <div className="flex items-center gap-2">
+                        <IconWallet size={15} className="text-warning shrink-0" />
+                        <p className="text-sm font-medium text-foreground">Reconnect your wallet extension</p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {getAvailableWallets().map((w) => (
+                          <button
+                            key={w.id}
+                            type="button"
+                            disabled={reconnecting}
+                            onClick={() => handleReconnect(w.id)}
+                            className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border hover:bg-accent/10 transition-colors text-sm text-foreground disabled:opacity-50"
+                          >
+                            {w.icon && <img src={w.icon} alt={w.name} width={18} height={18} className="rounded shrink-0" />}
+                            {w.name}
+                          </button>
+                        ))}
+                        {getAvailableWallets().length === 0 && (
+                          <p className="text-xs text-muted">No wallet extensions found. Install Nami, Eternl, or Lace.</p>
+                        )}
+                      </div>
+                    </div>
                   )}
 
                   {swapStatus && (

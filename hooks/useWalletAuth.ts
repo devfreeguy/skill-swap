@@ -34,7 +34,6 @@ function normalizeWalletError(err: unknown): string {
     lower.includes("wrong network")
   ) {
     return `Please switch your wallet to the required network, then try again.`;
-    return `Please switch your wallet to the required network, then try again.`;
   }
 
   // Wallet is locked
@@ -262,12 +261,6 @@ export function useWalletAuth() {
         const loginData = await loginRes.json();
 
         if (loginRes.ok) {
-          // Existing user: if not onboarded, go through /migrating so the sync
-          // API can copy their profile from the other network (handles the case
-          // where they were registered on this network before the sync was fixed).
-          // Existing user: if not onboarded, go through /migrating so the sync
-          // API can copy their profile from the other network (handles the case
-          // where they were registered on this network before the sync was fixed).
           router.push(
             loginData.teachSkill && loginData.learnSkill
               ? "/dashboard"
@@ -298,13 +291,6 @@ export function useWalletAuth() {
           });
           const regData = await regRes.json();
           if (regRes.ok) {
-            // New account: always go through /migrating — it will sync the
-            // profile from the other network (if any) and redirect to the
-            // right destination with a fresh JWT.
-            router.push("/migrating");
-            // New account: always go through /migrating — it will sync the
-            // profile from the other network (if any) and redirect to the
-            // right destination with a fresh JWT.
             router.push("/migrating");
             return;
           }

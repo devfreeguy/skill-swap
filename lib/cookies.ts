@@ -13,7 +13,7 @@ export function setAuthCookie(response: NextResponse, token: string): void {
 }
 
 export function clearAuthCookie(response: NextResponse): void {
-  response.cookies.set(COOKIE_NAME, "", { maxAge: 0 });
+  response.cookies.set(COOKIE_NAME, "", { maxAge: 0, path: "/" });
 }
 
 export function getAuthToken(request: NextRequest): string | undefined {

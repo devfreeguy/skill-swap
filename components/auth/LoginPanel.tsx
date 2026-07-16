@@ -27,11 +27,17 @@ export default function LoginPanel({ error }: { error?: string }) {
   const errorMessage = error ? ERROR_MESSAGES[error] : undefined;
 
   useEffect(() => {
+    // If the user landed here because they cancelled or an error occurred (e.g.
+    // twitter_denied), don't silently bounce them away — show the error message.
+    if (error) return;
     fetch("/api/auth/me")
       .then((r) => r.json())
-      .then((data) => { if (!data.error) router.replace("/dashboard"); })
+      .then((data) => {
+        if (data.error) return;
+        router.replace(data.onboarded ? "/dashboard" : "/migrating");
+      })
       .catch(() => {});
-  }, [router]);
+  }, [router, error]);
 
   function startTwitter() {
     window.location.href = "/api/auth/twitter";

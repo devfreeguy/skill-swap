@@ -15,5 +15,6 @@ export async function GET(request: NextRequest) {
     teachSkill: user.teachSkill,
     learnSkill: user.learnSkill,
     walletAddress: user.walletAddress,
+    onboarded: !!(user.teachSkill && user.learnSkill),
   });
 }

@@ -77,6 +77,9 @@ export default function WalletConnectButton({
   const [isOpen, setIsOpen] = useState(false);
   const [walletNetworks, setWalletNetworks] = useState<Record<string, NetworkId>>({});
   const autoTriggered = useRef(false);
+  // Set when the user explicitly clicks "Disconnect" — prevents the auto-trigger
+  // from re-firing if the wallet extension reconnects on its own.
+  const userDisconnected = useRef(false);
 
   const wallets = getAvailableWallets();
 
@@ -91,6 +94,7 @@ export default function WalletConnectButton({
   function handleWalletSelect(walletId: string) {
     setIsOpen(false);
     autoTriggered.current = true;
+    userDisconnected.current = false;
     runWalletFlow(walletId);
   }
 
@@ -100,6 +104,8 @@ export default function WalletConnectButton({
       autoTriggered.current = false;
       return;
     }
+    // Don't auto-trigger if the user explicitly clicked Disconnect.
+    if (userDisconnected.current) return;
     if (autoTriggered.current || !enabledWallet) return;
     autoTriggered.current = true;
     runWalletFlow(enabledWallet);
@@ -158,7 +164,11 @@ export default function WalletConnectButton({
             <Button
               variant="outline"
               className="rounded-full border-border text-foreground shrink-0"
-              onPress={() => disconnect()}
+              onPress={() => {
+                userDisconnected.current = true;
+                autoTriggered.current = false;
+                disconnect();
+              }}
               isDisabled={isLoading}
             >
               Disconnect
