@@ -35,6 +35,7 @@ export type UserMinAggregateOutputType = {
   learnSkill: string | null
   twitterId: string | null
   walletAddress: string | null
+  accountType: string | null
   publicKey: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -51,6 +52,7 @@ export type UserMaxAggregateOutputType = {
   learnSkill: string | null
   twitterId: string | null
   walletAddress: string | null
+  accountType: string | null
   publicKey: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -67,6 +69,7 @@ export type UserCountAggregateOutputType = {
   learnSkill: number
   twitterId: number
   walletAddress: number
+  accountType: number
   publicKey: number
   createdAt: number
   updatedAt: number
@@ -85,6 +88,7 @@ export type UserMinAggregateInputType = {
   learnSkill?: true
   twitterId?: true
   walletAddress?: true
+  accountType?: true
   publicKey?: true
   createdAt?: true
   updatedAt?: true
@@ -101,6 +105,7 @@ export type UserMaxAggregateInputType = {
   learnSkill?: true
   twitterId?: true
   walletAddress?: true
+  accountType?: true
   publicKey?: true
   createdAt?: true
   updatedAt?: true
@@ -117,6 +122,7 @@ export type UserCountAggregateInputType = {
   learnSkill?: true
   twitterId?: true
   walletAddress?: true
+  accountType?: true
   publicKey?: true
   createdAt?: true
   updatedAt?: true
@@ -206,6 +212,7 @@ export type UserGroupByOutputType = {
   learnSkill: string | null
   twitterId: string | null
   walletAddress: string | null
+  accountType: string | null
   publicKey: string | null
   createdAt: Date
   updatedAt: Date
@@ -243,6 +250,7 @@ export type UserWhereInput = {
   learnSkill?: Prisma.StringNullableFilter<"User"> | string | null
   twitterId?: Prisma.StringNullableFilter<"User"> | string | null
   walletAddress?: Prisma.StringNullableFilter<"User"> | string | null
+  accountType?: Prisma.StringNullableFilter<"User"> | string | null
   publicKey?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
@@ -265,6 +273,7 @@ export type UserOrderByWithRelationInput = {
   learnSkill?: Prisma.SortOrderInput | Prisma.SortOrder
   twitterId?: Prisma.SortOrderInput | Prisma.SortOrder
   walletAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  accountType?: Prisma.SortOrderInput | Prisma.SortOrder
   publicKey?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -290,6 +299,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   bio?: Prisma.StringNullableFilter<"User"> | string | null
   teachSkill?: Prisma.StringNullableFilter<"User"> | string | null
   learnSkill?: Prisma.StringNullableFilter<"User"> | string | null
+  accountType?: Prisma.StringNullableFilter<"User"> | string | null
   publicKey?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
@@ -312,6 +322,7 @@ export type UserOrderByWithAggregationInput = {
   learnSkill?: Prisma.SortOrderInput | Prisma.SortOrder
   twitterId?: Prisma.SortOrderInput | Prisma.SortOrder
   walletAddress?: Prisma.SortOrderInput | Prisma.SortOrder
+  accountType?: Prisma.SortOrderInput | Prisma.SortOrder
   publicKey?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -334,6 +345,7 @@ export type UserScalarWhereWithAggregatesInput = {
   learnSkill?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   twitterId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   walletAddress?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  accountType?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   publicKey?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -350,6 +362,7 @@ export type UserCreateInput = {
   learnSkill?: string | null
   twitterId?: string | null
   walletAddress?: string | null
+  accountType?: string | null
   publicKey?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -372,6 +385,7 @@ export type UserUncheckedCreateInput = {
   learnSkill?: string | null
   twitterId?: string | null
   walletAddress?: string | null
+  accountType?: string | null
   publicKey?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -394,6 +408,7 @@ export type UserUpdateInput = {
   learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   twitterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -416,6 +431,7 @@ export type UserUncheckedUpdateInput = {
   learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   twitterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -438,6 +454,7 @@ export type UserCreateManyInput = {
   learnSkill?: string | null
   twitterId?: string | null
   walletAddress?: string | null
+  accountType?: string | null
   publicKey?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -454,6 +471,7 @@ export type UserUpdateManyMutationInput = {
   learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   twitterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -470,6 +488,7 @@ export type UserUncheckedUpdateManyInput = {
   learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   twitterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -486,6 +505,7 @@ export type UserCountOrderByAggregateInput = {
   learnSkill?: Prisma.SortOrder
   twitterId?: Prisma.SortOrder
   walletAddress?: Prisma.SortOrder
+  accountType?: Prisma.SortOrder
   publicKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -502,6 +522,7 @@ export type UserMaxOrderByAggregateInput = {
   learnSkill?: Prisma.SortOrder
   twitterId?: Prisma.SortOrder
   walletAddress?: Prisma.SortOrder
+  accountType?: Prisma.SortOrder
   publicKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -518,6 +539,7 @@ export type UserMinOrderByAggregateInput = {
   learnSkill?: Prisma.SortOrder
   twitterId?: Prisma.SortOrder
   walletAddress?: Prisma.SortOrder
+  accountType?: Prisma.SortOrder
   publicKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -635,6 +657,7 @@ export type UserCreateWithoutSwapsInitiatedInput = {
   learnSkill?: string | null
   twitterId?: string | null
   walletAddress?: string | null
+  accountType?: string | null
   publicKey?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -656,6 +679,7 @@ export type UserUncheckedCreateWithoutSwapsInitiatedInput = {
   learnSkill?: string | null
   twitterId?: string | null
   walletAddress?: string | null
+  accountType?: string | null
   publicKey?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -682,6 +706,7 @@ export type UserCreateWithoutSwapsReceivedInput = {
   learnSkill?: string | null
   twitterId?: string | null
   walletAddress?: string | null
+  accountType?: string | null
   publicKey?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -703,6 +728,7 @@ export type UserUncheckedCreateWithoutSwapsReceivedInput = {
   learnSkill?: string | null
   twitterId?: string | null
   walletAddress?: string | null
+  accountType?: string | null
   publicKey?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -740,6 +766,7 @@ export type UserUpdateWithoutSwapsInitiatedInput = {
   learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   twitterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -761,6 +788,7 @@ export type UserUncheckedUpdateWithoutSwapsInitiatedInput = {
   learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   twitterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -793,6 +821,7 @@ export type UserUpdateWithoutSwapsReceivedInput = {
   learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   twitterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -814,6 +843,7 @@ export type UserUncheckedUpdateWithoutSwapsReceivedInput = {
   learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   twitterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -835,6 +865,7 @@ export type UserCreateWithoutProofsInput = {
   learnSkill?: string | null
   twitterId?: string | null
   walletAddress?: string | null
+  accountType?: string | null
   publicKey?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -856,6 +887,7 @@ export type UserUncheckedCreateWithoutProofsInput = {
   learnSkill?: string | null
   twitterId?: string | null
   walletAddress?: string | null
+  accountType?: string | null
   publicKey?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -893,6 +925,7 @@ export type UserUpdateWithoutProofsInput = {
   learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   twitterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -914,6 +947,7 @@ export type UserUncheckedUpdateWithoutProofsInput = {
   learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   twitterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -935,6 +969,7 @@ export type UserCreateWithoutDeliveriesInput = {
   learnSkill?: string | null
   twitterId?: string | null
   walletAddress?: string | null
+  accountType?: string | null
   publicKey?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -956,6 +991,7 @@ export type UserUncheckedCreateWithoutDeliveriesInput = {
   learnSkill?: string | null
   twitterId?: string | null
   walletAddress?: string | null
+  accountType?: string | null
   publicKey?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -993,6 +1029,7 @@ export type UserUpdateWithoutDeliveriesInput = {
   learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   twitterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1014,6 +1051,7 @@ export type UserUncheckedUpdateWithoutDeliveriesInput = {
   learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   twitterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1035,6 +1073,7 @@ export type UserCreateWithoutMessagesInput = {
   learnSkill?: string | null
   twitterId?: string | null
   walletAddress?: string | null
+  accountType?: string | null
   publicKey?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1056,6 +1095,7 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   learnSkill?: string | null
   twitterId?: string | null
   walletAddress?: string | null
+  accountType?: string | null
   publicKey?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1093,6 +1133,7 @@ export type UserUpdateWithoutMessagesInput = {
   learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   twitterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1114,6 +1155,7 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   twitterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1135,6 +1177,7 @@ export type UserCreateWithoutNotificationsInput = {
   learnSkill?: string | null
   twitterId?: string | null
   walletAddress?: string | null
+  accountType?: string | null
   publicKey?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1156,6 +1199,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   learnSkill?: string | null
   twitterId?: string | null
   walletAddress?: string | null
+  accountType?: string | null
   publicKey?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1193,6 +1237,7 @@ export type UserUpdateWithoutNotificationsInput = {
   learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   twitterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1214,6 +1259,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   learnSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   twitterId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publicKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1311,6 +1357,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   learnSkill?: boolean
   twitterId?: boolean
   walletAddress?: boolean
+  accountType?: boolean
   publicKey?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1334,6 +1381,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   learnSkill?: boolean
   twitterId?: boolean
   walletAddress?: boolean
+  accountType?: boolean
   publicKey?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1350,6 +1398,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   learnSkill?: boolean
   twitterId?: boolean
   walletAddress?: boolean
+  accountType?: boolean
   publicKey?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1366,12 +1415,13 @@ export type UserSelectScalar = {
   learnSkill?: boolean
   twitterId?: boolean
   walletAddress?: boolean
+  accountType?: boolean
   publicKey?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "avatarUrl" | "bio" | "teachSkill" | "learnSkill" | "twitterId" | "walletAddress" | "publicKey" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "avatarUrl" | "bio" | "teachSkill" | "learnSkill" | "twitterId" | "walletAddress" | "accountType" | "publicKey" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   swapsInitiated?: boolean | Prisma.User$swapsInitiatedArgs<ExtArgs>
   swapsReceived?: boolean | Prisma.User$swapsReceivedArgs<ExtArgs>
@@ -1405,6 +1455,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     learnSkill: string | null
     twitterId: string | null
     walletAddress: string | null
+    accountType: string | null
     publicKey: string | null
     createdAt: Date
     updatedAt: Date
@@ -1847,6 +1898,7 @@ export interface UserFieldRefs {
   readonly learnSkill: Prisma.FieldRef<"User", 'String'>
   readonly twitterId: Prisma.FieldRef<"User", 'String'>
   readonly walletAddress: Prisma.FieldRef<"User", 'String'>
+  readonly accountType: Prisma.FieldRef<"User", 'String'>
   readonly publicKey: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>

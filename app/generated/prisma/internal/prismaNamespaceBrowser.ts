@@ -87,6 +87,7 @@ export const UserScalarFieldEnum = {
   learnSkill: 'learnSkill',
   twitterId: 'twitterId',
   walletAddress: 'walletAddress',
+  accountType: 'accountType',
   publicKey: 'publicKey',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

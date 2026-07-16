@@ -62,6 +62,7 @@ export async function GET(request: NextRequest) {
         twitterId: profile.id,
         name: profile.name || profile.username,
         avatarUrl: profile.profileImageUrl,
+        accountType: "x",
       },
     });
     isNew = true;

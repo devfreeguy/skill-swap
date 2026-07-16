@@ -25,6 +25,14 @@ model User {
   twitterId     String? @unique
   walletAddress String? @unique
 
+  // Signup identity provider. Drives the business rule that a user can only
+  // authenticate with the account type they originally signed up with.
+  //   'x'     — created via X (Twitter) OAuth
+  //   'wallet' — created via a Cardano wallet signature
+  //   'email'  — created via email + password
+  // null until the first successful login/link sets it.
+  accountType String?
+
   // Public key for end-to-end encrypted messaging (derived from a wallet
   // signature on the client). Private key never leaves the user's device.
   publicKey String?

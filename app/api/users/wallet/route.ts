@@ -5,6 +5,7 @@ import { requireAuth } from "@/lib/api";
 import { signToken } from "@/lib/jwt";
 import { setAuthCookie } from "@/lib/cookies";
 import { consumeNonce } from "@/lib/wallet-nonce-store";
+import { checkWalletLinkable } from "@/lib/account-type";
 
 // CIP-8 verification needs Node APIs.
 export const runtime = "nodejs";
@@ -13,6 +14,9 @@ export const runtime = "nodejs";
  * Link a Cardano wallet to the *currently authenticated* account. Used by the
  * mandatory wallet gate and onboarding: the user proves ownership of the wallet
  * (signed nonce) and we bind its stake address to their existing user row.
+ *
+ * Account-type invariant: a wallet that already belongs to an 'x' account can
+ * never be linked to another account, so we validate before any state change.
  */
 export async function POST(request: NextRequest) {
   const auth = await requireAuth(request);
@@ -27,6 +31,18 @@ export async function POST(request: NextRequest) {
       { error: "walletAddress, signature, key, and nonce are required" },
       { status: 400 }
     );
+  }
+
+  // Pre-flight: reject an already-linked wallet (esp. one owned by an 'x'
+  // account) BEFORE consuming the nonce or verifying the signature. No state
+  // is changed on failure.
+  const linkCheck = await checkWalletLinkable(
+    prisma,
+    walletAddress,
+    currentUser.id
+  );
+  if (!linkCheck.ok) {
+    return NextResponse.json({ error: linkCheck.error }, { status: 409 });
   }
 
   // Single-use nonce issued by /api/auth/wallet/nonce.
@@ -51,18 +67,14 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Reject a wallet already bound to a different account.
-  const existing = await prisma.user.findUnique({ where: { walletAddress } });
-  if (existing && existing.id !== currentUser.id) {
-    return NextResponse.json(
-      { error: "This wallet is already linked to another account." },
-      { status: 409 }
-    );
-  }
-
   const updated = await prisma.user.update({
     where: { id: currentUser.id },
-    data: { walletAddress },
+    data: {
+      walletAddress,
+      // Linking a wallet upgrades a non-wallet account to 'wallet' so the user
+      // can subsequently authenticate via this wallet (matching signup type).
+      accountType: currentUser.accountType ?? "wallet",
+    },
   });
 
   const response = NextResponse.json({
@@ -89,7 +101,11 @@ export async function DELETE(request: NextRequest) {
 
   const updated = await prisma.user.update({
     where: { id: currentUser.id },
-    data: { walletAddress: null },
+    data: {
+      walletAddress: null,
+      // Detaching the wallet reverts the account to its original signup type.
+      accountType: currentUser.accountType === "wallet" ? null : currentUser.accountType,
+    },
   });
 
   const response = NextResponse.json({ success: true });

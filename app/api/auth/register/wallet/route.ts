@@ -43,10 +43,11 @@ export async function POST(request: NextRequest) {
 
   const existingWallet = await prisma.user.findUnique({ where: { walletAddress } });
   if (existingWallet) {
-    return NextResponse.json(
-      { error: "Wallet already linked to an account" },
-      { status: 409 }
-    );
+    const message =
+      existingWallet.accountType === "x"
+        ? "This wallet is already linked to another profile."
+        : "Wallet already linked to an account";
+    return NextResponse.json({ error: message }, { status: 409 });
   }
 
   if (email) {
@@ -64,6 +65,7 @@ export async function POST(request: NextRequest) {
       name,
       email: email || null,
       walletAddress,
+      accountType: "wallet",
     },
   });
 

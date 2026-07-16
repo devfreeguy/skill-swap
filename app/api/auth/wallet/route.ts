@@ -27,6 +27,21 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Account-type invariant: a wallet may only be used to log in if it belongs
+  // to a wallet-type account. An 'x' (or email) account that happens to share a
+  // wallet must not be authenticated via the wallet flow.
+  if (user.accountType && user.accountType !== "wallet") {
+    return NextResponse.json(
+      {
+        error:
+          user.accountType === "x"
+            ? "This wallet is already linked to another profile."
+            : "Please sign in with the account type you used to register.",
+      },
+      { status: 403 }
+    );
+  }
+
   // Nonce must have been issued by /api/auth/wallet/nonce and is single-use.
   if (!(await consumeNonce(nonce))) {
     return NextResponse.json(
