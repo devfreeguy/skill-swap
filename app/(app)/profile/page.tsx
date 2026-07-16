@@ -374,7 +374,19 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 <div className="p-3 rounded-xl bg-background border border-border">
-                  <WalletConnectButton mode="login" />
+                  <WalletConnectButton
+                    mode="link"
+                    onLinked={() => {
+                      // Re-fetch profile to show the newly linked wallet address.
+                      fetch("/api/users/profile")
+                        .then((r) => r.json())
+                        .then((data) => {
+                          if (data.error) return;
+                          setProfile(data);
+                        })
+                        .catch(() => {});
+                    }}
+                  />
                 </div>
               )}
             </div>
