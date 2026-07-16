@@ -34,6 +34,7 @@ function normalizeWalletError(err: unknown): string {
     lower.includes("wrong network")
   ) {
     return `Please switch your wallet to the required network, then try again.`;
+    return `Please switch your wallet to the required network, then try again.`;
   }
 
   // Wallet is locked
@@ -79,7 +80,10 @@ function normalizeWalletError(err: unknown): string {
 export function useWalletAuth() {
   const { limitNetwork } = useNetworkContext();
   const { isConnected, stakeAddress, signMessage, connect: rawConnect, enabledWallet } =
+  const { limitNetwork } = useNetworkContext();
+  const { isConnected, stakeAddress, signMessage, connect: rawConnect, enabledWallet } =
     useCardano({
+      limitNetwork: limitNetwork as NetworkType,
       limitNetwork: limitNetwork as NetworkType,
     });
   const router = useRouter();
@@ -105,6 +109,28 @@ export function useWalletAuth() {
     },
     []
   );
+
+  /**
+   * Wraps the library's connect() which returns BEFORE the wallet is actually
+   * connected (the underlying Wallet.connect() is fire-and-forget). This wrapper
+   * returns a promise that only resolves after the onConnect callback fires,
+   * ensuring signMessage is called only when the wallet is truly ready.
+   */
+  function connect(walletName: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      rawConnect(
+        walletName,
+        () => {
+          // onConnect — wallet is now connected and authorized
+          resolve();
+        },
+        (error) => {
+          // onError — connection failed or was rejected
+          reject(error);
+        }
+      );
+    });
+  }
 
   /**
    * Wraps the library's connect() which returns BEFORE the wallet is actually
@@ -251,9 +277,13 @@ export function useWalletAuth() {
           // Existing user: if not onboarded, go through /migrating so the sync
           // API can copy their profile from the other network (handles the case
           // where they were registered on this network before the sync was fixed).
+          // Existing user: if not onboarded, go through /migrating so the sync
+          // API can copy their profile from the other network (handles the case
+          // where they were registered on this network before the sync was fixed).
           router.push(
             loginData.teachSkill && loginData.learnSkill
               ? "/dashboard"
+              : "/migrating"
               : "/migrating"
           );
           return;
@@ -278,6 +308,10 @@ export function useWalletAuth() {
           });
           const regData = await regRes.json();
           if (regRes.ok) {
+            // New account: always go through /migrating — it will sync the
+            // profile from the other network (if any) and redirect to the
+            // right destination with a fresh JWT.
+            router.push("/migrating");
             // New account: always go through /migrating — it will sync the
             // profile from the other network (if any) and redirect to the
             // right destination with a fresh JWT.
