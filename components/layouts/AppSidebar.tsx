@@ -2,8 +2,8 @@
 
 import Logo from "@/components/elements/Logo";
 import ThemeToggle from "@/components/elements/ThemeToggle";
+import NetworkToggle from "@/components/elements/NetworkToggle";
 import { Avatar } from "@heroui/react";
-import { useNetworkContext } from "@/components/providers/NetworkProvider";
 import { NAV_ITEMS, isActivePath } from "@/components/layouts/nav";
 import { IconLogout } from "@tabler/icons-react";
 import Link from "next/link";
@@ -26,7 +26,6 @@ export default function AppSidebar({
   onLogout,
 }: Props) {
   const pathname = usePathname();
-  const { isMainnet, label } = useNetworkContext();
 
   return (
     <aside className="hidden md:flex flex-col w-64 shrink-0 border-r border-border bg-background sticky top-0 h-dvh">
@@ -66,11 +65,7 @@ export default function AppSidebar({
             );
           })}
 
-          {!isMainnet && (
-            <span className="inline-flex items-center mx-2 px-2.5 py-1 rounded-md text-[11px] font-medium text-muted border border-border bg-background w-fit">
-              {label}
-            </span>
-          )}
+          <NetworkToggle />
         </nav>
 
         {/* Bottom user */}
