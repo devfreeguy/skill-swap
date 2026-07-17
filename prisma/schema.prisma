@@ -15,7 +15,6 @@ model User {
   id        String  @id @default(cuid())
   name      String
   email     String? @unique
-  password  String?
   avatarUrl String?
   bio       String?
 
@@ -126,7 +125,6 @@ model Proof {
 
   teachSkill String
   learnSkill String
-  adaTxHash  String?
 
   metadataHash String?
   summary      String?

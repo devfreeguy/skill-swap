@@ -123,7 +123,6 @@ export async function GET(
           id: true,
           teachSkill: true,
           learnSkill: true,
-          adaTxHash: true,
           summary: true,
           metadataHash: true,
           chainTxHash: true,

@@ -28,7 +28,6 @@ export type UserMinAggregateOutputType = {
   id: string | null
   name: string | null
   email: string | null
-  password: string | null
   avatarUrl: string | null
   bio: string | null
   teachSkill: string | null
@@ -45,7 +44,6 @@ export type UserMaxAggregateOutputType = {
   id: string | null
   name: string | null
   email: string | null
-  password: string | null
   avatarUrl: string | null
   bio: string | null
   teachSkill: string | null
@@ -62,7 +60,6 @@ export type UserCountAggregateOutputType = {
   id: number
   name: number
   email: number
-  password: number
   avatarUrl: number
   bio: number
   teachSkill: number
@@ -81,7 +78,6 @@ export type UserMinAggregateInputType = {
   id?: true
   name?: true
   email?: true
-  password?: true
   avatarUrl?: true
   bio?: true
   teachSkill?: true
@@ -98,7 +94,6 @@ export type UserMaxAggregateInputType = {
   id?: true
   name?: true
   email?: true
-  password?: true
   avatarUrl?: true
   bio?: true
   teachSkill?: true
@@ -115,7 +110,6 @@ export type UserCountAggregateInputType = {
   id?: true
   name?: true
   email?: true
-  password?: true
   avatarUrl?: true
   bio?: true
   teachSkill?: true
@@ -205,7 +199,6 @@ export type UserGroupByOutputType = {
   id: string
   name: string
   email: string | null
-  password: string | null
   avatarUrl: string | null
   bio: string | null
   teachSkill: string | null
@@ -243,7 +236,6 @@ export type UserWhereInput = {
   id?: Prisma.StringFilter<"User"> | string
   name?: Prisma.StringFilter<"User"> | string
   email?: Prisma.StringNullableFilter<"User"> | string | null
-  password?: Prisma.StringNullableFilter<"User"> | string | null
   avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
   bio?: Prisma.StringNullableFilter<"User"> | string | null
   teachSkill?: Prisma.StringNullableFilter<"User"> | string | null
@@ -266,7 +258,6 @@ export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
-  password?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
   teachSkill?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -294,7 +285,6 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   name?: Prisma.StringFilter<"User"> | string
-  password?: Prisma.StringNullableFilter<"User"> | string | null
   avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
   bio?: Prisma.StringNullableFilter<"User"> | string | null
   teachSkill?: Prisma.StringNullableFilter<"User"> | string | null
@@ -315,7 +305,6 @@ export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
-  password?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
   teachSkill?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -338,7 +327,6 @@ export type UserScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"User"> | string
   name?: Prisma.StringWithAggregatesFilter<"User"> | string
   email?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
-  password?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   avatarUrl?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   bio?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   teachSkill?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
@@ -355,7 +343,6 @@ export type UserCreateInput = {
   id?: string
   name: string
   email?: string | null
-  password?: string | null
   avatarUrl?: string | null
   bio?: string | null
   teachSkill?: string | null
@@ -378,7 +365,6 @@ export type UserUncheckedCreateInput = {
   id?: string
   name: string
   email?: string | null
-  password?: string | null
   avatarUrl?: string | null
   bio?: string | null
   teachSkill?: string | null
@@ -401,7 +387,6 @@ export type UserUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -424,7 +409,6 @@ export type UserUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -447,7 +431,6 @@ export type UserCreateManyInput = {
   id?: string
   name: string
   email?: string | null
-  password?: string | null
   avatarUrl?: string | null
   bio?: string | null
   teachSkill?: string | null
@@ -464,7 +447,6 @@ export type UserUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -481,7 +463,6 @@ export type UserUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -498,7 +479,6 @@ export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  password?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
   bio?: Prisma.SortOrder
   teachSkill?: Prisma.SortOrder
@@ -515,7 +495,6 @@ export type UserMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  password?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
   bio?: Prisma.SortOrder
   teachSkill?: Prisma.SortOrder
@@ -532,7 +511,6 @@ export type UserMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  password?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
   bio?: Prisma.SortOrder
   teachSkill?: Prisma.SortOrder
@@ -650,7 +628,6 @@ export type UserCreateWithoutSwapsInitiatedInput = {
   id?: string
   name: string
   email?: string | null
-  password?: string | null
   avatarUrl?: string | null
   bio?: string | null
   teachSkill?: string | null
@@ -672,7 +649,6 @@ export type UserUncheckedCreateWithoutSwapsInitiatedInput = {
   id?: string
   name: string
   email?: string | null
-  password?: string | null
   avatarUrl?: string | null
   bio?: string | null
   teachSkill?: string | null
@@ -699,7 +675,6 @@ export type UserCreateWithoutSwapsReceivedInput = {
   id?: string
   name: string
   email?: string | null
-  password?: string | null
   avatarUrl?: string | null
   bio?: string | null
   teachSkill?: string | null
@@ -721,7 +696,6 @@ export type UserUncheckedCreateWithoutSwapsReceivedInput = {
   id?: string
   name: string
   email?: string | null
-  password?: string | null
   avatarUrl?: string | null
   bio?: string | null
   teachSkill?: string | null
@@ -759,7 +733,6 @@ export type UserUpdateWithoutSwapsInitiatedInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -781,7 +754,6 @@ export type UserUncheckedUpdateWithoutSwapsInitiatedInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -814,7 +786,6 @@ export type UserUpdateWithoutSwapsReceivedInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -836,7 +807,6 @@ export type UserUncheckedUpdateWithoutSwapsReceivedInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -858,7 +828,6 @@ export type UserCreateWithoutProofsInput = {
   id?: string
   name: string
   email?: string | null
-  password?: string | null
   avatarUrl?: string | null
   bio?: string | null
   teachSkill?: string | null
@@ -880,7 +849,6 @@ export type UserUncheckedCreateWithoutProofsInput = {
   id?: string
   name: string
   email?: string | null
-  password?: string | null
   avatarUrl?: string | null
   bio?: string | null
   teachSkill?: string | null
@@ -918,7 +886,6 @@ export type UserUpdateWithoutProofsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -940,7 +907,6 @@ export type UserUncheckedUpdateWithoutProofsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -962,7 +928,6 @@ export type UserCreateWithoutDeliveriesInput = {
   id?: string
   name: string
   email?: string | null
-  password?: string | null
   avatarUrl?: string | null
   bio?: string | null
   teachSkill?: string | null
@@ -984,7 +949,6 @@ export type UserUncheckedCreateWithoutDeliveriesInput = {
   id?: string
   name: string
   email?: string | null
-  password?: string | null
   avatarUrl?: string | null
   bio?: string | null
   teachSkill?: string | null
@@ -1022,7 +986,6 @@ export type UserUpdateWithoutDeliveriesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1044,7 +1007,6 @@ export type UserUncheckedUpdateWithoutDeliveriesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1066,7 +1028,6 @@ export type UserCreateWithoutMessagesInput = {
   id?: string
   name: string
   email?: string | null
-  password?: string | null
   avatarUrl?: string | null
   bio?: string | null
   teachSkill?: string | null
@@ -1088,7 +1049,6 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   id?: string
   name: string
   email?: string | null
-  password?: string | null
   avatarUrl?: string | null
   bio?: string | null
   teachSkill?: string | null
@@ -1126,7 +1086,6 @@ export type UserUpdateWithoutMessagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1148,7 +1107,6 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1170,7 +1128,6 @@ export type UserCreateWithoutNotificationsInput = {
   id?: string
   name: string
   email?: string | null
-  password?: string | null
   avatarUrl?: string | null
   bio?: string | null
   teachSkill?: string | null
@@ -1192,7 +1149,6 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   id?: string
   name: string
   email?: string | null
-  password?: string | null
   avatarUrl?: string | null
   bio?: string | null
   teachSkill?: string | null
@@ -1230,7 +1186,6 @@ export type UserUpdateWithoutNotificationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1252,7 +1207,6 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   teachSkill?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1350,7 +1304,6 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   name?: boolean
   email?: boolean
-  password?: boolean
   avatarUrl?: boolean
   bio?: boolean
   teachSkill?: boolean
@@ -1374,7 +1327,6 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   name?: boolean
   email?: boolean
-  password?: boolean
   avatarUrl?: boolean
   bio?: boolean
   teachSkill?: boolean
@@ -1391,7 +1343,6 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   name?: boolean
   email?: boolean
-  password?: boolean
   avatarUrl?: boolean
   bio?: boolean
   teachSkill?: boolean
@@ -1408,7 +1359,6 @@ export type UserSelectScalar = {
   id?: boolean
   name?: boolean
   email?: boolean
-  password?: boolean
   avatarUrl?: boolean
   bio?: boolean
   teachSkill?: boolean
@@ -1421,7 +1371,7 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "avatarUrl" | "bio" | "teachSkill" | "learnSkill" | "twitterId" | "walletAddress" | "accountType" | "publicKey" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "avatarUrl" | "bio" | "teachSkill" | "learnSkill" | "twitterId" | "walletAddress" | "accountType" | "publicKey" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   swapsInitiated?: boolean | Prisma.User$swapsInitiatedArgs<ExtArgs>
   swapsReceived?: boolean | Prisma.User$swapsReceivedArgs<ExtArgs>
@@ -1448,7 +1398,6 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     id: string
     name: string
     email: string | null
-    password: string | null
     avatarUrl: string | null
     bio: string | null
     teachSkill: string | null
@@ -1891,7 +1840,6 @@ export interface UserFieldRefs {
   readonly id: Prisma.FieldRef<"User", 'String'>
   readonly name: Prisma.FieldRef<"User", 'String'>
   readonly email: Prisma.FieldRef<"User", 'String'>
-  readonly password: Prisma.FieldRef<"User", 'String'>
   readonly avatarUrl: Prisma.FieldRef<"User", 'String'>
   readonly bio: Prisma.FieldRef<"User", 'String'>
   readonly teachSkill: Prisma.FieldRef<"User", 'String'>

@@ -1,5 +1,4 @@
 import "dotenv/config";
-import bcrypt from "bcryptjs";
 import { PrismaClient } from "../app/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
@@ -22,8 +21,6 @@ async function main() {
 
   console.log("🗑️  Cleared existing data");
 
-  const pw = await bcrypt.hash("password123", 12);
-
   // ─── Users ────────────────────────────────────────────────────────────────
   const [alice, hiroshi, luisa, karl, priya, seoYeon, etienne, diego, amira, lars, jordan, maya] =
     await Promise.all([
@@ -31,7 +28,6 @@ async function main() {
         data: {
           name: "Alice Chen",
           email: "alice@fakeemail.xyz",
-          password: pw,
           teachSkill: s(["React", "Next.js"]),
           learnSkill: s(["Python", "Machine Learning"]),
         },
@@ -40,7 +36,6 @@ async function main() {
         data: {
           name: "Hiroshi Tanaka",
           email: "hiroshi@fakeemail.xyz",
-          password: pw,
           teachSkill: s(["Machine Learning", "TensorFlow"]),
           learnSkill: s(["React", "TypeScript"]),
         },
@@ -49,7 +44,6 @@ async function main() {
         data: {
           name: "Luisa Santos",
           email: "luisa@fakeemail.xyz",
-          password: pw,
           teachSkill: s(["Spanish", "Portuguese"]),
           learnSkill: s(["Rust", "WebAssembly"]),
         },
@@ -58,7 +52,6 @@ async function main() {
         data: {
           name: "Karl Weber",
           email: "karl@fakeemail.xyz",
-          password: pw,
           teachSkill: s(["Kubernetes", "Docker"]),
           learnSkill: s(["Figma", "UI Design"]),
         },
@@ -67,7 +60,6 @@ async function main() {
         data: {
           name: "Priya Sharma",
           email: "priya@fakeemail.xyz",
-          password: pw,
           teachSkill: s(["Data Science", "Pandas"]),
           learnSkill: s(["Docker", "Kubernetes"]),
         },
@@ -76,7 +68,6 @@ async function main() {
         data: {
           name: "Seo-Yeon Park",
           email: "seoyeon@fakeemail.xyz",
-          password: pw,
           teachSkill: s(["UI/UX Design", "Figma"]),
           learnSkill: s(["Node.js", "Express"]),
         },
@@ -85,7 +76,6 @@ async function main() {
         data: {
           name: "Étienne Dubois",
           email: "etienne@fakeemail.xyz",
-          password: pw,
           teachSkill: s(["French Language", "Translation"]),
           learnSkill: s(["React Native", "Mobile Dev"]),
         },
@@ -94,7 +84,6 @@ async function main() {
         data: {
           name: "Diego Morales",
           email: "diego@fakeemail.xyz",
-          password: pw,
           teachSkill: s(["Go", "gRPC"]),
           learnSkill: s(["TypeScript", "React"]),
         },
@@ -103,7 +92,6 @@ async function main() {
         data: {
           name: "Amira Hassan",
           email: "amira@fakeemail.xyz",
-          password: pw,
           teachSkill: s(["Arabic", "Calligraphy"]),
           learnSkill: s(["Vue.js", "Nuxt"]),
         },
@@ -112,7 +100,6 @@ async function main() {
         data: {
           name: "Lars Eriksson",
           email: "lars@fakeemail.xyz",
-          password: pw,
           teachSkill: s(["PostgreSQL", "Database Design"]),
           learnSkill: s(["Swift", "iOS Dev"]),
         },
@@ -121,7 +108,6 @@ async function main() {
         data: {
           name: "Jordan Taylor",
           email: "jordan@fakeemail.xyz",
-          password: pw,
           teachSkill: s(["Swift", "SwiftUI"]),
           learnSkill: s(["Machine Learning", "Python"]),
         },
@@ -130,7 +116,6 @@ async function main() {
         data: {
           name: "Maya Patel",
           email: "maya@fakeemail.xyz",
-          password: pw,
           teachSkill: s(["TypeScript", "GraphQL"]),
           learnSkill: s(["Kubernetes", "DevOps"]),
         },
@@ -320,7 +305,6 @@ async function main() {
       userId: lars.id,
       teachSkill: "PostgreSQL",
       learnSkill: "Swift",
-      adaTxHash: "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
       metadataHash: "deadbeef1234567890abcdef1234567890abcdef1234567890abcdef12345678",
       summary: "Lars taught PostgreSQL schema design and query optimization. Jordan taught SwiftUI fundamentals.",
       createdAt: completedAt1,
@@ -333,7 +317,6 @@ async function main() {
       userId: maya.id,
       teachSkill: "TypeScript",
       learnSkill: "Kubernetes",
-      adaTxHash: "b2c3d4e5f67890123456789012345678901bcdef2345678901bcdef2345678",
       metadataHash: "cafebabe1234567890abcdef1234567890abcdef1234567890abcdef12345678",
       summary: "Maya taught TypeScript + GraphQL. Karl taught Kubernetes cluster management with Helm.",
       createdAt: completedAt2,
@@ -420,7 +403,7 @@ async function main() {
   console.log(`🔔 Created ${notifs.length} notifications`);
 
   console.log("\n✅ Seed complete!");
-  console.log("\n📋 Test accounts (all use password: password123):");
+  console.log("\n📋 Test accounts:");
   console.log("   alice@fakeemail.xyz  — React teacher, 1 PENDING swap");
   console.log("   hiroshi@fakeemail.xyz — ML teacher, 1 PENDING swap request");
   console.log("   luisa@fakeemail.xyz  — Spanish teacher, 1 ACTIVE swap");
