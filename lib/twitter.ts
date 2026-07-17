@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import type { NextRequest } from "next/server";
 
 /**
  * Twitter / X OAuth2 (Authorization Code + PKCE) helpers.
@@ -36,14 +37,13 @@ function base64url(input: Buffer): string {
     .replace(/=+$/, "");
 }
 
-/** Resolve the app base URL (no trailing slash) used to build the callback. */
-export function appBaseUrl(): string {
-  const url = process.env.NEXTAUTH_URL || "http://localhost:3000";
-  return url.replace(/\/+$/, "");
+/** Derive the app base URL from the incoming request origin. */
+export function appBaseUrl(request: NextRequest): string {
+  return request.nextUrl.origin;
 }
 
-export function redirectUri(): string {
-  return `${appBaseUrl()}/api/auth/twitter/callback`;
+export function redirectUri(request: NextRequest): string {
+  return `${appBaseUrl(request)}/api/auth/twitter/callback`;
 }
 
 /** A random URL-safe value for the OAuth `state` (CSRF) parameter. */
@@ -60,11 +60,11 @@ export function createPkcePair(): { verifier: string; challenge: string } {
   return { verifier, challenge };
 }
 
-export function buildAuthorizeUrl(state: string, challenge: string): string {
+export function buildAuthorizeUrl(state: string, challenge: string, callbackUri: string): string {
   const params = new URLSearchParams({
     response_type: "code",
     client_id: process.env.TWITTER_CLIENT_ID ?? "",
-    redirect_uri: redirectUri(),
+    redirect_uri: callbackUri,
     scope: SCOPES.join(" "),
     state,
     code_challenge: challenge,
@@ -76,7 +76,8 @@ export function buildAuthorizeUrl(state: string, challenge: string): string {
 /** Exchange an authorization code for an access token. */
 export async function exchangeCodeForToken(
   code: string,
-  verifier: string
+  verifier: string,
+  callbackUri: string
 ): Promise<string> {
   const clientId = process.env.TWITTER_CLIENT_ID ?? "";
   const clientSecret = process.env.TWITTER_CLIENT_SECRET ?? "";
@@ -84,7 +85,7 @@ export async function exchangeCodeForToken(
   const body = new URLSearchParams({
     grant_type: "authorization_code",
     code,
-    redirect_uri: redirectUri(),
+    redirect_uri: callbackUri,
     code_verifier: verifier,
     client_id: clientId,
   });

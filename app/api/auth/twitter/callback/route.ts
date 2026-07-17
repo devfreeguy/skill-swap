@@ -7,6 +7,7 @@ import {
   appBaseUrl,
   exchangeCodeForToken,
   fetchTwitterProfile,
+  redirectUri,
   TWITTER_STATE_COOKIE,
   TWITTER_VERIFIER_COOKIE,
 } from "@/lib/twitter";
@@ -15,8 +16,8 @@ import { syncProfileFromOtherNetwork } from "@/lib/network-profile-sync";
 // Token exchange + profile fetch run on Node.
 export const runtime = "nodejs";
 
-function loginError(reason: string): NextResponse {
-  return NextResponse.redirect(`${appBaseUrl()}/login?error=${reason}`);
+function loginError(reason: string, request: NextRequest): NextResponse {
+  return NextResponse.redirect(`${appBaseUrl(request)}/login?error=${reason}`);
 }
 
 /** Profile is onboarded when both skill fields are set (matches wallet routes). */
@@ -33,22 +34,22 @@ export async function GET(request: NextRequest) {
   const state = searchParams.get("state");
   const oauthError = searchParams.get("error");
 
-  if (oauthError) return loginError("twitter_denied");
-  if (!code || !state) return loginError("twitter_invalid");
+  if (oauthError) return loginError("twitter_denied", request);
+  if (!code || !state) return loginError("twitter_invalid", request);
 
   const expectedState = request.cookies.get(TWITTER_STATE_COOKIE)?.value;
   const verifier = request.cookies.get(TWITTER_VERIFIER_COOKIE)?.value;
 
   if (!expectedState || !verifier || state !== expectedState) {
-    return loginError("twitter_state");
+    return loginError("twitter_state", request);
   }
 
   let profile;
   try {
-    const accessToken = await exchangeCodeForToken(code, verifier);
+    const accessToken = await exchangeCodeForToken(code, verifier, redirectUri(request));
     profile = await fetchTwitterProfile(accessToken);
   } catch {
-    return loginError("twitter_failed");
+    return loginError("twitter_failed", request);
   }
 
   const network = getNetwork(request);
@@ -87,7 +88,7 @@ export async function GET(request: NextRequest) {
   // Route purely on onboarded status — sync already ran above for new users,
   // so if skills were copied the user is onboarded and goes straight to dashboard.
   const destination = onboarded ? "/dashboard" : "/migrating";
-  const response = NextResponse.redirect(`${appBaseUrl()}${destination}`);
+  const response = NextResponse.redirect(`${appBaseUrl(request)}${destination}`);
   setAuthCookie(response, token);
 
   // Clear the one-time OAuth cookies.

@@ -1,9 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import {
   appBaseUrl,
   buildAuthorizeUrl,
   createPkcePair,
   createState,
+  redirectUri,
   TWITTER_STATE_COOKIE,
   TWITTER_VERIFIER_COOKIE,
 } from "@/lib/twitter";
@@ -16,17 +17,18 @@ export const runtime = "nodejs";
  * them in short-lived HttpOnly cookies, then redirects the browser to X's
  * authorize screen. The callback route verifies state + verifier on return.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   if (!process.env.TWITTER_CLIENT_ID) {
     return NextResponse.redirect(
-      `${appBaseUrl()}/login?error=twitter_not_configured`
+      `${appBaseUrl(request)}/login?error=twitter_not_configured`
     );
   }
 
   const state = createState();
   const { verifier, challenge } = createPkcePair();
+  const uri = redirectUri(request);
 
-  const response = NextResponse.redirect(buildAuthorizeUrl(state, challenge));
+  const response = NextResponse.redirect(buildAuthorizeUrl(state, challenge, uri));
 
   const cookieOptions = {
     httpOnly: true,
