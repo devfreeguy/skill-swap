@@ -12,6 +12,7 @@ import {
   Surface,
 } from "@heroui/react";
 import SkillTag from "@/components/elements/SkillTag";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -195,6 +196,15 @@ export default function UserProfilePage() {
         {isOwnProfile && (
           <Button variant="secondary" className="w-full" onPress={() => router.push("/onboarding")}>Edit Your Skills</Button>
         )}
+
+        <div className="text-center">
+          <Link
+            href={`/reputation/${profile.id}`}
+            className="text-xs text-muted hover:text-accent transition-colors"
+          >
+            View Reputation Page →
+          </Link>
+        </div>
       </Card>
     </main>
   );

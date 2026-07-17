@@ -216,6 +216,16 @@ export default function DashboardPage() {
       <FirstRunGuide />
 
       {/* Stats */}
+      <div className="flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">Overview</h2>
+        <Link
+          href={`/reputation/${user.id}`}
+          className="text-sm text-accent hover:text-accent/80 transition-colors flex items-center gap-1"
+        >
+          My Reputation <IconArrowRight size={14} />
+        </Link>
+      </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard
           label="Completed Exchanges"
@@ -274,6 +284,7 @@ export default function DashboardPage() {
             </svg>
           }
         />
+      </div>
       </div>
 
       {/* Suggested Matches */}

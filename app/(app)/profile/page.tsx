@@ -382,6 +382,15 @@ export default function ProfilePage() {
                 {profile.id}
               </p>
             </div>
+
+            <a
+              href={`/reputation/${profile.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-accent hover:text-accent/80 transition-colors"
+            >
+              View Public Reputation Page →
+            </a>
           </Card>
 
           {/* Section 5 - Exchange Statistics */}
