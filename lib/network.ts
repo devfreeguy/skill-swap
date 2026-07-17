@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 export type ActiveNetwork = "mainnet" | "preprod";
 export const NETWORK_COOKIE = "x-skillswap-network";
-export const DEFAULT_NETWORK: ActiveNetwork = "preprod";
+export const DEFAULT_NETWORK: ActiveNetwork =
+  process.env.NEXT_PUBLIC_DEFAULT_NETWORK === "mainnet" ? "mainnet" : "preprod";
 
 export function getNetwork(request: NextRequest): ActiveNetwork {
   const val = request.cookies.get(NETWORK_COOKIE)?.value;
-  return val === "mainnet" ? "mainnet" : "preprod";
+  return val === "mainnet" ? "mainnet" : DEFAULT_NETWORK;
 }
 
 export function setNetworkCookie(
