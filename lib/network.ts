@@ -7,7 +7,8 @@ export const DEFAULT_NETWORK: ActiveNetwork =
 
 export function getNetwork(request: NextRequest): ActiveNetwork {
   const val = request.cookies.get(NETWORK_COOKIE)?.value;
-  return val === "mainnet" ? "mainnet" : DEFAULT_NETWORK;
+  if (val === "mainnet" || val === "preprod") return val;
+  return DEFAULT_NETWORK;
 }
 
 export function setNetworkCookie(

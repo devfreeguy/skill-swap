@@ -42,7 +42,7 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const rawNetwork = cookieStore.get(NETWORK_COOKIE)?.value;
   const initialNetwork: ActiveNetwork =
-    rawNetwork === "mainnet" ? "mainnet" : DEFAULT_NETWORK;
+    rawNetwork === "mainnet" || rawNetwork === "preprod" ? rawNetwork : DEFAULT_NETWORK;
 
   return (
     <html
