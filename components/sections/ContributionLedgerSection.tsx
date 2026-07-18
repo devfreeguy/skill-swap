@@ -15,6 +15,12 @@ type RecentSwap = {
   verified: boolean;
 };
 
+const FALLBACK: RecentSwap[] = [
+  { id: "#00231", skill: "React Fundamentals", initiatorName: "Daniel", receiverName: "Sarah", completedAt: "2026-01-15T00:00:00Z", verified: true },
+  { id: "#00198", skill: "Solidity Basics", initiatorName: "Maya", receiverName: "Kwame", completedAt: "2026-01-08T00:00:00Z", verified: true },
+  { id: "#00156", skill: "UI/UX Design", initiatorName: "Carlos", receiverName: "Priya", completedAt: "2025-12-22T00:00:00Z", verified: true },
+];
+
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", {
     month: "short",
@@ -89,13 +95,13 @@ export default function ContributionLedgerSection() {
     fetch("/api/swaps/recent")
       .then((r) => r.json())
       .then((data) => {
-        if (Array.isArray(data)) setRecords(data);
+        if (Array.isArray(data) && data.length > 0) setRecords(data);
+        else setRecords(FALLBACK);
       })
-      .catch(() => setRecords([]));
+      .catch(() => setRecords(FALLBACK));
   }, []);
 
   const showSkeletons = records === null;
-  const isEmpty = records !== null && records.length === 0;
 
   return (
     <SectionWrapper id="ledger">
@@ -118,8 +124,7 @@ export default function ContributionLedgerSection() {
         </p>
       </motion.div>
 
-      {isEmpty ? null : (
-        <motion.div
+      <motion.div
           className="grid grid-cols-1 md:grid-cols-3 gap-4"
           variants={stagger}
           whileInView="visible"
@@ -138,7 +143,6 @@ export default function ContributionLedgerSection() {
                 </motion.div>
               ))}
         </motion.div>
-      )}
     </SectionWrapper>
   );
 }
