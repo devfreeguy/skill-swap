@@ -66,42 +66,17 @@ function ContributionCard({ record }: { record: RecentSwap }) {
   );
 }
 
-function CardSkeleton() {
-  return (
-    <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-4 h-full animate-pulse">
-      <div className="flex items-start justify-between gap-3">
-        <div className="h-3 w-14 rounded bg-border" />
-        <div className="h-5 w-16 rounded-full bg-border" />
-      </div>
-      <div className="h-4 w-3/4 rounded bg-border" />
-      <div className="flex items-center gap-2 mt-auto">
-        <div className="w-6 h-6 rounded-full bg-border" />
-        <div className="h-3 w-14 rounded bg-border" />
-        <div className="h-3 w-4 rounded bg-border" />
-        <div className="w-6 h-6 rounded-full bg-border" />
-        <div className="h-3 w-14 rounded bg-border" />
-      </div>
-      <div className="border-t border-border pt-3">
-        <div className="h-3 w-20 rounded bg-border" />
-      </div>
-    </div>
-  );
-}
-
 export default function ContributionLedgerSection() {
-  const [records, setRecords] = useState<RecentSwap[] | null>(null);
+  const [records, setRecords] = useState<RecentSwap[]>(FALLBACK);
 
   useEffect(() => {
     fetch("/api/swaps/recent")
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) setRecords(data);
-        else setRecords(FALLBACK);
       })
-      .catch(() => setRecords(FALLBACK));
+      .catch(() => {});
   }, []);
-
-  const showSkeletons = records === null;
 
   return (
     <SectionWrapper id="ledger">
@@ -125,24 +100,18 @@ export default function ContributionLedgerSection() {
       </motion.div>
 
       <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-4"
-          variants={stagger}
-          whileInView="visible"
-          initial="hidden"
-          viewport={{ once: true, amount: 0.3 }}
-        >
-          {showSkeletons
-            ? [0, 1, 2].map((i) => (
-                <motion.div key={i} variants={fadeUp} className="h-full">
-                  <CardSkeleton />
-                </motion.div>
-              ))
-            : records.map((record) => (
-                <motion.div key={record.id} variants={fadeUp} className="h-full">
-                  <ContributionCard record={record} />
-                </motion.div>
-              ))}
-        </motion.div>
+        className="grid grid-cols-1 md:grid-cols-3 gap-4"
+        variants={stagger}
+        whileInView="visible"
+        initial="hidden"
+        viewport={{ once: true, amount: 0.3 }}
+      >
+        {records.map((record) => (
+          <motion.div key={record.id} variants={fadeUp} className="h-full">
+            <ContributionCard record={record} />
+          </motion.div>
+        ))}
+      </motion.div>
     </SectionWrapper>
   );
 }
