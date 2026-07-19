@@ -16,8 +16,7 @@
 - One-sentence description: A peer-to-peer skill exchange platform where anyone can teach what they know and learn what they need, secured by Cardano wallet authentication and on-chain completion proofs.
 - Official public repository: https://github.com/devfreeguy/skill-swap
 - Deployed public product: https://myskillswap.xyz
-- Official X account: https://x.com/myskillswap
-- Primary X posting account: https://x.com/devfreeguy
+- Official X account: @myskillswap
 - Team members as registered: Daniel (solo)
 
 ---
@@ -51,6 +50,9 @@ Recommended flow:
 5. Request a swap — approve the 2 ADA fee in the wallet extension
 6. Swap detail — encrypted chat, deliverable upload, mark done
 7. Completion — both sides confirm, on-chain proof anchored, Cardano transaction visible on explorer
+
+Demo video: https://ody.sh/QfDMSrwp3R
+Mainnet swap history/proof: https://myskillswap.xyz/reputation/cmrqtfsoo000004jlgu2oltxj
 
 ---
 
@@ -161,9 +163,9 @@ How SkillSwap uses Cardano mainnet:
 
 4. On-chain Proof Anchoring — When both parties complete a swap, a Cardano metadata transaction is submitted anchoring the proof hash (swap ID, participants, skills, timestamp). Creates a permanent public record of the exchange.
 
-- Mainnet transaction links: [TO BE ADDED after first mainnet transactions]
-- Platform treasury address: [TO BE ADDED]
-- Proof anchor tx examples: [TO BE ADDED]
+- Proof anchor tx: https://cardanoscan.io/transaction/350fa8c06384318df4492067bafdf27d9fe0480d8288309ee7abecbb8a268d62
+- Platform treasury address: addr1q8gk9dexqfts4etzqrxdenrrzudcxqn443a7hws5rgu8y57dt7qhd4syq8l0yqgp7z06wfaclndsvgk34ut48k5dxvdqmwr3gs
+- Mainnet swap history/proof page: https://myskillswap.xyz/reputation/cmrqtfsoo000004jlgu2oltxj
 
 ---
 
@@ -172,15 +174,26 @@ How SkillSwap uses Cardano mainnet:
 ## Real User Slide A: Paying User Evidence
 
 - Platform has approximately 5 active users on mainnet
-- Real ADA payment evidence: [TO BE ADDED — blockchain payment records from Cardano mainnet after first completed swaps]
+- Proof anchor tx on Cardano mainnet: https://cardanoscan.io/transaction/350fa8c06384318df4492067bafdf27d9fe0480d8288309ee7abecbb8a268d62
+- Public reputation/swap history: https://myskillswap.xyz/reputation/cmrqtfsoo000004jlgu2oltxj
 
 ## Real User Slide B: Customer Acquisition Story
 
-Who the user is: Early adopters from the Gimbalabs and Cardano community who connected during the hackathon build process.
-How they found the product: Weekly X posts under #gimbalabs #pieceofpie #hackathon and direct outreach in the Gimbalabs Discord.
-Why they decided to use it: Interest in peer skill exchange and the Cardano ecosystem.
-What they paid for: The 2 ADA swap initiation fee to request a skill exchange with another user.
-What happened after: Swap entered PENDING status, receiver notified, exchange coordination began in encrypted chat.
+Who the user is: Michael, a student from MetaC — a tech education initiative that teaches teenagers and adults web development, mobile application development, and graphic design.
+
+How they found the product: Daniel (the builder) volunteers at Metac as an instructor. Students in the program were introduced to SkillSwap directly as part of their learning journey.
+
+Why they decided to use it: Michael and Daniel(the builder) already had complementary skills. Rather than a traditional teaching setup, they used SkillSwap to formalize the exchange — each teaching the other something of value, with the transaction recorded on-chain.
+
+What they paid for: The 2 ADA swap initiation fee on Cardano mainnet to request a skill exchange.
+
+What happened after: The swap was initiated, both parties coordinated via encrypted chat, submitted deliverables, confirmed completion, and an on-chain proof record was anchored to Cardano mainnet.
+
+Community evidence (Metac platform):
+- Metac Instagram: https://www.instagram.com/metac_online/
+- Supporting proof 1: https://www.instagram.com/p/DYhHzufM5wo/
+- Supporting proof 2: https://www.instagram.com/p/DaGZb8dObiy/
+- Supporting proof 3: https://www.instagram.com/p/DR7lVPJDBww/
 
 ---
 
@@ -189,7 +202,7 @@ What happened after: Swap entered PENDING status, receiver notified, exchange co
 Project name: SkillSwap
 Repo: https://github.com/devfreeguy/skill-swap
 Live product: https://myskillswap.xyz
-Demo video link: [TO BE ADDED]
+Demo video link: https://ody.sh/QfDMSrwp3R
 X account: @myskillswap
 
 Weekly update posts:
@@ -207,6 +220,5 @@ Weekly update posts:
 - Week 12: https://x.com/devfreeguy/status/2078080614448697618
 
 Optional track evidence:
-Cardano: CIP-8 wallet auth, 2 ADA swap fee with automatic refund on decline, on-chain proof anchoring via Blockfrost/Koios/Maestro — mainnet tx links to be added after first transactions
-Real User: ~5 active mainnet users — blockchain payment records to be added after first completed swaps
-Feedback: Not pursuing
+Cardano: CIP-8 wallet auth, 2 ADA swap fee with automatic refund on decline, on-chain proof anchoring — https://cardanoscan.io/transaction/350fa8c06384318df4492067bafdf27d9fe0480d8288309ee7abecbb8a268d62
+Real User: Michael (Metac student) — paid 2 ADA on mainnet, completed swap, proof anchored on-chain. Metac community: https://www.instagram.com/metac_online/
