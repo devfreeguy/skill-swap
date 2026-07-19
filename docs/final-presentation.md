@@ -6,7 +6,7 @@
 
 - Project name: SkillSwap
 - Presenter name: Daniel
-- Track(s) pursued: Builder Pie, Cardano Pie, Real User Pie
+- Track(s) pursued: Cardano Pie, Real User Pie
 
 ---
 
